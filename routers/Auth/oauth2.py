@@ -17,6 +17,6 @@ async def get_current_user_bearer(token: str = Depends(oauth2_scheme)) -> UserPu
 async def get_current_user_cookie(token: str = Depends(api_key_cookie)) -> UserPublic:
 
     if not token:
-        return UserPublic(id='-1', email='Guest.01@hayla.com', name='Guest', role='Guest', active=False)
+        return UserPublic(id='-1', email='Guest.NONE', name='Guest', role='NONE', active=False)
 
     return AuthToken().verify_token(token)

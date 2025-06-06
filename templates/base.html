@@ -63,7 +63,7 @@
 
             <!-- [ Sidebar Menu - Dashboard ] start -->
             <li class="pc-item">
-              <a href="#" class="pc-link">
+              <a href="/dashboard" class="pc-link">
                 <span class="pc-micon"><i class="ti ti-dashboard"></i></span>
                 <span class="pc-mtext">Dashboard</span>
               </a>
@@ -78,7 +78,7 @@
             </li>
 
             <li class="pc-item">
-              <a href="#" class="pc-link">
+              <a href="/calendar" class="pc-link">
                 <span class="pc-micon"><i class="ti ti-calendar-time"></i></span>
                 <span class="pc-mtext">Calendar</span>
               </a>
@@ -87,59 +87,67 @@
 
 
             <!-- [ Sidebar Menu - Operation ] start -->
-            <li class="pc-item pc-caption">
-              <label>Operation</label>
-              <i class="ti ti-table"></i>
-            </li>
+            {% if user.role in ['Admin', 'Staff'] %}
+              <li class="pc-item pc-caption">
+                <label>Operation</label>
+                <i class="ti ti-table"></i>
+              </li>
 
-            <li class="pc-item">
-              <a href="#" class="pc-link">
-                <span class="pc-micon"><i class="ti ti-table"></i></span>
-                <span class="pc-mtext">Raw ingredient</span>
-              </a>
-            </li>
+              <li class="pc-item">
+                <a href="#" class="pc-link">
+                  <span class="pc-micon"><i class="ti ti-table"></i></span>
+                  <span class="pc-mtext">Inventory</span>
+                </a>
+              </li>
 
-            <li class="pc-item">
-              <a href="#" class="pc-link">
-                <span class="pc-micon"><i class="ti ti-table"></i></span>
-                <span class="pc-mtext">Processed ingredient</span>
-              </a>
-            </li>
+              <li class="pc-item">
+                <a href="#" class="pc-link">
+                  <span class="pc-micon"><i class="ti ti-table"></i></span>
+                  <span class="pc-mtext">Ingredient usage</span>
+                </a>
+              </li>
 
-            <li class="pc-item">
-              <a href="#" class="pc-link">
-                <span class="pc-micon"><i class="ti ti-table"></i></span>
-                <span class="pc-mtext">Recipes</span>
-              </a>
-            </li>
+              <li class="pc-item">
+                <a href="#" class="pc-link">
+                  <span class="pc-micon"><i class="ti ti-table"></i></span>
+                  <span class="pc-mtext">Drinks</span>
+                </a>
+              </li>
 
-            <li class="pc-item">
-              <a href="#" class="pc-link">
-                <span class="pc-micon"><i class="ti ti-table"></i></span>
-                <span class="pc-mtext">Drinks</span>
-              </a>
-            </li>
+              <li class="pc-item">
+                <a href="#" class="pc-link">
+                  <span class="pc-micon"><i class="ti ti-table"></i></span>
+                  <span class="pc-mtext">Recipes</span>
+                </a>
+              </li>
 
-            <li class="pc-item">
-              <a href="#" class="pc-link">
-                <span class="pc-micon"><i class="ti ti-table"></i></span>
-                <span class="pc-mtext">Fixed cost</span>
-              </a>
-            </li>
+              <li class="pc-item">
+                <a href="#" class="pc-link">
+                  <span class="pc-micon"><i class="ti ti-table"></i></span>
+                  <span class="pc-mtext">Raw ingredient</span>
+                </a>
+              </li>
 
-            <li class="pc-item">
-              <a href="#" class="pc-link">
-                <span class="pc-micon"><i class="ti ti-table"></i></span>
-                <span class="pc-mtext">Ingredient usage</span>
-              </a>
-            </li>
+              <li class="pc-item">
+                <a href="#" class="pc-link">
+                  <span class="pc-micon"><i class="ti ti-table"></i></span>
+                  <span class="pc-mtext">Processed ingredient</span>
+                </a>
+              </li>
 
-            <li class="pc-item">
-              <a href="#" class="pc-link">
-                <span class="pc-micon"><i class="ti ti-table"></i></span>
-                <span class="pc-mtext">Inventory</span>
-              </a>
-            </li>
+              {% if user.role in ['Admin'] %}
+
+                <li class="pc-item">
+                  <a href="#" class="pc-link">
+                    <span class="pc-micon"><i class="ti ti-table"></i></span>
+                    <span class="pc-mtext">Fixed cost</span>
+                  </a>
+                </li>
+
+              {% endif %}
+
+
+            {% endif %}
             <!-- [ Sidebar Menu - Operation ] end -->
 
           </ul>
@@ -212,7 +220,7 @@
 
           <ul class="list-unstyled">
 
-            {% if user.role != 'Guest' %}
+            {% if user.role != 'NONE' %}
 
               <!-- ======= Notification ===== -->
               <li class="dropdown pc-h-item">
@@ -422,17 +430,17 @@
                     </div>
                     <div class="flex-grow-1 ms-3">
                       <h6 class="mb-1">{{ user.name if user else 'Guest' }}</h6>
-                      <span>{{ user.role if user else 'Guest' }}</span>
+                      <span>{{ user.role if user else 'NONE' }}</span>
                     </div>
 
-                    {% if user.role != 'Guest' %}
+                    {% if user.role != 'NONE' %}
                       <a href="/logout" class="pc-head-link bg-transparent"><i class="ti ti-power text-danger"></i></a>
                     {% endif %}
 
                   </div>
                 </div>
 
-                {% if user.role == 'Guest' %}
+                {% if user.role == 'NONE' %}
 
                   <div class="dropdown-divider"></div>
 
@@ -558,9 +566,7 @@
         <div class="page-header">
           <div class="page-block">
             <div class="row align-items-center">
-              <div class="col-md-12">
-                {% block breadcrumb %}{% endblock %}
-              </div>
+              {% block breadcrumb %}{% endblock %}
             </div>
           </div>
         </div>
@@ -596,11 +602,8 @@
     {% endblock %}
 
 
+    {% block charting_scripts %}{% endblock %}
 
-<!--    &lt;!&ndash; [Page Specific JS] start &ndash;&gt;-->
-<!--    <script src="{{ request.url_for('static', path='js/plugins/apexcharts.min.js') }}"></script>-->
-<!--    <script src="{{ request.url_for('static', path='js/pages/dashboard-default.js') }}"></script>-->
-<!--    &lt;!&ndash; [Page Specific JS] end &ndash;&gt;-->
 
     <!-- Required Js -->
     <script src="{{ request.url_for('static', path='js/plugins/popper.min.js') }}"></script>
@@ -616,7 +619,7 @@
     <script>preset_change("preset-1");</script>
     <script>font_change("Public-Sans");</script>
 
-     {% block extra_scripts %}{% endblock %}
+    {% block extra_scripts %}{% endblock %}
 
   </body>
   <!-- [Body] end -->

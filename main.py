@@ -20,10 +20,6 @@ templates = Jinja2Templates(directory='templates')
 
 
 
-
-
-
-
 @app.get('/', response_class=HTMLResponse)
 async def home(request: Request, current_user: UserPublic = Depends(get_current_user_cookie)):
     return templates.TemplateResponse('/home.html', {
@@ -33,10 +29,21 @@ async def home(request: Request, current_user: UserPublic = Depends(get_current_
 
 
 
+@app.get('/dashboard', response_class=HTMLResponse)
+async def home(request: Request, current_user: UserPublic = Depends(get_current_user_cookie)):
+    return templates.TemplateResponse('/dashboard/index.html', {
+        'request': request,
+        'user': current_user.model_dump(),
+    })
 
 
 
-
+@app.get('/calendar', response_class=HTMLResponse)
+async def home(request: Request, current_user: UserPublic = Depends(get_current_user_cookie)):
+    return templates.TemplateResponse('/application/calendar.html', {
+        'request': request,
+        'user': current_user.model_dump(),
+    })
 
 
 

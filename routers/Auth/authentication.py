@@ -42,7 +42,7 @@ async def login_post(request: Request, email: str = Form(...), password: str = F
 
     access_token = AuthToken().create_access_token(
         data=crud_user.get_public_user().model_dump(),
-        expires_minutes=5
+        expires_minutes=15
     )
 
     response = RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
