@@ -1,0 +1,104 @@
+<!-- Load template html -->
+{% extends "./base.html" %}
+
+<!-- Title -->
+{% block title %}Processed Ingredient | Haylà{% endblock %}
+
+
+<!-- [ breadcrumb ] start -->
+{% block breadcrumb %}
+<div class="col-md-12">
+  <ul class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/">Home</a></li>
+    <li class="breadcrumb-item"><a href="javascript: void(0)">Operation</a></li>
+    <li class="breadcrumb-item" aria-current="page">Processed ingredient</li>
+  </ul>
+</div>
+
+<div class="col-md-12">
+  <div class="page-header-title">
+    <h2 class="mb-0">Processed ingredient</h2>
+  </div>
+</div>
+{% endblock %}
+<!-- [ breadcrumb ] end -->
+
+
+<!-- [ Main Content ] start -->
+{% block main_content %}
+<div class="text-end p-4 pb-0 mb-4">
+  <a href="#" class="btn btn-primary d-inline-flex align-item-center" data-bs-toggle="modal" data-bs-target="#user-edit_add-modal">
+    <i class="ti ti-plus f-18"></i> Add processed ingredient
+  </a>
+</div>
+
+<div class="row">
+
+  {% for pro_igr in lst_processed_ingredient %}
+
+    <div class="col-sm-6">
+      <div class="card table-card">
+        <div class="card-body">
+
+          <h4 class="m-2">
+            <span class="badge bg-green-500">{{ pro_igr.Processed_Ingredient_ID }}</span>
+            <span class="badge bg-light-success border border-success">{{ pro_igr.Processed_Ingredient_Name }}</span>
+          </h4>
+
+          <ul class="mb-0">
+            <li>
+              Can use <span class="badge bg-light-success f-14">{{ pro_igr.Used_Quanty }}</span> times
+            </li>
+
+            <li>
+              Total cost <span class="badge bg-light-success f-14">{{ pro_igr.Used_Quanty }}</span> VND
+            </li>
+
+          </ul>
+
+
+
+
+          <div class="table-responsive">
+            <table class="table table-hover" id="dt-processed-ingredient">
+
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>R-ID</th>
+                  <th>R-Name</th>
+                  <th>R-Quanty</th>
+                  <th>R-Unit</th>
+                  <th>R-Cost Per Unit (VND)</th>
+                </tr>
+              </thead>
+
+              <tbody>
+
+                {% for item in pro_igr.Raw_Ingredients %}
+                  <tr data-id="{{ pro_igr.Processed_Ingredient_ID }}">
+                    <td><div class="form-check"><input class="form-check-input" type="checkbox"></div></td>
+                    <td>{{ item.Raw_Ingredient_ID }}</td>
+                    <td>{{ item.Raw_Ingredient_Name }}</td>
+                    <td>{{ item.Raw_Ingredient_Quanty }}</td>
+                    <td>{{ item.Unit }}</td>
+                    <td>{{ "{:,}".format(item.Cost_Per_Unit) }}</td>
+                  </tr>
+                {% endfor %}
+
+              </tbody>
+
+            </table>
+          </div>
+
+
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+
+
+{% endblock %}
+<!-- [ Main Content ] end -->

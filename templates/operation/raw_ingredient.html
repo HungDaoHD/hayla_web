@@ -1,0 +1,169 @@
+<!-- Load template html -->
+{% extends "./base.html" %}
+
+<!-- Title -->
+{% block title %}Raw Ingredient | Haylà{% endblock %}
+
+
+<!-- [ breadcrumb ] start -->
+{% block breadcrumb %}
+<div class="col-md-12">
+  <ul class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/">Home</a></li>
+    <li class="breadcrumb-item"><a href="javascript: void(0)">Operation</a></li>
+    <li class="breadcrumb-item" aria-current="page">Raw ingredient</li>
+  </ul>
+</div>
+
+<div class="col-md-12">
+  <div class="page-header-title">
+    <h2 class="mb-0">Raw ingredient</h2>
+  </div>
+</div>
+{% endblock %}
+<!-- [ breadcrumb ] end -->
+
+
+<!-- [ Main Content ] start -->
+{% block main_content %}
+<div class="row">
+  <div class="col-sm-12">
+    <div class="card table-card">
+      <div class="card-body">
+
+        <div class="text-end p-4 pb-0 mb-3">
+          <a href="#" class="btn btn-primary d-inline-flex align-item-center" data-bs-toggle="modal" data-bs-target="#user-edit_add-modal">
+            <i class="ti ti-plus f-18"></i> Add raw ingredient
+          </a>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-hover" id="dt-raw-ingredient">
+
+            <thead>
+              <tr>
+                <th></th>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Quanty</th>
+                <th>Unit</th>
+                <th>Cost (VND)</th>
+                <th>Cost Per an Uint (VND)</th>
+              </tr>
+            </thead>
+
+            <tbody>
+
+              {% for raw_igr in lst_raw_ingredient %}
+
+                <tr data-id="{{ raw_igr.Raw_Ingredient_ID }}">
+                  <td><div class="form-check"><input class="form-check-input" type="checkbox"></div></td>
+                  <td>{{ raw_igr.Raw_Ingredient_ID }}</td>
+                  <td>{{ raw_igr.Raw_Ingredient_Name }}</td>
+                  <td>{{ "{:,}".format(raw_igr.Quanty) }}</td>
+                  <td>{{ raw_igr.Unit }}</td>
+                  <td>{{ "{:,}".format(raw_igr.Cost) }}</td>
+                  <td>{{ "{:,}".format(raw_igr.Cost_Per_Unit) }}</td>
+                </tr>
+
+              {% endfor %}
+            </tbody>
+
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+<!-- [ Main Content ] end -->
+
+
+
+<!--{% block extra_scripts %}-->
+<!--Latest 3.x version from jQuery CDN-->
+<!--<script src="https://code.jquery.com/jquery-3.6.4.min.js"-->
+<!--  integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8="-->
+<!--  crossorigin="anonymous">-->
+<!--</script>-->
+
+<!--<script>-->
+<!--  $(function() {-->
+<!--    $('#dt-raw-ingredient').on('click', '.status-btn', function(e) {-->
+<!--      e.preventDefault();-->
+
+<!--      const btn = $(this);-->
+<!--      const row = btn.closest('tr');-->
+<!--      const user_id = row.data('id');-->
+<!--      const payload = {-->
+<!--        active: row.data('active'),-->
+<!--      };-->
+
+<!--      $.ajax({-->
+<!--        url: `user/${user_id}/toggle_status`,-->
+<!--        type: 'POST',-->
+<!--        contentType: 'application/json',-->
+<!--        data: JSON.stringify(payload),-->
+
+<!--        success: function(resp) {-->
+
+<!--          row.data('active', resp.active);-->
+
+<!--          const badge = btn.closest('tr').find('td:nth-child(4) .badge');-->
+<!--          const icon = btn.find('i');-->
+
+<!--          if (resp.active == true) {-->
+
+<!--            badge-->
+<!--              .removeClass('bg-light-warning')-->
+<!--              .addClass('bg-light-success')-->
+<!--              .text('Active');-->
+
+<!--            btn-->
+<!--              .removeClass('btn-outline-success')-->
+<!--              .addClass('btn-outline-danger');-->
+
+<!--            icon-->
+<!--              .removeClass('ti-circle-check')-->
+<!--              .addClass('ti-circle-x');-->
+
+<!--            alert(`${resp.email} is active!`);-->
+
+<!--          } else {-->
+
+<!--            badge-->
+<!--              .removeClass('bg-light-success')-->
+<!--              .addClass('bg-light-warning')-->
+<!--              .text('Inactive');-->
+
+<!--            btn-->
+<!--              .removeClass('btn-outline-danger')-->
+<!--              .addClass('btn-outline-success');-->
+
+<!--            icon-->
+<!--              .removeClass('ti-circle-x')-->
+<!--              .addClass('ti-circle-check');-->
+
+<!--            alert(`${resp.email} is inactive!`);-->
+<!--          }-->
+
+<!--        },-->
+
+<!--        error: function(xhr, status, err) {-->
+<!--          console.error(err);-->
+<!--          alert('Could not update status. Please try again.');-->
+<!--        }-->
+<!--      });-->
+<!--    });-->
+<!--  });-->
+<!--</script>-->
+
+<!--{% endblock %}-->
+
+
+
+
+
+
+

@@ -2,16 +2,20 @@ from fastapi import FastAPI, Request, Depends, status
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.exception_handlers import http_exception_handler as fastapi_http_exception_handler
+from starlette.exceptions import HTTPException as StarletteHTTPException
+from urllib.parse import quote
 
-
-
-from routers.Auth import authentication
-from routers.Auth.oauth2 import get_current_user_cookie
-from routers.Auth.auth_token import UserPublic
+from routers.auth import authentication
+from routers.auth.oauth2 import UserPublic, get_current_user_cookie, validate_current_user_cookie
+from routers.administration import users
+from routers.operation import operation
 
 
 app = FastAPI()
 app.include_router(authentication.router)
+app.include_router(users.router)
+app.include_router(operation.router)
 
 
 app.mount('/static', StaticFiles(directory='static'), name='static')
@@ -21,8 +25,11 @@ templates = Jinja2Templates(directory='templates')
 
 
 @app.get('/', response_class=HTMLResponse)
-async def home(request: Request, current_user: UserPublic = Depends(get_current_user_cookie)):
-    return templates.TemplateResponse('/home.html', {
+async def home(request: Request):
+
+    current_user: UserPublic = await validate_current_user_cookie(request)
+
+    return templates.TemplateResponse('home.html', {
         'request': request,
         'user': current_user.model_dump(),
     })
@@ -30,8 +37,8 @@ async def home(request: Request, current_user: UserPublic = Depends(get_current_
 
 
 @app.get('/dashboard', response_class=HTMLResponse)
-async def home(request: Request, current_user: UserPublic = Depends(get_current_user_cookie)):
-    return templates.TemplateResponse('/dashboard/index.html', {
+async def dashboard(request: Request, current_user: UserPublic = Depends(get_current_user_cookie)):
+    return templates.TemplateResponse('dashboard/index.html', {
         'request': request,
         'user': current_user.model_dump(),
     })
@@ -39,8 +46,8 @@ async def home(request: Request, current_user: UserPublic = Depends(get_current_
 
 
 @app.get('/calendar', response_class=HTMLResponse)
-async def home(request: Request, current_user: UserPublic = Depends(get_current_user_cookie)):
-    return templates.TemplateResponse('/application/calendar.html', {
+async def calendar(request: Request, current_user: UserPublic = Depends(get_current_user_cookie)):
+    return templates.TemplateResponse('application/calendar.html', {
         'request': request,
         'user': current_user.model_dump(),
     })
@@ -53,24 +60,19 @@ async def home(request: Request, current_user: UserPublic = Depends(get_current_
 
 
 
-@app.exception_handler(status.HTTP_404_NOT_FOUND)
-async def custom_404_handler(request: Request, _):
-    # print('HTTP_404_NOT_FOUND')
-    return templates.TemplateResponse('pages/error-404.html', {'request': request}, status_code=404)
+@app.exception_handler(StarletteHTTPException)
+async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
+    # If it’s a 401 (Unauthorized) or 403 (Forbidden), redirect to /login
+    if exc.status_code in (401, 403):
+        return RedirectResponse(url=f"/login?error={quote(exc.detail)}")
+
+    # 404 (Not Found)
+    if exc.status_code == 404:
+        return templates.TemplateResponse('pages/error-404.html', {'request': request}, status_code=404)
 
 
-
-@app.exception_handler(status.HTTP_403_FORBIDDEN)
-async def custom_403_handler(_, __):
-    # print('HTTP_403_FORBIDDEN')
-    return RedirectResponse('/login', status_code=status.HTTP_403_FORBIDDEN)
-
-
-
-@app.exception_handler(status.HTTP_401_UNAUTHORIZED)
-async def custom_401_handler(_, __):
-    # print('HTTP_401_UNAUTHORIZED')
-    return RedirectResponse('/login', status_code=status.HTTP_401_UNAUTHORIZED)
+    # Otherwise, fall back to FastAPI’s default HTTP‐exception handler
+    return await fastapi_http_exception_handler(request, exc)
 
 
 

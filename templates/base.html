@@ -122,14 +122,14 @@
               </li>
 
               <li class="pc-item">
-                <a href="#" class="pc-link">
+                <a href="/operation/raw_ingredient" class="pc-link">
                   <span class="pc-micon"><i class="ti ti-table"></i></span>
                   <span class="pc-mtext">Raw ingredient</span>
                 </a>
               </li>
 
               <li class="pc-item">
-                <a href="#" class="pc-link">
+                <a href="/operation/processed_ingredient" class="pc-link">
                   <span class="pc-micon"><i class="ti ti-table"></i></span>
                   <span class="pc-mtext">Processed ingredient</span>
                 </a>
@@ -149,6 +149,24 @@
 
             {% endif %}
             <!-- [ Sidebar Menu - Operation ] end -->
+
+
+            <!-- [ Sidebar Menu - Administration ] start -->
+            {% if user.role == 'Admin' %}
+              <li class="pc-item pc-caption">
+                <label>Administration</label>
+                <i class="ti ti-users"></i>
+              </li>
+
+              <li class="pc-item">
+                <a href="/administration/users" class="pc-link">
+                  <span class="pc-micon"><i class="ti ti-users"></i></span>
+                  <span class="pc-mtext">Users</span>
+                </a>
+              </li>
+            {% endif %}
+            <!-- [ Sidebar Menu - Administration ] end -->
+
 
           </ul>
         </div>
@@ -214,7 +232,6 @@
           </ul>
         </div>
         <!-- [Mobile Media Block end] -->
-
 
         <div class="ms-auto">
 
@@ -401,55 +418,40 @@
                 </div>
               </li>
 
-            {% endif %}
+              <!-- ======= User information ===== -->
+              <li class="dropdown pc-h-item header-user-profile">
 
-            <!-- ======= User information ===== -->
-            <li class="dropdown pc-h-item header-user-profile">
+                <!-- ======= User information unclicked ===== -->
+                <a
+                  class="pc-head-link dropdown-toggle arrow-none me-0"
+                  data-bs-toggle="dropdown"
+                  href="#"
+                  role="button"
+                  aria-haspopup="false"
+                  data-bs-auto-close="outside"
+                  aria-expanded="false"
+                >
+                  <img src="{{ request.url_for('static', path='images/user/avatar-0.jpg') }}" alt="user-image" class="user-avtar">
+                  <span>{{ user.firstname + ' ' + user.lastname  if user else 'Guest' }}</span>
+                </a>
 
-              <!-- ======= User information unclicked ===== -->
-              <a
-                class="pc-head-link dropdown-toggle arrow-none me-0"
-                data-bs-toggle="dropdown"
-                href="#"
-                role="button"
-                aria-haspopup="false"
-                data-bs-auto-close="outside"
-                aria-expanded="false"
-              >
-                <img src="{{ request.url_for('static', path='images/user/avatar-0.jpg') }}" alt="user-image" class="user-avtar">
-                <span>{{ user.name if user else 'Guest' }}</span>
-              </a>
+                <!-- ======= User information clicked ===== -->
+                <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
 
-              <!-- ======= User information clicked ===== -->
-              <div class="dropdown-menu dropdown-user-profile dropdown-menu-end pc-h-dropdown">
+                  <div class="dropdown-header">
+                    <div class="d-flex mb-1">
+                      <div class="flex-shrink-0">
+                        <img src="{{ request.url_for('static', path='images/user/avatar-0.jpg') }}" alt="user-image" class="user-avtar wid-35">
+                      </div>
+                      <div class="flex-grow-1 ms-3">
+                        <h6 class="mb-1">{{ user.firstname + ' ' + user.lastname  if user else 'Guest' }}</h6>
+                        <span>{{ user.role if user else 'NONE' }}</span>
+                      </div>
 
-                <div class="dropdown-header">
-                  <div class="d-flex mb-1">
-                    <div class="flex-shrink-0">
-                      <img src="{{ request.url_for('static', path='images/user/avatar-0.jpg') }}" alt="user-image" class="user-avtar wid-35">
-                    </div>
-                    <div class="flex-grow-1 ms-3">
-                      <h6 class="mb-1">{{ user.name if user else 'Guest' }}</h6>
-                      <span>{{ user.role if user else 'NONE' }}</span>
-                    </div>
-
-                    {% if user.role != 'NONE' %}
                       <a href="/logout" class="pc-head-link bg-transparent"><i class="ti ti-power text-danger"></i></a>
-                    {% endif %}
 
+                    </div>
                   </div>
-                </div>
-
-                {% if user.role == 'NONE' %}
-
-                  <div class="dropdown-divider"></div>
-
-                  <a href="/login" class="dropdown-item">
-                    <i class="ti ti-login"></i>
-                    <span>Login</span>
-                  </a>
-
-                {% else %}
 
                   <ul class="nav drp-tabs nav-fill nav-tabs" id="mydrpTab" role="tablist">
 
@@ -544,11 +546,23 @@
                     </div>
                   </div>
 
-                {% endif %}
 
+                </div>
+              </li>
 
-              </div>
-            </li>
+            {% else %}
+
+              <li class="pc-h-item">
+
+                <a href="/login" class="dropdown-item">
+                  <i class="ti ti-login"></i>
+                  <span>Login</span>
+                </a>
+
+              </li>
+
+            {% endif %}
+
           </ul>
         </div>
       </div>

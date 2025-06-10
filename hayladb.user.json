@@ -1,0 +1,33 @@
+[{
+  "_id": {
+    "$oid": "684119fdefa1e7442ce11e69"
+  },
+  "email": "hungdao1991@live.com",
+  "firstname": "Hung",
+  "lastname": "Dao",
+  "hashed_password": "$2b$14$UE4x2ehE6WDx3SyXmfPdqOQLgiJasbgyG7lcSNrXL9m.Nq0T7sEzC",
+  "role": "Admin",
+  "active": true
+},
+{
+  "_id": {
+    "$oid": "68411ca8eafa416468a445e6"
+  },
+  "email": "hungdao.staff@hayla.com",
+  "firstname": "Hung",
+  "lastname": "Staff",
+  "hashed_password": "$2b$14$UE4x2ehE6WDx3SyXmfPdqOQLgiJasbgyG7lcSNrXL9m.Nq0T7sEzC",
+  "role": "Staff",
+  "active": false
+},
+{
+  "_id": {
+    "$oid": "68411d0eeafa416468a445e7"
+  },
+  "email": "hungdao.guest@hayla.com",
+  "firstname": "Hung",
+  "lastname": "Guest",
+  "hashed_password": "$2b$14$UE4x2ehE6WDx3SyXmfPdqOQLgiJasbgyG7lcSNrXL9m.Nq0T7sEzC",
+  "role": "Guest",
+  "active": false
+}]
