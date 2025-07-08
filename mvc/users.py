@@ -1,13 +1,17 @@
 from pydantic import BaseModel, EmailStr, Field
-from typing import Optional
+from typing import Optional, Literal
 from bson import ObjectId
 from pymongo import ReturnDocument
+from datetime import datetime
 
 from fastapi import HTTPException
 from fastapi.encoders import jsonable_encoder
 
-from routers.auth.password_hashing import PasswordHashing
 from mvc.database import mongo_db
+from routers.auth.password_hashing import PasswordHashing
+
+
+
 
 
 
@@ -19,11 +23,16 @@ class UserInDB(BaseModel):
     hashed_password: str
     role: str = 'Guest'
     active: bool = False
+    location: str
+    last_login: datetime
 
     model_config = {
         'populate_by_name': True,
         'arbitrary_types_allowed': True,
-        'json_encoders': {ObjectId: lambda oid: str(oid)},
+        'json_encoders': {
+            ObjectId: lambda oid: str(oid),
+            datetime: lambda dt: dt.strftime("%d/%m/%Y/ %H:%M"),
+        },
     }
 
 
@@ -35,26 +44,16 @@ class UserPublic(BaseModel):
     lastname: str
     role: str = 'Guest'
     active: bool = False
+    location: str
+    last_login: datetime
 
     model_config = {
         'from_attributes': True,
-        'json_encoders': {ObjectId: lambda oid: str(oid)},
+        'json_encoders': {
+            ObjectId: lambda oid: str(oid),
+            datetime: lambda dt: dt.strftime("%d/%m/%Y %H:%M"),
+        },
     }
-
-
-    # @classmethod
-    # def convert(cls, data: dict) -> 'UserPublic':
-    #
-    #     user = UserPublic(
-    #         id=str(data['_id']),
-    #         email=data['email'],
-    #         firstname=data['firstname'],
-    #         lastname=data['lastname'],
-    #         role=data['role'],
-    #         active=data['active'],
-    #     )
-    #
-    #     return user
 
 
 
@@ -63,6 +62,9 @@ class UserUpdate(BaseModel):
     lastname: str | None = None
     role: str | None = None
     active: bool | None = None
+    location: str | None = None
+    last_login: datetime | None = None
+
 
 
 
@@ -104,6 +106,11 @@ class CrudUser:
 
         if not self.user.active:
             return False, 'Email is not active, please contact admin to activate it'
+
+
+        # Update last login datetime
+        await self.update_user(self.user.id, UserUpdate(last_login=datetime.now()))
+
 
         return self.user
 

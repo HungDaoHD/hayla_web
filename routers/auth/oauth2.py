@@ -1,3 +1,4 @@
+from datetime import datetime
 from fastapi.security import OAuth2PasswordBearer, APIKeyCookie
 from fastapi import Depends, Request, HTTPException, status
 
@@ -26,7 +27,17 @@ async def validate_current_user_cookie(request: Request) -> UserPublic:
         return await get_current_user_cookie(request.cookies.get("access_token"))
 
     else:
-        return UserPublic(id='-1', email='Guest.NONE', firstname='Guest', lastname='None', role='NONE', active=False)
+        return UserPublic(
+            id='-1',
+            email='Guest.NONE',
+            firstname='Guest',
+            lastname='None',
+            role='NONE',
+            active=False,
+            location='SGN',
+            last_login=datetime.now()
+        )
+
 
 
 def require_role(role: list):

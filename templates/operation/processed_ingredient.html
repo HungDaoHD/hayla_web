@@ -1,8 +1,10 @@
 <!-- Load template html -->
 {% extends "./base.html" %}
 
+{% set str_title = 'Processed Ingredient' %}
+
 <!-- Title -->
-{% block title %}Processed Ingredient | Haylà{% endblock %}
+{% block title %} {{ str_title ~ ' | Haylà' }} {% endblock %}
 
 
 <!-- [ breadcrumb ] start -->
@@ -11,13 +13,13 @@
   <ul class="breadcrumb">
     <li class="breadcrumb-item"><a href="/">Home</a></li>
     <li class="breadcrumb-item"><a href="javascript: void(0)">Operation</a></li>
-    <li class="breadcrumb-item" aria-current="page">Processed ingredient</li>
+    <li class="breadcrumb-item" aria-current="page">{{ str_title }}</li>
   </ul>
 </div>
 
 <div class="col-md-12">
   <div class="page-header-title">
-    <h2 class="mb-0">Processed ingredient</h2>
+    <h2 class="mb-0">{{ str_title }}</h2>
   </div>
 </div>
 {% endblock %}
@@ -28,77 +30,350 @@
 {% block main_content %}
 <div class="text-end p-4 pb-0 mb-4">
   <a href="#" class="btn btn-primary d-inline-flex align-item-center" data-bs-toggle="modal" data-bs-target="#user-edit_add-modal">
-    <i class="ti ti-plus f-18"></i> Add processed ingredient
+    <i class="ti ti-plus f-18"></i> Add
   </a>
 </div>
 
+<!-- [Main table] start -->
+
 <div class="row">
+  <div class="col-sm-12">
+    <div class="card table-card">
 
-  {% for pro_igr in lst_processed_ingredient %}
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover table-sm" id="dt-processed-ingredient">
 
-    <div class="col-sm-6">
-      <div class="card table-card">
-        <div class="card-body">
+            <thead>
+              <tr>
+                <th>Item Name</th>
+                <th>Quanty</th>
 
-          <h4 class="m-2">
-            <span class="badge bg-green-500">{{ pro_igr.Processed_Ingredient_ID }}</span>
-            <span class="badge bg-light-success border border-success">{{ pro_igr.Processed_Ingredient_Name }}</span>
-          </h4>
+                {% if user.role.lower() == 'admin' %}
+                  <th>Total Cost</th>
+                  <th>Cost per Unit</th>
+                {% endif %}
 
-          <ul class="mb-0">
-            <li>
-              Can use <span class="badge bg-light-success f-14">{{ pro_igr.Used_Quanty }}</span> times
-            </li>
+                <th></th>
+              </tr>
+            </thead>
 
-            <li>
-              Total cost <span class="badge bg-light-success f-14">{{ pro_igr.Used_Quanty }}</span> VND
-            </li>
+            <tbody>
+              {% for pro_igr in lst_processed_ingredient %}
 
-          </ul>
+                <tr data-id="{{ pro_igr.Processed_Ingredient_ID }}" data-index="{{ loop.index0 }}">
 
+                  <td>
+                    <div class="row">
+                      <div class="col">
+                        <h6 class="mb-0">{{ pro_igr.Processed_Ingredient_Name }}</h6>
+                        <p class="text-muted f-12 mb-0">{{ pro_igr.Processed_Ingredient_ID }}</p>
+                      </div>
+                    </div>
+                  </td>
 
+                  <td>{{ "{:,.0f}".format(pro_igr.Quanty) }} <span class="text-muted f-12 mb-0">{{ pro_igr.Unit }}</span></td>
 
+                  {% if user.role.lower() == 'admin' %}
+                    <td>{{ "{:,.0f}".format(pro_igr.Total_Cost) }} <span class="text-muted f-12 mb-0">đ</span></td>
+                    <td>{{ "{:,.0f}".format(pro_igr.Cost_Per_Unit) }} <span class="text-muted f-12 mb-0">đ / {{ pro_igr.Unit }}</span></td>
+                  {% endif %}
 
-          <div class="table-responsive">
-            <table class="table table-hover" id="dt-processed-ingredient">
+                  <td>
+                    <ul class="list-inline me-auto mb-0">
+                      <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="View">
+                        <a href="#" class="avtar avtar-xs btn-link-secondary pig-view-btn"> <!-- data-bs-toggle="modal" data-bs-target="#pig-view-modal" -->
+                          <i class="ti ti-eye f-18"></i>
+                        </a>
+                      </li>
+                      <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Edit">
+                        <a href="#" class="avtar avtar-xs btn-link-primary">
+                          <i class="ti ti-edit-circle f-18"></i>
+                        </a>
+                      </li>
+                      <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Delete">
+                        <a href="#" class="avtar avtar-xs btn-link-danger">
+                          <i class="ti ti-trash f-18"></i>
+                        </a>
+                      </li>
+                    </ul>
+                  </td>
 
-              <thead>
-                <tr>
-                  <th></th>
-                  <th>R-ID</th>
-                  <th>R-Name</th>
-                  <th>R-Quanty</th>
-                  <th>R-Unit</th>
-                  <th>R-Cost Per Unit (VND)</th>
                 </tr>
-              </thead>
 
-              <tbody>
+              {% endfor %}
 
-                {% for item in pro_igr.Raw_Ingredients %}
-                  <tr data-id="{{ pro_igr.Processed_Ingredient_ID }}">
-                    <td><div class="form-check"><input class="form-check-input" type="checkbox"></div></td>
-                    <td>{{ item.Raw_Ingredient_ID }}</td>
-                    <td>{{ item.Raw_Ingredient_Name }}</td>
-                    <td>{{ item.Raw_Ingredient_Quanty }}</td>
-                    <td>{{ item.Unit }}</td>
-                    <td>{{ "{:,}".format(item.Cost_Per_Unit) }}</td>
-                  </tr>
-                {% endfor %}
+            </tbody>
 
-              </tbody>
-
-            </table>
-          </div>
-
+          </table>
 
         </div>
       </div>
     </div>
-  {% endfor %}
+  </div>
 </div>
+<!-- [Main table] end -->
 
 
+<!-- [Modal View] start -->
+<div class="modal fade" id="pig-view-modal" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1" aria-labelledby="pigViewModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h4 class="mb-0 modal-title" id="pigViewModalLabel">Recipe</h4>
+        <a href="#" class="avtar avtar-s btn-link-danger" data-bs-dismiss="modal">
+          <i class="ti ti-x f-20"></i>
+        </a>
+      </div>
+
+      <div class="mx-4 my-4 mt-2 mb-2">
+        <select class="form-select form-select-sm w-auto text-center" name="pig-choice" id="pig-choice">
+          {% for pro_igr in lst_processed_ingredient %}
+            <option data-id="{{ pro_igr.Processed_Ingredient_Name }}" value="{{ loop.index0 }}">{{ pro_igr.Processed_Ingredient_Name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="modal-body">
+
+        <div class="row">
+
+          <!----------------------------------------------------------------------------------------------------------->
+          <div class="col-lg-4">
+
+            <div class="card">
+
+              <div class="card-body position-relative p-1">
+
+                <div class="text-center mt-3">
+
+                  <h4 id="pig-name" class="mb-0">[ PIG NAME ]</h4>
+                  <p id="pig-id" class="text-muted text-sm">[ PIG ID ]</p>
+
+                  <hr class="my-3">
+
+                  <div class="row g-1">
+
+                    <div class="col-{{ 4 if user.role.lower() == 'admin' else 12 }}">
+                      <p id="pig-quanty" class="mb-0">[ xx ]</p>
+                      <small id="pig-unit" class="text-muted">[ xx ]</small>
+                    </div>
+
+                    {% if user.role.lower() == 'admin' %}
+
+                      <div class="col-4 border border-top-0 border-bottom-0">
+                        <p id="pig-total-cost" class="mb-0">[ xx,xxx ]</p>
+                        <small class="text-muted">Total cost</small>
+                      </div>
+
+                      <div class="col-4">
+                        <p id="pig-cost-per-unit" class="mb-0">[ x,xxx ]</p>
+                        <small class="text-muted">Unit cost</small>
+                      </div>
+
+                    {% endif %}
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <!----------------------------------------------------------------------------------------------------------->
+          <div class="col-lg-8">
+
+            <div class="card">
+
+              <div class="card-header p-2">
+                <h4>Raw Ingredient</h4>
+              </div>
+
+              <div class="card-body p-2">
+
+                <div class="table-responsive">
+                  <table class="table table-hover table-sm" id="dt-rig-items">
+
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th class="text-center">Used Quanty</th>
+
+                        {% if user.role.lower() == 'admin' %}
+                          <th class="text-end">Cost</th>
+                        {% endif %}
+                      </tr>
+                    </thead>
+
+                    <tbody>
+
+                    </tbody>
+
+                  </table>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="modal-footer justify-content-between">
+      </div>
+
+    </div>
+  </div>
+</div>
+<!-- [Modal View] end -->
 
 {% endblock %}
 <!-- [ Main Content ] end -->
+
+
+
+
+{% block extra_scripts %}
+
+<!--Latest 3.x version from jQuery CDN-->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"
+  integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8="
+  crossorigin="anonymous">
+</script>
+
+<script src="{{ request.url_for('static', path='js/plugins/choices.min.js') }}"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var genericExamples = document.querySelectorAll('[data-trigger]');
+    for (i = 0; i < genericExamples.length; ++i) {
+      var element = genericExamples[i];
+      new Choices(element, {
+        placeholderValue: 'This is a placeholder set in the config',
+        searchPlaceholderValue: 'This is a search placeholder',
+
+        // turn off all automatic sorting:
+        shouldSort: false,
+        shouldSortItems: false,
+
+      });
+    }
+  });
+</script>
+
+<script>
+  $(function() {
+
+    const pigViewModalEl = document.getElementById('pig-view-modal');
+    const pigViewModal   = new bootstrap.Modal(pigViewModalEl);
+    const js_pigs = JSON.parse('{{ js_pigs | tojson | safe }}');
+
+    const pig_choice = new Choices(document.getElementById('pig-choice'), {
+      allowHTML: true,
+      searchEnabled: true,
+      shouldSort: false,
+      shouldSortItems: false,
+    });
+
+    function populatePigModal(obj_pig) {
+
+      $('#pig-id').text(obj_pig.Processed_Ingredient_ID);
+      $('#pig-name').text(obj_pig.Processed_Ingredient_Name);
+
+      $('#pig-quanty').text(Number(obj_pig.Quanty).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0}));
+      $('#pig-unit').text(obj_pig.Unit);
+
+      $('#pig-total-cost').text(Number(obj_pig.Total_Cost).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0}));
+      $('#pig-cost-per-unit').text(Number(obj_pig.Cost_Per_Unit).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0}));
+
+      $('#dt-rig-items tbody').empty();
+      const tbody = document.querySelector('#dt-rig-items tbody');
+
+      obj_pig.Raw_Ingredients.forEach(item => {
+
+        const tr_rig = document.createElement('tr');
+
+        if (!item.Enable) {
+          tr_rig.classList.add('bg-danger');
+        }
+
+        tr_rig.innerHTML = `
+          <td>
+            <div class="row">
+              <div class="col">
+                <h6 class="mb-0">${item.Raw_Ingredient_Name}</h6>
+                <p class="text-muted f-12 mb-0">${item.Raw_Ingredient_ID}</p>
+              </div>
+            </div>
+          </td>
+
+          <td class="text-center">
+            <div class="row">
+              <div class="col">
+                <p class="mb-0">${Number(item.Raw_Ingredient_Quanty).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</p>
+                <p class="text-muted f-12 mb-0">${item.Unit}</p>
+              </div>
+            </div>
+          </td>
+
+          {% if user.role.lower() == 'admin' %}
+            <td class="text-end">${Number(item.Total_Cost).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})} <span class="text-muted f-12 mb-0">đ</span></td>
+          {% endif %}
+          `;
+
+        tbody.appendChild(tr_rig);
+
+      });
+
+    }
+
+    $('#dt-processed-ingredient').on('click', '.pig-view-btn', function() {
+
+      const $tr = $(this).closest('tr');
+      const obj_pig = js_pigs[parseInt($tr.data('index'))];
+
+      if (obj_pig.Processed_Ingredient_ID !== $tr.data('id')) {
+        alert("Incorrect ID & index");
+        return false;
+      }
+
+      pig_choice.setChoiceByValue($tr.data('index').toString());
+
+      populatePigModal(obj_pig);
+      pigViewModal.show();
+
+      return false; // Prevent scrolling
+    });
+
+    $('#pig-choice').on('change', function() {
+
+      const $opt = $(this).find('option:selected');
+      const obj_pig = js_pigs[parseInt($opt.val())];
+
+      if (obj_pig.Processed_Ingredient_Name !== $opt.text()) {
+        alert("Incorrect ID & index");
+        return false;
+      }
+
+      console.log($opt.text());
+
+      pig_choice.setChoiceByValue($opt.val());
+
+      populatePigModal(obj_pig);
+      pigViewModal.show();
+
+      return false; // Prevent scrolling
+    });
+
+  });
+</script>
+
+{% endblock %}

@@ -22,7 +22,7 @@ async def retrieve_normal_users(request: Request, current_user: UserPublic = Dep
 
     return templates.TemplateResponse('administration/users.html', {
         'request': request,
-        'user': current_user.model_dump(),
+        'user': current_user.model_dump(mode='json'),
         'normal_users': lst_normal_user,
     })
 
@@ -36,14 +36,14 @@ async def toggle_status(user_id: str, payload: UserUpdate, current_user: UserPub
 
     updated_user: UserPublic = await CrudUser().update_user(user_id=user_id, payload=payload)
 
-    return JSONResponse(content=updated_user.model_dump())
+    return JSONResponse(content=updated_user.model_dump(mode='json'))
 
 
 
 
-@router.get('/users/me')
-async def read_users_me(current_user: UserPublic = Depends(require_role(role=['Admin']))):
-    return current_user
+# @router.get('/users/me')
+# async def read_users_me(current_user: UserPublic = Depends(require_role(role=['Admin']))):
+#     return current_user
 
 
 

@@ -1,0 +1,39 @@
+{% extends "./base.html" %}
+
+{% block title %}500 | Haylà{% endblock %}
+
+{% block sidebar_menu %}{% endblock %}
+
+{% block header_topbar %}{% endblock %}
+
+{% block center_container %}
+<div class="maintenance-block">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="card error-card">
+          <div class="card-body">
+            <div class="error-image-block">
+              <div class="row justify-content-center">
+                <div class="col-10">
+                  <img class="img-fluid" src="{{ request.url_for('static', path='images/pages/Error500.png') }}" alt="img">
+                </div>
+              </div>
+            </div>
+            <div class="text-center">
+              <h1 class="mt-4"><b>Internal Server Error</b></h1>
+              <p class="mt-2 mb-4 text-sm text-muted">Server error 500. We are fixing the problem. Please<br> try again at a later stage.</p>
+              <a href="/"><button type="button" class="btn btn-primary mb-3">Go to home</button></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block footer %}{% endblock %}
+
+
+

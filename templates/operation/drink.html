@@ -1,0 +1,1121 @@
+<!-- Load template html -->
+{% extends "./base.html" %}
+
+<!-- Title -->
+{% block title %}Drink | Haylà{% endblock %}
+
+
+<!-- [ breadcrumb ] start -->
+{% block breadcrumb %}
+<div class="col-md-12">
+  <ul class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/">Home</a></li>
+    <li class="breadcrumb-item"><a href="javascript: void(0)">Operation</a></li>
+    <li class="breadcrumb-item" aria-current="page">Drink</li>
+  </ul>
+</div>
+
+<div class="col-md-12">
+  <div class="page-header-title">
+    <h2 class="mb-0">Drink</h2>
+  </div>
+</div>
+
+{% endblock %}
+<!-- [ breadcrumb ] end -->
+
+
+<!-- [ Main Content ] start -->
+{% block main_content %}
+<div class="text-end p-2 pb-2">
+  <a href="javascript:void(0)" class="btn btn-primary d-inline-flex align-item-center" data-bs-toggle="modal" data-bs-target="#user-edit_add-modal">
+    <i class="ti ti-plus f-18"></i>Add
+  </a>
+</div>
+
+
+<ul class="nav nav-pills p-2" id="pills-tab" role="tablist">
+
+  <li class="nav-item">
+    <a class="nav-link active" id="pills-drinks-tab" data-bs-toggle="pill" href="#pills-drinks" role="tab" aria-controls="pills-drinks" aria-selected="true">
+      Drinks
+    </a>
+  </li>
+
+  {% if user.role.lower() == 'admin' %}
+    <li class="nav-item">
+      <a class="nav-link" id="pills-margin-tab" data-bs-toggle="pill" href="#pills-margin" role="tab" aria-controls="pills-margin" aria-selected="false">
+        Margin
+      </a>
+    </li>
+  {% endif %}
+
+</ul>
+
+<div class="tab-content" id="pills-tabContent">
+
+  <div class="tab-pane fade show active" id="pills-drinks" role="tabpanel" aria-labelledby="pills-drinks-tab">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="card">
+          <div class="card-body">
+            <div class="dt-responsive table-responsive">
+              <table id="dt-drinks" class="table table-hover table-sm">
+
+                <thead>
+
+                  <tr>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th colspan="2">Price</th>
+                  </tr>
+
+                  <tr>
+                    <th>Group</th>
+                    <th>Location</th>
+                    <th>Name</th>
+                    <th>SGN</th>
+                    <th>NTR</th>
+                  </tr>
+
+                </thead>
+
+                <tbody>
+                  {% for group, lst_drink in dict_drink.items() %}
+
+                    {% if group in ['Trà trái cây'] %}
+                      {% set bg_group_color = 'bg-red-600' %}
+                    {% elif group in ['Trà sữa'] %}
+                      {% set bg_group_color = 'bg-green-600' %}
+                    {% else %}
+                      {% set bg_group_color = 'bg-yellow-600' %}
+                    {% endif %}
+
+                    {% for drink in lst_drink %}
+
+                      <tr data-id="{{ drink.Drink_ID }}" data-index="{{ loop.index0 }}" data-group="{{ group }}">
+                        <td>
+                          <span class="badge {{ bg_group_color }}">{{ group }}</span>
+                        </td>
+
+                        <td>
+                          {% for loc in drink.Location %}
+                            <span class="badge {{ 'bg-blue-500' if loc == 'SGN' else 'bg-orange-500' }}">{{ loc }}</span>
+                          {% endfor %}
+                        </td>
+
+                        <td>
+                          <div class="row">
+                            <div class="col">
+                              <h6 class="mb-0">{{ drink.Drink_Name }}</h6>
+                              <p class="text-muted f-12 mb-0">{{ drink.Drink_ID }}</p>
+                            </div>
+                            <div class="col">
+                              <ul class="list-inline me-auto mb-0">
+
+                                <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Edit">
+                                  <a href="javascript:void(0)" class="avtar avtar-xs btn-link-primary btn-edit-recipe">
+                                    <i class="ti ti-edit-circle f-18"></i>
+                                  </a>
+                                </li>
+
+                                <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Delete">
+                                  <a href="javascript:void(0)" class="avtar avtar-xs btn-link-danger">
+                                    <i class="ti ti-trash f-18"></i>
+                                  </a>
+                                </li>
+
+                              </ul>
+                            </div>
+                          </div>
+
+                        </td>
+
+                        <td>
+                          {% if drink.Price.SGN.Size_M > 0 %}
+                            <ul class="list-inline me-auto mb-0">
+                              <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="One Size">
+                                <a data-location="SGN" data-size="M"
+                                   href="javascript:void(0)" class="avtar avtar-xs badge bg-light-success btn-view-recipe">
+                                  {{ "{:,.0f}".format(drink.Price.SGN.Size_M / 1000) }}
+                                </a>
+                              </li>
+                            </ul>
+                          {% endif %}
+                        </td>
+
+                        <td>
+
+                          <ul class="list-inline me-auto mb-0">
+                            {% if drink.Price.NTR.Size_S > 0 %}
+                              <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="S">
+                                <a data-location="NTR" data-size="S"
+                                   href="javascript:void(0)" class="avtar avtar-xs badge bg-light-warning btn-view-recipe">
+                                  {{ "{:,.0f}".format(drink.Price.NTR.Size_S / 1000) }}
+                                </a>
+                              </li>
+                            {% endif %}
+
+                            {% if drink.Price.NTR.Size_M > 0 %}
+                              <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="M">
+                                <a data-location="NTR" data-size="M"
+                                   href="javascript:void(0)" class="avtar avtar-xs badge bg-light-success btn-view-recipe">
+                                  {{ "{:,.0f}".format(drink.Price.NTR.Size_M / 1000) }}
+                                </a>
+                              </li>
+                            {% endif %}
+
+
+                            {% if drink.Price.NTR.Size_L > 0 %}
+                              <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="L">
+                                <a data-location="NTR" data-size="L"
+                                   href="javascript:void(0)" class="avtar avtar-xs badge bg-light-danger btn-view-recipe">
+                                  {{ "{:,.0f}".format(drink.Price.NTR.Size_L / 1000) }}
+                                </a>
+                              </li>
+                            {% endif %}
+
+                          </ul>
+                        </td>
+                      </tr>
+                    {% endfor %}
+
+                  {% endfor %}
+                </tbody>
+
+              </table>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  {% if user.role.lower() == 'admin' %}
+  <div class="tab-pane fade show" id="pills-margin" role="tabpanel" aria-labelledby="pills-margin-tab">
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="card">
+          <div class="card-body">
+            <div class="dt-responsive table-responsive">
+              <table id="dt-drink-margin" class="table table-hover table-sm">
+                <thead>
+                  <tr>
+                    <th colspan="3"></th>
+                    <th colspan="3">SGN</th>
+                    <th colspan="3">NTR (S)</th>
+                    <th colspan="3">NTR (M)</th>
+                    <th colspan="3">NTR (L)</th>
+                  </tr>
+
+                  <tr>
+                    <th>Group</th>
+                    <th>Location</th>
+                    <th>Name</th>
+
+                    <th>Cost</th>
+                    <th>Price</th>
+                    <th>Margin</th>
+
+                    <th>Cost</th>
+                    <th>Price</th>
+                    <th>Margin</th>
+
+                    <th>Cost</th>
+                    <th>Price</th>
+                    <th>Margin</th>
+
+                    <th>Cost</th>
+                    <th>Price</th>
+                    <th>Margin</th>
+
+                  </tr>
+
+                </thead>
+
+                <tbody>
+                  {% for group, lst_drink in dict_drink.items() %}
+
+                    {% if group in ['Trà trái cây'] %}
+                      {% set bg_group_color = 'bg-red-600' %}
+                    {% elif group in ['Trà sữa'] %}
+                      {% set bg_group_color = 'bg-green-600' %}
+                    {% else %}
+                      {% set bg_group_color = 'bg-yellow-600' %}
+                    {% endif %}
+
+                    {% for drink in lst_drink %}
+
+                      <tr data-id="{{ drink.Drink_ID }}" data-index="{{ loop.index0 }}" data-group="{{ group }}">
+                        <td>
+                          <span class="badge {{ bg_group_color }}">{{ group }}</span>
+                        </td>
+
+                        <td>
+                          {% for loc in drink.Location %}
+                            <span class="badge {{ 'bg-blue-500' if loc == 'SGN' else 'bg-orange-500' }}">{{ loc }}</span>
+                          {% endfor %}
+                        </td>
+
+                        <td>
+                          <div class="row">
+                            <div class="col">
+                              <h6 class="mb-0">{{ drink.Drink_Name }}</h6>
+                              <p class="text-muted f-12 mb-0">{{ drink.Drink_ID }}</p>
+                            </div>
+                          </div>
+                        </td>
+
+
+                        {% if 'SGN' in drink.Location %}
+                          {% set cost = drink.Total_Cost * drink.Weighting.SGN.Size_M %}
+                          {% set price = drink.Price.SGN.Size_M %}
+                          {% set margin = ((price - cost) / price) * 100 %}
+
+                          {% if margin >= 80 %}
+                            {% set badge_clr = 'bg-light-success' %}
+                          {% elif margin >= 70 %}
+                            {% set badge_clr = 'bg-light-warning' %}
+                          {% else %}
+                            {% set badge_clr = 'bg-light-danger' %}
+                          {% endif %}
+
+                          <td>{{ "{:,.0f}".format(cost) }}</td>
+                          <td>{{ "{:,.0f}".format(price) }}</td>
+                          <td><span class="badge {{ badge_clr }} f-14">{{ "{:,.1f}".format(margin) }}</span></td>
+
+                        {% else %}
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                        {% endif %}
+
+
+
+                        {% if 'NTR' in drink.Location %}
+
+                          {% for size in drink.Price['NTR'] %}
+
+                            {% set cost = (drink.Total_Cost * drink.Weighting.NTR[size[0]]) + 4000 %}
+                            {% set price = drink.Price.NTR[size[0]] %}
+
+                            {% if price > 0 %}
+
+                              {% set margin = ((price - cost) / price) * 100 %}
+
+                              {% if margin >= 60 %}
+                                {% set badge_clr = 'bg-light-success' %}
+                              {% elif margin >= 30 %}
+                                {% set badge_clr = 'bg-light-warning' %}
+                              {% else %}
+                                {% set badge_clr = 'bg-light-danger' %}
+                              {% endif %}
+
+                              <td>{{ "{:,.0f}".format(cost) }}</td>
+                              <td>{{ "{:,.0f}".format(price) }}</td>
+                              <td><span class="badge {{ badge_clr }} f-14">{{ "{:,.1f}".format(margin) }}</span></td>
+                            {% else %}
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                            {% endif %}
+
+                          {% endfor %}
+
+                        {% else %}
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                        {% endif %}
+
+                      </tr>
+                    {% endfor %}
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  {% endif %}
+
+</div>
+
+<!-- [Modal View] start -->
+<div class="modal fade" id="drink-view-modal" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
+     aria-labelledby="drinkViewModalLabel" aria-hidden="true">
+
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+
+      <div class="modal-header border-0 pb-0">
+        <h4 class="mb-0 modal-title" id="drinkViewModalLabel">Drink Recipe</h4>
+        <a href="javascript:void(0)" class="avtar avtar-s btn-link-danger" data-bs-dismiss="modal">
+          <i class="ti ti-x f-20"></i>
+        </a>
+      </div>
+
+      <div class="modal-body">
+
+        <div class="row">
+
+          <!----------------------------------------------------------------------------------------------------------->
+          <div class="col-lg-4">
+
+            <div class="card">
+
+              <div class="card-body position-relative">
+
+                <div class="position-absolute end-0 top-0 p-3">
+                  <span id="drink-group" class="badge bg-secondary">[ GROUP ]</span>
+                </div>
+
+                <div class="text-center mt-3">
+
+                  <h4 id="drink-name" class="mb-0">[ NAME ]</h4>
+                  <p id="drink-id" class="text-muted text-sm">[ ID ]</p>
+
+                  <hr class="my-3">
+
+                  <div class="row g-1">
+
+                    <div class="col-{{ 4 if user.role.lower() == 'admin' else 6 }}">
+                      <h6 id="drink-loc" class="mb-0">[ SGN|NTR ]</h6>
+                      <small class="text-muted">Location</small>
+                    </div>
+
+                    <div class="col-{{ 4 if user.role.lower() == 'admin' else 6 }} border border-top-0 border-bottom-0">
+                      <h6 id="drink-size" class="mb-0">[ S|M|L ]</h6>
+                      <small class="text-muted">Size</small>
+                    </div>
+
+                    {% if user.role.lower() == 'admin' %}
+                      <div class="col-4">
+                        <h6 id="drink-margin" class="mb-0">[ xx,x % ]</h6>
+                        <small class="text-muted">Margin (inc. extra)</small>
+                      </div>
+                    {% endif %}
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <!----------------------------------------------------------------------------------------------------------->
+          <div class="col-lg-8">
+
+            <div class="card">
+
+              <div class="card-header p-2">
+                <h4>Ingredients</h4>
+              </div>
+
+              <div class="card-body p-2">
+
+                <div class="table-responsive">
+                  <table class="table table-hover table-sm" id="dt-drink-igr">
+
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th width="20%" class="text-center">Used Quanty</th>
+
+                        {% if user.role.lower() == 'admin' %}
+                          <th class="text-end">Cost</th>
+                        {% endif %}
+                      </tr>
+                    </thead>
+
+                    <tbody></tbody>
+
+                  </table>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+<!-- [Modal View] end -->
+
+
+<!-- [Modal Edit] start -->
+<form class="validate-me" id="form-edit-drink" data-validate>
+  <div class="modal fade" id="drink-edit-modal" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
+       aria-labelledby="drinkEditModalLabel" aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+
+        <div class="modal-header border-0 pb-0">
+          <h3 class="mb-0 modal-title" id="drinkEditModalLabel">Drink Recipe: [Name]</h3>
+          <a href="javascript:void(0)" class="avtar avtar-s btn-link-danger btn-cancel-edit-drink" data-bs-dismiss="modal">
+            <i class="ti ti-x f-20"></i>
+          </a>
+        </div>
+
+        <div class="modal-body">
+
+          <div class="row">
+
+            <!----------------------------------------------------------------------------------------------------------->
+            <div class="card">
+
+              <div class="card-header pt-2 pb-0"><h4>General</h4></div>
+
+              <div class="card-body pb-0">
+                <div class="row g-2">
+
+                  <div class="col-sm-2">
+                    <div class="form-group form-floating">
+                      <input type="hidden" id="edit-drink-oid">
+                      <input class="form-control" type="text" pattern="^DRK\d+$" name="edit-drink-id" id="edit-drink-id" placeholder="ID" required disabled>
+                      <label for="edit-drink-id">ID</label>
+                    </div>
+                  </div>
+
+                  <div class="col-sm-3">
+                    <div class="form-group form-floating">
+                      <input class="form-control" type="text" minlength="3" maxlength="50" name="edit-drink-name" id="edit-drink-name" placeholder="Name" required>
+                      <label for="edit-drink-name">Name</label>
+                    </div>
+                  </div>
+
+                  <div class="col-sm-3">
+                    <div class="form-group form-floating">
+                      <select class="form-control" name="edit-drink-group" id="edit-drink-group" required>
+                        <option label="select"></option>
+                        <option value="Cafe">Cafe</option>
+                        <option value="Trà trái cây">Trà trái cây</option>
+                        <option value="Trà sữa">Trà sữa</option>
+                      </select>
+                      <label for="edit-drink-group">Group</label>
+                    </div>
+                  </div>
+
+                  <div class="col-sm-4">
+                    <div class="form-group">
+                      <select class="form-control" name="edit-drink-location" id="edit-drink-location" multiple required>
+                        <option label="select"></option>
+                        <option value="SGN">SGN</option>
+                        <option value="NTR">NTR</option>
+                      </select>
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+            <!----------------------------------------------------------------------------------------------------------->
+            <div class="card">
+              <div class="card-header pt-2 pb-0"><h4>Price</h4></div>
+
+              <div class="card-body pb-0">
+
+                <div class="row g-2 col-sm-12">
+
+                  <div class="col-sm-6">
+                    <table class="table-sm">
+                      <thead>
+                        <tr>
+                          <th class="text-center" colspan="3">SGN</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>
+                            <div class="form-group form-floating">
+                              <input type="number" class="form-control" min="0" max="100000" name="edit-drink-sgn-s-price" id="edit-drink-sgn-s-price" placeholder="S" required>
+                              <label for="edit-drink-sgn-s-price">S</label>
+                            </div>
+                          </td>
+                          <td>
+                            <div class="form-group form-floating">
+                              <input type="number" class="form-control" min="0" max="100000" name="edit-drink-sgn-m-price" id="edit-drink-sgn-m-price" placeholder="M" required>
+                              <label for="edit-drink-sgn-m-price">M</label>
+                            </div>
+                          </td>
+                          <td>
+                            <div class="form-group form-floating">
+                              <input type="number" class="form-control" min="0" max="100000" name="edit-drink-sgn-l-price" id="edit-drink-sgn-l-price" placeholder="L" required>
+                              <label for="edit-drink-sgn-l-price">L</label>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div class="col-sm-6">
+                    <table class="table-sm">
+                      <thead>
+                        <tr>
+                          <th class="text-center" colspan="3">NTR</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>
+                            <div class="form-group form-floating">
+                              <input type="number" class="form-control" min="0" max="100000" name="edit-drink-ntr-s-price" id="edit-drink-ntr-s-price" placeholder="S" required>
+                              <label for="edit-drink-ntr-s-price">S</label>
+                            </div>
+                          </td>
+                          <td>
+                            <div class="form-group form-floating">
+                              <input type="number" class="form-control" min="0" max="100000" name="edit-drink-ntr-m-price" id="edit-drink-ntr-m-price" placeholder="M" required>
+                              <label for="edit-drink-ntr-m-price">M</label>
+                            </div>
+                          </td>
+                          <td>
+                            <div class="form-group form-floating">
+                              <input type="number" class="form-control" min="0" max="100000" name="edit-drink-ntr-l-price" id="edit-drink-ntr-l-price" placeholder="L" required>
+                              <label for="edit-drink-ntr-l-price">L</label>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+
+              </div>
+
+            </div>
+
+            <!----------------------------------------------------------------------------------------------------------->
+            <div class="card">
+
+              <div class="card-header  pt-2 pb-0">
+                <h4 >Ingredients</h4>
+              </div>
+
+              <div class="card-body pb-0">
+
+                <table class="table table-sm" id="dt-edit-drink-igr">
+
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th width="15%" class="text-center">Used Quanty</th>
+                      <th width="5%" class="text-center">
+                        <a href="javascript:void(0)" class="btn btn-outline-primary align-item-center" id="btn-add-new-igr">
+                          <i class="ti ti-plus f-18"></i>
+                        </a>
+                      </th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                  </tbody>
+
+                </table>
+
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="modal-footer justify-content-between">
+          <ul class="list-inline me-auto mb-0">
+            <li class="list-inline-item align-bottom">
+              <a href="javascript:void(0)" class="avtar avtar-s btn-link-danger w-sm-auto" data-bs-toggle="tooltip" title="Delete">
+                <i class="ti ti-trash f-18"></i>
+              </a>
+            </li>
+          </ul>
+
+          <div class="flex-grow-1 text-end">
+            <button type="button" class="btn btn-link-danger btn-cancel-edit-drink" data-bs-dismiss="modal">Cancel</button>
+            <button id="save-drink" type="button" class="btn btn-primary" data-bs-dismiss="modal">Save</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  </form>
+<!-- [Modal Edit] end -->
+
+
+{% endblock %}
+<!-- [ Main Content ] end -->
+
+
+
+{% block extra_scripts %}
+
+<!--Latest 3.x version from jQuery CDN-->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+
+<script src="{{ request.url_for('static', path='js/plugins/choices.min.js') }}"></script>
+<script src="{{ request.url_for('static', path='js/plugins/bouncer.min.js') }}"></script>
+<script src="{{ request.url_for('static', path='js/pages/form-validation.js') }}"></script>
+
+<script src="{{ request.url_for('static', path='js/plugins/jquery.dataTables.min.js') }}"></script>
+<script src="{{ request.url_for('static', path='js/plugins/dataTables.bootstrap5.min.js') }}"></script>
+<script src="{{ request.url_for('static', path='js/plugins/dataTables.colReorder.min.js') }}"></script>
+<script src="{{ request.url_for('static', path='js/plugins/dataTables.fixedHeader.min.js') }}"></script>
+<script src="{{ request.url_for('static', path='js/plugins/sweetalert2.all.min.js') }}"></script>
+
+<script>
+
+<!--  var colheader_drinks = $('#dt-drinks').DataTable({-->
+<!--    fixedHeader: true-->
+<!--  });-->
+
+<!--  var colheader_margin = $('#dt-drink-margin').DataTable({-->
+<!--    fixedHeader: true-->
+<!--  });-->
+
+
+  // -------------------------------------------------------------------------------------------------------------------
+  // VIEW DRINK --------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
+
+  const drinkViewModalEl = document.getElementById('drink-view-modal');
+  const drinkViewModal   = new bootstrap.Modal(drinkViewModalEl);
+  const js_drinks = JSON.parse('{{ js_drinks | tojson | safe }}');
+
+  $('#dt-drinks').on('click', '.btn-view-recipe', function() {
+
+    const $tr = $(this).closest('tr');
+    const obj_drink = js_drinks[$tr.data('group')][parseInt($tr.data('index'))];
+
+    if(obj_drink.Drink_ID !== $tr.data('id')) {
+      alert("Incorrect ID & index");
+      return false;
+    }
+
+    $('#drink-group').text(obj_drink.Group);
+    $('#drink-id').text(obj_drink.Drink_ID);
+    $('#drink-name').text(obj_drink.Drink_Name);
+
+    str_sel_loc = $(this).data('location');
+
+    $('#drink-loc').text(str_sel_loc);
+    $('#drink-size').text($(this).data('size'));
+
+    const num_weighting = obj_drink.Weighting[str_sel_loc][`Size_${$(this).data('size')}`]
+    const num_total_cost = obj_drink.Total_Cost * num_weighting;
+    var num_extra_cost = 0;
+
+    if(str_sel_loc == 'NTR') {
+      num_extra_cost = 4000;
+    }
+
+    const num_price = obj_drink.Price[str_sel_loc][`Size_${$(this).data('size')}`]
+    const num_margin = ((num_price - (num_total_cost + num_extra_cost)) / num_price) * 100
+
+    $('#drink-margin').text(Number(num_margin).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0}));
+
+    $('#dt-drink-igr tbody').empty();
+    const tbody = document.querySelector('#dt-drink-igr tbody');
+
+    obj_drink.Ingredients.forEach(item => {
+
+      const tr_drink_igr = document.createElement('tr');
+
+      tr_drink_igr.innerHTML = `
+        <tr>
+          <td>
+            <div class="row">
+              <div class="col">
+                <h6 class="mb-0">${item.Ingredient_Name}</h6>
+                <p class="text-muted f-12 mb-0">${item.Ingredient_ID}</p>
+              </div>
+            </div>
+          </td>
+
+          <td class="text-center">
+            ${Number(item.Ingredient_Quanty * num_weighting).toLocaleString('en-US')}
+            <span class="text-muted f-12 mb-0">${item.Unit}</span>
+          </td>
+
+          {% if user.role.lower() == 'admin' %}
+            <td class="text-end">
+              ${Number(item.Total_Cost * num_weighting).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+              <span class="text-muted f-12 mb-0">đ</span>
+            </td>
+          {% endif %}
+        </tr>
+       `;
+
+      tbody.appendChild(tr_drink_igr);
+
+    });
+
+    {% if user.role.lower() == 'admin' %}
+
+      const $table = $('#dt-drink-igr');
+      $table.find('tfoot').remove();
+
+      $table.append(`
+        <tfoot class="bg-gray-200">
+          <tr>
+            <td colspan="2"><h6>Total</h6></td>
+            <td class="text-end">
+              ${Number(num_total_cost).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+              <span class="text-muted f-12 mb-0">đ</span>
+            </td>
+          </tr>
+
+          <tr>
+            <td colspan="2"><h6>Ống hút, ly nhựa, trà đá</h6></td>
+            <td class="text-end">
+              ${Number(num_extra_cost).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+              <span class="text-muted f-12 mb-0">đ</span>
+            </td>
+          </tr>
+
+          <tr>
+            <td colspan="2"><h6>Total (inc extra)</h6></td>
+            <td class="text-end">
+              ${Number(num_total_cost + num_extra_cost).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+              <span class="text-muted f-12 mb-0">đ</span>
+            </td>
+          </tr>
+
+        </tfoot>
+      `);
+
+    {% endif %}
+
+    drinkViewModal.show();
+
+  });
+
+  // -------------------------------------------------------------------------------------------------------------------
+  // EDIT DRINK --------------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
+
+  var editDrinkLocation = new Choices('#edit-drink-location', {
+    placeholderValue: 'Location',
+    searchPlaceholderValue: 'Search',
+    allowHTML: true,
+    removeItemButton: true,
+    shouldSort: false,
+    shouldSortItems: false,
+    maxItemCount: 2
+  });
+
+  const drinkEditModalEl = document.getElementById('drink-edit-modal');
+  const drinkEditModal   = new bootstrap.Modal(drinkEditModalEl);
+  const js_full_igr = JSON.parse('{{ js_full_igr | tojson | safe }}');
+
+  $('#dt-drinks').on('click', '.btn-edit-recipe', function() {
+
+    const $tr = $(this).closest('tr');
+    const obj_drink = js_drinks[$tr.data('group')][parseInt($tr.data('index'))];
+
+    if(obj_drink.Drink_ID !== $tr.data('id')) {
+      alert("Incorrect ID & index");
+      return false;
+    }
+
+    $('#drinkEditModalLabel').text(`Drink Recipe: ${obj_drink.Drink_Name}`);
+    $('#edit-drink-oid').val(obj_drink.id);
+    $('#edit-drink-id').val(obj_drink.Drink_ID);
+    $('#edit-drink-name').val(obj_drink.Drink_Name);
+    $('#edit-drink-group').val(obj_drink.Group).change();
+
+    editDrinkLocation.setChoiceByValue(obj_drink.Location);
+
+    ['sgn', 'ntr'].forEach(loc => {
+      ['s', 'm', 'l'].forEach(size => {
+        $(`#edit-drink-${loc}-${size}-price`).val(obj_drink.Price[loc.toUpperCase()][`Size_${size.toUpperCase()}`]);
+      });
+    });
+
+    $('#dt-edit-drink-igr tbody').empty();
+    const tbody = document.querySelector('#dt-edit-drink-igr tbody');
+
+    obj_drink.Ingredients.forEach((item_drink_igr, idx) => {
+
+      const tr_drink_igr = createDrinkTrHtml(item_drink_igr, idx);
+
+      tbody.appendChild(tr_drink_igr);
+
+      var itemIgrChoice = createNewChoice(`#edit-drink-irg-name-${idx}`);
+      itemIgrChoice.setChoiceByValue(`${item_drink_igr.Ingredient_ID}`);
+
+    });
+
+    drinkEditModal.show();
+
+  });
+
+  // -------------------------------------------------------------------------------------------------------------------
+  // EDIT DRINK - CREATE IGR TR ----------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
+  function createDrinkTrHtml(item_drink_igr, idx) {
+
+    const tr_drink_igr = document.createElement('tr');
+    const str_id_pattern = 'edit-drink-irg';
+
+    tr_drink_igr.dataset.id = `${str_id_pattern}-row-${idx}`;
+
+    if (item_drink_igr == null) {
+      var item_igr_id = '';
+      var item_igr_qty = -1;
+      var item_igr_unit = '';
+    }
+    else {
+      var item_igr_id = item_drink_igr.Ingredient_ID;
+      var item_igr_qty = Number(item_drink_igr.Ingredient_Quanty).toLocaleString('en-US');
+      var item_igr_unit = item_drink_igr.Unit;
+    }
+
+    tr_drink_igr.innerHTML = `
+      <td>
+        <select class="form-control ${str_id_pattern}-name" name="${str_id_pattern}-name-${idx}" id="${str_id_pattern}-name-${idx}" data-index="${idx}">
+            <option value="">Choose a ingredient</option>
+
+            <optgroup label="Processed Ingredient">
+              {% for igr in js_full_igr.values() %}
+                {% if igr.Type == 'Processed'  %}
+                  <option value="{{ igr.ID }}" data-igrType="{{ igr.Type }}">{{ igr.Name }}</option>
+                {% endif %}
+              {% endfor %}
+            </optgroup>
+
+            <optgroup label="Raw Ingredient">
+              {% for igr in js_full_igr.values() %}
+                {% if igr.Type == 'Raw'  %}
+                  <option value="{{ igr.ID }}" data-igrType="{{ igr.Type }}">{{ igr.Name }}</option>
+                {% endif %}
+              {% endfor %}
+            </optgroup>
+
+          </select>
+
+        <p class="text-muted f-12 mb-0" id="${str_id_pattern}-qty-${idx}-id">${item_igr_id}</p>
+      </td>
+
+      <td class="text-center">
+        <div class="form-group form-floating">
+          <input type="number" class="form-control" min="0.1" max="1000"
+            name="${str_id_pattern}-qty-${idx}" id="${str_id_pattern}-qty-${idx}"
+            value=${item_igr_qty} required
+          >
+          <label for="${str_id_pattern}-qty-${idx}" id="${str_id_pattern}-qty-${idx}-unit">${item_igr_unit}</label>
+        </div>
+      </td>
+    `;
+
+      if (idx !== 0) {
+        tr_drink_igr.innerHTML += `
+          <td class="text-center">
+            <a onclick="deleteRowByDataId('${str_id_pattern}-row-${idx}');" href="javascript:void(0)"
+              class="avtar avtar-s btn-link-danger w-sm-auto" data-bs-toggle="tooltip" title="Delete">
+              <i class="ti ti-trash f-18"></i>
+            </a>
+          </td>
+        `;
+      }
+      else {
+        tr_drink_igr.innerHTML += `<td class="text-center"></td>`;
+      }
+
+      return tr_drink_igr;
+
+  };
+
+  // -------------------------------------------------------------------------------------------------------------------
+  // EDIT DRINK - ADD NEW IGR ------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
+  $('#btn-add-new-igr').on('click', function() {
+
+    const tbody = document.querySelector('#dt-edit-drink-igr tbody');
+    const idx = $('#dt-edit-drink-igr tbody tr').length;
+
+    const tr_drink_igr = createDrinkTrHtml(null, idx);
+    tbody.appendChild(tr_drink_igr);
+
+    var itemIgrChoice = createNewChoice(`#edit-drink-irg-name-${idx}`);
+
+    tr_drink_igr.scrollIntoView({
+      behavior: 'smooth',   // or 'auto' for an instant jump
+      block:    'start',    // 'start' | 'center' | 'end' | 'nearest'
+      inline:   'nearest'
+    });
+
+  });
+
+  function createNewChoice(id) {
+    return new Choices(id, {
+      allowHTML: true,
+      searchEnabled: true,
+      shouldSort: false,
+      shouldSortItems: false,
+    });
+  };
+
+
+  // -------------------------------------------------------------------------------------------------------------------
+  // EDIT DRINK - IGR CHANGE -------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
+  $('#dt-edit-drink-igr').on('change', '.edit-drink-irg-name', function() {
+    const $sel = $(this);
+    const val  = $sel.val();
+    const name = $sel.text();
+    const type = js_full_igr[val].Type;
+    const unit = js_full_igr[val].Unit;
+    $(`#edit-drink-irg-qty-${$sel.data('index')}-unit`).text(unit);
+    $(`#edit-drink-irg-qty-${$sel.data('index')}-id`).text(val);
+  });
+
+
+  // -------------------------------------------------------------------------------------------------------------------
+  // EDIT DRINK - DELETE  IGR ------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
+  function deleteRowByDataId(dataId) {
+    const row = document.querySelector(`tr[data-id="${dataId}"]`);
+    if (!row) {
+      alert(`No table row found with data-id="${dataId}"`);
+      return;
+    }
+    row.remove();
+  }
+
+  // -------------------------------------------------------------------------------------------------------------------
+  // EDIT DRINK - SAVE (POST) ------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
+  $('#save-drink').on('click', function() {
+
+    const drink_igr = [];
+
+    for (let idx = 0; idx < $('#dt-edit-drink-igr tbody tr').length; idx++) {
+      drink_igr.push({
+        Ingredient_ID: $(`#edit-drink-irg-name-${idx}`).val(),
+        Ingredient_Quanty: Number($(`#edit-drink-irg-qty-${idx}`).val())
+      });
+    }
+
+    const obj_drink = {
+      Drink_ID: $(`#edit-drink-id`).val(),
+      Group: $(`#edit-drink-group`).val(),
+      Drink_Name: $(`#edit-drink-name`).val(),
+      Location: $(`#edit-drink-location`).val(),
+      Price: {
+        SGN: {
+          Size_S: Number($(`#edit-drink-sgn-s-price`).val()),
+          Size_M: Number($(`#edit-drink-sgn-m-price`).val()),
+          Size_L: Number($(`#edit-drink-sgn-l-price`).val())
+        },
+        NTR: {
+          Size_S: Number($(`#edit-drink-ntr-s-price`).val()),
+          Size_M: Number($(`#edit-drink-ntr-m-price`).val()),
+          Size_L: Number($(`#edit-drink-ntr-l-price`).val())
+        }
+      },
+      Ingredients: drink_igr,
+    };
+
+    const oid = $(`#edit-drink-oid`).val();
+
+    console.log(oid, obj_drink);
+
+    Swal.fire({
+      title: `Do you want to save the changes of "${$('#edit-drink-name').val()}"?`,
+      showDenyButton: true,
+      showCancelButton: false,
+      confirmButtonText: `Save`,
+      denyButtonText: `Don't save`
+    }).then((result) => {
+      if (result.isDenied) {
+        Swal.fire('Changes are not saved', '', 'info');
+        return;
+      } else if (result.isConfirmed) {
+
+        $.ajax({
+          url: `/operation/drink/${oid}/update`,
+          method: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify(obj_drink),
+          success: function(resp) {
+
+            Swal.fire(`Drink ${obj_drink.Drink_Name} Saved!`, '', 'success').then(() => {
+              window.location.reload();
+            });
+
+          },
+          error: function(xhr, status, err) {
+            console.error(err);
+            Swal.fire('Changes are not saved', `Could not update drink "${obj_drink.Drink_Name}". Please try again.`, 'error');
+          }
+        });
+
+      }
+    });
+
+
+
+  });
+
+  // -------------------------------------------------------------------------------------------------------------------
+  // EDIT DRINK - CANCEL (DEL VAL) -------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
+  $('#drink-edit-modal').on('hidden.bs.modal', function (e) {
+
+    $('#drinkEditModalLabel').text('');
+    $('#edit-drink-oid').val(null);
+    $('#edit-drink-id').val(null);
+    $('#edit-drink-name').val(null);
+    $('#edit-drink-group').val(null).change();
+
+    editDrinkLocation.removeActiveItems();
+
+    ['sgn', 'ntr'].forEach(loc => {
+      ['s', 'm', 'l'].forEach(size => {
+        $(`#edit-drink-${loc}-${size}-price`).val(-1);
+      });
+    });
+
+    $('#dt-edit-drink-igr tbody').empty();
+
+  });
+
+
+
+
+
+
+
+
+</script>
+{% endblock %}

@@ -40,8 +40,8 @@ async def login_post(request: Request, email: str = Form(...), password: str = F
         )
 
     access_token = AuthToken().create_access_token(
-        data=crud_user.get_public_user().model_dump(),
-        expires_minutes=30
+        data=crud_user.get_public_user().model_dump(mode='json'),
+        expires_minutes=60 * 2
     )
 
     response = RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
@@ -52,8 +52,9 @@ async def login_post(request: Request, email: str = Form(...), password: str = F
         httponly=True,
         secure=True,  # set to True under HTTPS
         # samesite="lax",
-        max_age=60 * 30,
+        max_age=60 * 60 * 2,
     )
+
     return response
 
 

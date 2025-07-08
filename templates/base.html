@@ -30,6 +30,9 @@
     <link rel="stylesheet" href="{{ request.url_for('static', path='/css/style.css') }}" id="main-style-link" >
     <link rel="stylesheet" href="{{ request.url_for('static', path='/css/style-preset.css') }}" >
 
+    <!-- my css-->
+    <link rel="stylesheet" href="{{ request.url_for('static', path='/css/custom_style.css') }}" >
+
   </head>
   <!-- [Head] end -->
 
@@ -96,51 +99,44 @@
               <li class="pc-item">
                 <a href="#" class="pc-link">
                   <span class="pc-micon"><i class="ti ti-table"></i></span>
+                  <span class="pc-mtext">Bill</span>
+                </a>
+              </li>
+
+              <li class="pc-item">
+                <a href="/operation/inventory" class="pc-link">
+                  <span class="pc-micon"><i class="ti ti-table"></i></span>
                   <span class="pc-mtext">Inventory</span>
                 </a>
               </li>
 
               <li class="pc-item">
-                <a href="#" class="pc-link">
+                <a href="/operation/drink" class="pc-link">
                   <span class="pc-micon"><i class="ti ti-table"></i></span>
-                  <span class="pc-mtext">Ingredient usage</span>
-                </a>
-              </li>
-
-              <li class="pc-item">
-                <a href="#" class="pc-link">
-                  <span class="pc-micon"><i class="ti ti-table"></i></span>
-                  <span class="pc-mtext">Drinks</span>
-                </a>
-              </li>
-
-              <li class="pc-item">
-                <a href="#" class="pc-link">
-                  <span class="pc-micon"><i class="ti ti-table"></i></span>
-                  <span class="pc-mtext">Recipes</span>
-                </a>
-              </li>
-
-              <li class="pc-item">
-                <a href="/operation/raw_ingredient" class="pc-link">
-                  <span class="pc-micon"><i class="ti ti-table"></i></span>
-                  <span class="pc-mtext">Raw ingredient</span>
+                  <span class="pc-mtext">Drink</span>
                 </a>
               </li>
 
               <li class="pc-item">
                 <a href="/operation/processed_ingredient" class="pc-link">
                   <span class="pc-micon"><i class="ti ti-table"></i></span>
-                  <span class="pc-mtext">Processed ingredient</span>
+                  <span class="pc-mtext">Processed Ingredient</span>
                 </a>
               </li>
 
               {% if user.role in ['Admin'] %}
 
                 <li class="pc-item">
-                  <a href="#" class="pc-link">
+                  <a href="/operation/raw_ingredient" class="pc-link">
                     <span class="pc-micon"><i class="ti ti-table"></i></span>
-                    <span class="pc-mtext">Fixed cost</span>
+                    <span class="pc-mtext">Raw Ingredient</span>
+                  </a>
+                </li>
+
+                <li class="pc-item">
+                  <a href="/operation/fixed_cost" class="pc-link">
+                    <span class="pc-micon"><i class="ti ti-table"></i></span>
+                    <span class="pc-mtext">Fixed Cost</span>
                   </a>
                 </li>
 
@@ -555,8 +551,8 @@
               <li class="pc-h-item">
 
                 <a href="/login" class="dropdown-item">
-                  <i class="ti ti-login"></i>
-                  <span>Login</span>
+                  <i class="ti ti-login f-20"></i>
+                  <span class="f-16">Login</span>
                 </a>
 
               </li>
@@ -626,6 +622,7 @@
     <script src="{{ request.url_for('static', path='js/fonts/custom-font.js') }}"></script>
     <script src="{{ request.url_for('static', path='js/pcoded.js') }}"></script>
     <script src="{{ request.url_for('static', path='js/plugins/feather.min.js') }}"></script>
+
 
     <script>layout_change('light');</script>
     <script>change_box_container('false');</script>

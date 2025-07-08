@@ -66,8 +66,11 @@ class AuthToken:
                 'firstname': payload.get('firstname'),
                 'lastname': payload.get('lastname'),
                 'role': payload.get('role'),
-                'active': payload.get('active')
+                'active': payload.get('active'),
+                'location': payload.get('location'),
+                'last_login': datetime.datetime.strptime(payload.get('last_login'), "%d/%m/%Y %H:%M"),
             })
+
 
         except JWTError:
             raise credentials_exception

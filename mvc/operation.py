@@ -1,23 +1,49 @@
-from pydantic import BaseModel, Field, constr, conint, conlist
-from typing import Optional, Literal
+import pandas as pd
+from pydantic import BaseModel, Field, field_validator, model_validator, computed_field, EmailStr
+from typing import Optional, Literal, Union, Dict, List, Annotated
 from bson import ObjectId
 from pymongo import ReturnDocument
-
+from datetime import datetime
 from fastapi import HTTPException
 from fastapi.encoders import jsonable_encoder
 
 from mvc.database import mongo_db
+from mvc.users import UserPublic
+
+
+
+
+class LocationFixedCost(BaseModel):
+    SGN: Union[int, float] = Field(..., ge=10000)
+    NTR: Union[int, float] = Field(..., ge=0)
+
+
+
+class FixedCost(BaseModel):
+    id: str = Field(default_factory=ObjectId, alias="_id")
+    Fixed_Cost_ID: str = Field(pattern=r"^FIX\d+$")
+    Fixed_Cost_Name: str = Field(min_length=3)
+    Cost: LocationFixedCost
+
+    model_config = {
+        'populate_by_name': True,
+        'arbitrary_types_allowed': True,
+        'json_encoders': {ObjectId: lambda oid: str(oid)},
+    }
 
 
 
 class RawIngredient(BaseModel):
     id: str = Field(default_factory=ObjectId, alias='_id')
-    Raw_Ingredient_ID: constr(pattern=r"^RIG\d+$")
-    Raw_Ingredient_Name: constr(min_length=2)
-    Cost: conint(ge=1000)
-    Quanty: conint(ge=1)
+    Raw_Ingredient_ID: str = Field(pattern=r"^RIG\d+$")
+    Raw_Ingredient_Name: str = Field(min_length=2)
+    Cost: int = Field(ge=1000)
+    Quanty: int = Field(ge=1)
     Unit: Literal["gram", "ml", "ly", "trái", "gói"]
-    Cost_Per_Unit: conint(ge=1)
+    Enable: bool = Field(...)
+
+    # Calculated fields
+    Cost_Per_Unit: Annotated[float, Field(ge=1, default=None)]
 
     model_config = {
         'populate_by_name': True,
@@ -26,33 +52,223 @@ class RawIngredient(BaseModel):
     }
 
 
+    @model_validator(mode='after')
+    @classmethod
+    def compute_unit_cost(cls, values):
+        values.Cost_Per_Unit = values.Cost / values.Quanty
+        return values
+
+
 
 class RawIngredientItem(BaseModel):
-    Raw_Ingredient_ID: constr(pattern=r"^RIG\d+$")
-    Raw_Ingredient_Quanty: conint(gt=1)
+    Raw_Ingredient_ID: str = Field(pattern=r"^RIG\d+$")
+    Raw_Ingredient_Quanty: int = Field(gt=1)
 
-    Raw_Ingredient_Name: Optional[constr(min_length=2)] = None
-    Unit: Optional[Literal["gram", "ml", "ly", "trái", "gói"]] = None
-    Cost_Per_Unit: Optional[conint(ge=1)] = None
+    # Reference fields
+    Raw_Ingredient_Name: Annotated[str, Field(min_length=2, default=None)]
+    Unit: Annotated[Literal["gram", "ml", "ly", "trái", "gói"], Field(description="Must be in ['gram', 'ml', 'ly', 'trái', 'gói']", default=None)]
+    Cost_Per_Unit: Annotated[float, Field(ge=1, default=None)]
+    Enable: Annotated[bool, Field(default=None)]
+
+    # Calculated fields
+    Total_Cost: Annotated[float, Field(ge=1, default=None)]
+    Cost_Per_Proc_Unit: Annotated[float, Field(ge=1, default=None)]
 
 
 
+    def add_data_ref_cal_fields(self, rig: RawIngredient, pig_qty: float):
+        self.Raw_Ingredient_Name = rig.Raw_Ingredient_Name
+        self.Unit = rig.Unit
+        self.Cost_Per_Unit = rig.Cost_Per_Unit
+        self.Enable = rig.Enable
 
+        self.Total_Cost = self.Raw_Ingredient_Quanty * self.Cost_Per_Unit
+        self.Cost_Per_Proc_Unit = self.Total_Cost / pig_qty
 
 
 
 class ProcessedIngredient(BaseModel):
     id: str = Field(default_factory=ObjectId, alias='_id')
-    Processed_Ingredient_ID: constr(pattern=r"^PIG\d+$")
-    Processed_Ingredient_Name: constr(min_length=3)
-    Used_Quanty: conint(ge=1)
-    Raw_Ingredients: conlist(RawIngredientItem, min_length=2)
+    Processed_Ingredient_ID: str = Field(pattern=r"^PIG\d+$")
+    Processed_Ingredient_Name: str = Field(min_length=3)
+    Used_Quanty: int = Field(ge=1)
+    Raw_Ingredients: List[RawIngredientItem] = Field(min_length=1)
+    Quanty: int = Field(ge=1)
+    Unit: Literal["ml", "gram"]
+
+
+    # Calculated fields
+    Total_Cost: Annotated[float, Field(ge=1000, default=0)]
+    Cost_Per_Unit: Annotated[float, Field(ge=1, default=None)]
+
 
     model_config = {
         'populate_by_name': True,
         'arbitrary_types_allowed': True,
         'json_encoders': {ObjectId: lambda oid: str(oid)},
     }
+
+
+
+class IngredientForFil(BaseModel):
+    ID: str = Field(pattern=r"^(R|P)IG\d+$")
+    Name: str = Field(min_length=3)
+    Unit: Literal["gram", "ml", "ly", "trái", "gói"]
+    Type: Literal["Raw", "Processed"] = Field(default=None)
+
+
+    @model_validator(mode='after')
+    @classmethod
+    def compute_ingredient_type(cls, values):
+        values.Type = 'Raw' if values.ID[:3] == 'RIG' else 'Processed'
+        return values
+
+
+
+class DrinkIngredientItem(BaseModel):
+    Ingredient_ID: str = Field(pattern=r"^(RIG|PIG)\d+$")
+    Ingredient_Quanty: float = Field(ge=0.1)
+
+    # Reference fields
+    Ingredient_Name: Annotated[str, Field(min_length=2, default=None)]
+    Unit: Optional[str] = None
+    Cost_Per_Unit: Annotated[float, Field(ge=1, default=None)]
+
+    # Calculated fields
+    Total_Cost: Annotated[float, Field(ge=1, default=0)]
+
+
+
+    def add_data_ref_cal_fields(self, igr: RawIngredient | ProcessedIngredient):
+
+        if isinstance(igr, RawIngredient):
+
+            self.Ingredient_Name = igr.Raw_Ingredient_Name
+            self.Unit = igr.Unit
+            self.Cost_Per_Unit = igr.Cost_Per_Unit
+
+            self.Total_Cost = self.Ingredient_Quanty * self.Cost_Per_Unit
+
+        else:
+
+            self.Ingredient_Name = igr.Processed_Ingredient_Name
+            self.Unit = igr.Unit
+            self.Cost_Per_Unit = igr.Cost_Per_Unit
+
+            self.Total_Cost = self.Ingredient_Quanty * self.Cost_Per_Unit
+
+
+
+
+class DrinkPrice(BaseModel):
+    Size_S: Annotated[Union[float, int], Field(ge=10000)] | Literal[0] = 0
+    Size_M: Annotated[Union[float, int], Field(ge=10000)] | Literal[0] = 0
+    Size_L: Annotated[Union[float, int], Field(ge=10000)] | Literal[0] = 0
+
+
+
+class LocationDrinkPrice(BaseModel):
+    SGN: DrinkPrice
+    NTR: DrinkPrice
+
+
+
+class Drink(BaseModel):
+    id: str = Field(default_factory=ObjectId, alias='_id')
+    Group: str = Field(min_length=3)
+    Location: List[Literal["SGN", "NTR"]] = Field(min_length=1)
+    Drink_ID: str = Field(pattern=r"^DRK\d+$")
+    Drink_Name: str = Field(min_length=3)
+    Ingredients: List[DrinkIngredientItem] = Field(min_length=1)
+    Price: LocationDrinkPrice
+    Enable: bool = Field(...)
+
+    # Calculated fields
+    Total_Cost: Annotated[float, Field(ge=1, default=0)]
+    Weighting: Annotated[dict, Field(default={
+        'SGN': {
+            'Size_S': 0,
+            'Size_M': 1,
+            'Size_L': 0,
+        },
+        'NTR': {
+            'Size_S': 0,
+            'Size_M': 0,
+            'Size_L': 0,
+        },
+    })]
+
+
+    model_config = {
+        'populate_by_name': True,
+        'arbitrary_types_allowed': True,
+        'json_encoders': {ObjectId: lambda oid: str(oid)},
+    }
+
+
+
+class DrinkIngredientItemUpdate(BaseModel):
+    Ingredient_ID: str = Field(pattern=r"^(RIG|PIG)\d+$")
+    Ingredient_Quanty: float = Field(ge=0.1)
+
+
+
+class DrinkUpdate(BaseModel):
+    Drink_ID: str = Field(pattern=r"^DRK\d+$")
+    Drink_Name: str = Field(min_length=3, default=None)
+    Group: str = Field(min_length=3, default=None)
+    Location: List[Literal["SGN", "NTR"]] = Field(min_length=1, default=None)
+    Price: LocationDrinkPrice = Field(default=None)
+    Ingredients: List[DrinkIngredientItemUpdate] = Field(min_length=1, default=None)
+
+
+
+class InventoryItem(BaseModel):
+    id: str = Field(default_factory=ObjectId, alias='_id')
+    Raw_Ingredient_ID: str = Field(pattern=r"^RIG\d+$")
+    Location: Literal["SGN", "NTR"]
+    email: EmailStr
+    Action: Literal["add", "get"]
+    DateTime: datetime
+    Qty: float = Field(ge=-10, le=50)
+
+
+    # Reference fields
+    Raw_Ingredient_Name: Annotated[str, Field(min_length=2, default=None)]
+    Quanty: Annotated[int, Field(ge=1, default=None)]
+    Unit: Annotated[Literal["gram", "ml", "ly", "trái", "gói"], Field(description="Must be in ['gram', 'ml', 'ly', 'trái', 'gói']", default=None)]
+
+
+    model_config = {
+        'populate_by_name': True,
+        'arbitrary_types_allowed': True,
+        'json_encoders': {
+            ObjectId: lambda oid: str(oid),
+            datetime: lambda dt: dt.strftime("%d/%m/%Y %H:%M"),
+        },
+    }
+
+
+    @field_validator('Qty')
+    @classmethod
+    def value_not_zero(cls, qty: float) -> float:
+        if qty == 0:
+            raise ValueError('value must not be zero')
+        return qty
+
+
+
+class InventoryItemInsert(BaseModel):
+    Raw_Ingredient_ID: str = Field(pattern=r"^RIG\d+$")
+    Location: Literal["SGN", "NTR"]
+    email: str = Field(default=None)
+    Action: Literal["add", "get"] = Field(default="add")
+    DateTime: datetime = Field(default=datetime.now())
+    Qty: float = Field(ge=-10, le=50)
+
+
+
+
 
 
 
@@ -68,25 +284,41 @@ class Operation:
         self.mongo_db = mongo_db
         self.clt_raw_ingredient = mongo_db.hayladb['raw_ingredient']
         self.clt_processed_ingredient = mongo_db.hayladb['processed_ingredient']
-        self.clt_recipes = mongo_db.hayladb['recipes']
+        self.clt_drink = mongo_db.hayladb['drink']
+        self.clt_fixed_cost = mongo_db.hayladb['fixed_cost']
+        self.clt_inventory = mongo_db.hayladb['inventory']
 
 
 
-    async def retrieve_raw_ingredient(self) -> list[RawIngredient]:
+    @staticmethod
+    async def convert_raw_ingredient(rig: dict, current_user: UserPublic) -> RawIngredient:
+        rig_data = jsonable_encoder(rig, custom_encoder={ObjectId: str})
+        rig_data = RawIngredient(**rig_data)
+
+        if current_user.role.upper() not in ['ADMIN']:
+            rig_data.Cost_Per_Unit = 0
+
+        return rig_data
+
+
+
+    async def retrieve_raw_ingredient(self, current_user: UserPublic, is_show_disable: bool = False) -> list[RawIngredient]:
 
         lst_raw_ingredient = list()
 
-        async for rig in self.clt_raw_ingredient.find({'Raw_Ingredient_ID': {'$exists': True, '$ne': None}}):
+        async for rig in self.clt_raw_ingredient.find({
+            'Raw_Ingredient_ID': {'$exists': True, '$ne': None},
+        } | {'Enable': True} if not is_show_disable else {}).sort({'Enable': -1}):
 
-            rig_data = jsonable_encoder(rig, custom_encoder={ObjectId: str})
-            lst_raw_ingredient.append(RawIngredient(**rig_data))
+            rig_data = await self.convert_raw_ingredient(rig, current_user)
+            lst_raw_ingredient.append(rig_data)
 
         return lst_raw_ingredient
 
 
 
 
-    async def convert_processed_ingredient(self, pig: dict) -> ProcessedIngredient:
+    async def convert_processed_ingredient(self, pig: dict, current_user: UserPublic) -> ProcessedIngredient:
 
         pig_data = jsonable_encoder(pig, custom_encoder={ObjectId: str})
         pig_data = ProcessedIngredient(**pig_data)
@@ -94,31 +326,228 @@ class Operation:
         for item in pig_data.Raw_Ingredients:
             rig = await self.clt_raw_ingredient.find_one({'Raw_Ingredient_ID': {'$exists': True, '$eq': item.Raw_Ingredient_ID}})
             rig_data = jsonable_encoder(rig, custom_encoder={ObjectId: str})
-            rig_data = RawIngredient(**rig_data)
+            rig_data = await self.convert_raw_ingredient(rig_data, current_user)
+            item.add_data_ref_cal_fields(rig_data, pig_qty=pig_data.Quanty)  # item = RawIngredientItem
 
-            item.Raw_Ingredient_Name = rig_data.Raw_Ingredient_Name
-            item.Unit = rig_data.Unit
-            item.Cost_Per_Unit = rig_data.Cost_Per_Unit
+            # Calculated fields - pro igr
+            pig_data.Total_Cost += item.Total_Cost
+            pig_data.Cost_Per_Unit = pig_data.Total_Cost / pig_data.Quanty
 
         return pig_data
 
 
 
-    async def retrieve_processed_ingredient(self) -> list[RawIngredient]:
+    async def retrieve_processed_ingredient(self, current_user: UserPublic) -> list[ProcessedIngredient]:
 
         lst_processed_ingredient = list()
 
         async for pig in self.clt_processed_ingredient.find({'Processed_Ingredient_ID': {'$exists': True, '$ne': None}}):
-            pig_data = await self.convert_processed_ingredient(pig)
-
+            pig_data = await self.convert_processed_ingredient(pig, current_user)
             lst_processed_ingredient.append(pig_data)
-
-
-
 
         return lst_processed_ingredient
 
 
+
+    async def convert_drink(self, drk: dict, current_user: UserPublic) -> Drink:
+
+        drk_data = jsonable_encoder(drk, custom_encoder={ObjectId: str})
+        drk_data = Drink(**drk_data)
+
+        for item in drk_data.Ingredients:
+
+            if str(item.Ingredient_ID)[:3].upper() == 'RIG':
+
+                drk_igr = await self.clt_raw_ingredient.find_one({'Raw_Ingredient_ID': {'$exists': True, '$eq': item.Ingredient_ID}})
+                drk_igr_data = jsonable_encoder(drk_igr, custom_encoder={ObjectId: str})
+                drk_igr_data = await self.convert_raw_ingredient(drk_igr_data, current_user)
+
+                item.add_data_ref_cal_fields(drk_igr_data)
+
+            else:
+
+                drk_igr = await self.clt_processed_ingredient.find_one({'Processed_Ingredient_ID': {'$exists': True, '$eq': item.Ingredient_ID}})
+                drk_igr_data = await self.convert_processed_ingredient(drk_igr, current_user)
+
+                item.add_data_ref_cal_fields(drk_igr_data)
+
+
+            drk_data.Total_Cost += item.Total_Cost
+
+            for loc in drk_data.Location:
+
+                if loc == 'SGN':
+                    continue
+
+                obj_price_loc = getattr(drk_data.Price, loc)
+                dict_weighting: dict = drk_data.Weighting.get(loc)
+
+                if obj_price_loc.Size_S > 0:
+                    dict_weighting['Size_S'] = 1
+                    dict_weighting['Size_M'] = 1.5
+                    dict_weighting['Size_L'] = 1.5 * 1.5
+
+                elif obj_price_loc.Size_S == 0 and obj_price_loc.Size_M > 0:
+                    dict_weighting['Size_S'] = 0
+                    dict_weighting['Size_M'] = 1
+                    dict_weighting['Size_L'] = 1.5
+
+
+        return drk_data
+
+
+
+    async def retrieve_drink(self, current_user: UserPublic) -> Dict[str, list[Drink]]:
+
+        dict_drink = dict()
+
+        async for drk in self.clt_drink.find({
+            'Drink_ID': {'$exists': True, '$ne': None},
+            'Enable': True,
+        }).sort({'Group': 1, 'Location': -1, 'Drink_Name': 1}):
+
+            drk_data = await self.convert_drink(drk, current_user)
+
+            if not dict_drink.get(drk_data.Group):
+                dict_drink.update({drk_data.Group: [drk_data]})
+
+            else:
+                dict_drink[drk_data.Group].append(drk_data)
+
+
+        return dict_drink
+
+
+
+    async def update_drink(self, oid: str, obj_drink: DrinkUpdate) -> DrinkUpdate:
+
+        try:
+            oid = ObjectId(oid)
+        except Exception:
+            raise HTTPException(status_code=400, detail='Invalid drink_oid')
+
+        update_data = {k: v for k, v in obj_drink.model_dump().items() if v is not None}
+
+        if not update_data:
+            raise HTTPException(status_code=400, detail='No fields to update')
+
+        updated_drink = await self.clt_drink.find_one_and_update(
+            {'_id': oid},
+            {'$set': update_data},
+            return_document=ReturnDocument.AFTER,
+            # projection={'hashed_password': 0}
+        )
+
+        if not updated_drink:
+            raise HTTPException(status_code=404, detail='Drink not found')
+
+        updated_drink = DrinkUpdate(**updated_drink)
+
+        return updated_drink
+
+
+
+
+    async def retrieve_fixed_cost(self) -> list[FixedCost]:
+
+        lst_fixed_cost = list()
+
+        async for fix in self.clt_fixed_cost.find({'Fixed_Cost_ID': {'$exists': True, '$ne': None}}):
+            fix_data = jsonable_encoder(fix, custom_encoder={ObjectId: str})
+            lst_fixed_cost.append(FixedCost(**fix_data))
+
+        return lst_fixed_cost
+
+
+
+
+    async def convert_inventory(self, inv: dict) -> InventoryItem:
+
+        inv_data = jsonable_encoder(inv, custom_encoder={ObjectId: str})
+        inv_data = InventoryItem(**inv_data)
+
+        rig = await self.clt_raw_ingredient.find_one({'Raw_Ingredient_ID': {'$exists': True, '$eq': inv_data.Raw_Ingredient_ID}})
+        rig_data = jsonable_encoder(rig, custom_encoder={ObjectId: str})
+
+        # Reference fields
+        inv_data.Raw_Ingredient_Name = rig_data['Raw_Ingredient_Name']
+        inv_data.Quanty = rig_data['Quanty']
+        inv_data.Unit = rig_data['Unit']
+
+        return inv_data
+
+
+
+    async def retrieve_inventory(self) -> list[InventoryItem]:
+        lst_inventory = list()
+
+        async for inv in self.clt_inventory.find({'Raw_Ingredient_ID': {'$exists': True, '$ne': None}}).sort({'DateTime': -1}):
+            inv_data = await self.convert_inventory(inv)
+            lst_inventory.append(inv_data)
+
+        return lst_inventory
+
+
+
+
+    @staticmethod
+    def analyze_inventory(lst_inventory: list[InventoryItem]):
+
+        df_summary = pd.DataFrame([i.model_dump() for i in lst_inventory])
+
+
+        df_total_qty: pd.DataFrame = (
+            df_summary
+            .groupby(['Raw_Ingredient_ID', 'Raw_Ingredient_Name', 'Location', 'Quanty', 'Unit'])['Qty']
+            .sum()
+            .reset_index(name="TotalQty")
+            .sort_values(by=['Location', 'TotalQty', 'Raw_Ingredient_ID'], ascending=[False, True, True])
+        )
+        
+
+        dict_total_qty = df_total_qty.to_dict(orient='records')
+
+        return dict_total_qty
+
+
+
+    async def add_inventory_items(self, lst_inv_item: list[InventoryItemInsert], current_user: UserPublic) -> list[InventoryItem]:
+
+        try:
+            lst_inv_item_dump = list()
+            for i in lst_inv_item:
+                i.email = current_user.email
+                lst_inv_item_dump.append(i.model_dump(by_alias=True, exclude_none=True))
+
+            result = await self.clt_inventory.insert_many(lst_inv_item_dump)
+
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
+
+        lst_inventory = list()
+        async for inv in self.clt_inventory.find({"_id": {"$in": result.inserted_ids}}).sort({'DateTime': -1}):
+            inv_data = await self.convert_inventory(inv)
+            lst_inventory.append(inv_data)
+
+        return lst_inventory
+
+
+
+
+    async def get_full_ingredients(self, current_user: UserPublic) -> list[IngredientForFil]:
+
+        lst_full_igr = list()
+        lst_full_pig = await self.retrieve_processed_ingredient(current_user)
+        lst_full_rig = await self.retrieve_raw_ingredient(current_user)
+
+        for pig in lst_full_pig:
+            lst_full_igr.append(IngredientForFil(ID=pig.Processed_Ingredient_ID, Name=pig.Processed_Ingredient_Name, Unit=pig.Unit))
+
+        for rig in lst_full_rig:
+            lst_full_igr.append(IngredientForFil(ID=rig.Raw_Ingredient_ID, Name=rig.Raw_Ingredient_Name, Unit=rig.Unit))
+
+        return lst_full_igr
 
 
 

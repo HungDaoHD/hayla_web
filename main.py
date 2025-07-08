@@ -7,7 +7,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from urllib.parse import quote
 
 from routers.auth import authentication
-from routers.auth.oauth2 import UserPublic, get_current_user_cookie, validate_current_user_cookie
+from routers.auth.oauth2 import UserPublic, get_current_user_cookie, validate_current_user_cookie, require_role
 from routers.administration import users
 from routers.operation import operation
 
@@ -36,7 +36,7 @@ async def home(request: Request):
 
 
 
-@app.get('/dashboard', response_class=HTMLResponse)
+@app.get('/dashboard', response_class=HTMLResponse, dependencies=[Depends(require_role(role=['Admin']))])
 async def dashboard(request: Request, current_user: UserPublic = Depends(get_current_user_cookie)):
     return templates.TemplateResponse('dashboard/index.html', {
         'request': request,
@@ -69,6 +69,10 @@ async def custom_http_exception_handler(request: Request, exc: StarletteHTTPExce
     # 404 (Not Found)
     if exc.status_code == 404:
         return templates.TemplateResponse('pages/error-404.html', {'request': request}, status_code=404)
+
+    # 500 (Internal Server Error)
+    if exc.status_code == 500:
+        return templates.TemplateResponse('pages/error-500.html', {'request': request}, status_code=500)
 
 
     # Otherwise, fall back to FastAPI’s default HTTP‐exception handler

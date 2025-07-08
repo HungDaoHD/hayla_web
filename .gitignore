@@ -3,4 +3,7 @@ __pycache__
 old
 template_demo
 venv
+bak
 .env
+*.xlsm
+*.xlsx
