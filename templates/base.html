@@ -97,29 +97,29 @@
               </li>
 
               <li class="pc-item">
-                <a href="#" class="pc-link">
-                  <span class="pc-micon"><i class="ti ti-table"></i></span>
-                  <span class="pc-mtext">Bill</span>
+                <a href="/operation/receipt" class="pc-link">
+                  <span class="pc-micon"><i class="ti ti-receipt"></i></span>
+                  <span class="pc-mtext">Receipt</span>
                 </a>
               </li>
 
               <li class="pc-item">
                 <a href="/operation/inventory" class="pc-link">
-                  <span class="pc-micon"><i class="ti ti-table"></i></span>
+                  <span class="pc-micon"><i class="ti ti-building-warehouse"></i></span>
                   <span class="pc-mtext">Inventory</span>
                 </a>
               </li>
 
               <li class="pc-item">
                 <a href="/operation/drink" class="pc-link">
-                  <span class="pc-micon"><i class="ti ti-table"></i></span>
+                  <span class="pc-micon"><i class="ti ti-coffee"></i></span>
                   <span class="pc-mtext">Drink</span>
                 </a>
               </li>
 
               <li class="pc-item">
                 <a href="/operation/processed_ingredient" class="pc-link">
-                  <span class="pc-micon"><i class="ti ti-table"></i></span>
+                  <span class="pc-micon"><i class="ti ti-tools-kitchen-2"></i></span>
                   <span class="pc-mtext">Processed Ingredient</span>
                 </a>
               </li>
@@ -128,14 +128,14 @@
 
                 <li class="pc-item">
                   <a href="/operation/raw_ingredient" class="pc-link">
-                    <span class="pc-micon"><i class="ti ti-table"></i></span>
+                    <span class="pc-micon"><i class="ti ti-leaf"></i></span>
                     <span class="pc-mtext">Raw Ingredient</span>
                   </a>
                 </li>
 
                 <li class="pc-item">
                   <a href="/operation/fixed_cost" class="pc-link">
-                    <span class="pc-micon"><i class="ti ti-table"></i></span>
+                    <span class="pc-micon"><i class="ti ti-businessplan"></i></span>
                     <span class="pc-mtext">Fixed Cost</span>
                   </a>
                 </li>
@@ -183,7 +183,7 @@
 
             <!-- ======= Menu collapse icon desktop ===== -->
             <li class="pc-h-item pc-sidebar-collapse">
-              <a href="#" class="pc-head-link ms-0" id="sidebar-hide">
+              <a href="javascript:void(0)" class="pc-head-link ms-0" id="sidebar-hide">
                 <i class="ti ti-menu-2"></i>
               </a>
             </li>
@@ -198,7 +198,7 @@
 
             <!-- ======= Menu collapse icon mobile ===== -->
             <li class="pc-h-item pc-sidebar-popup">
-              <a href="#" class="pc-head-link ms-0" id="mobile-collapse">
+              <a href="javascript:void(0)" class="pc-head-link ms-0" id="mobile-collapse">
                 <i class="ti ti-menu-2"></i>
               </a>
             </li>
@@ -208,7 +208,7 @@
               <a
                 class="pc-head-link dropdown-toggle arrow-none m-0"
                 data-bs-toggle="dropdown"
-                href="#"
+                href="javascript:void(0)"
                 role="button"
                 aria-haspopup="false"
                 aria-expanded="false"
@@ -241,7 +241,7 @@
                 <a
                   class="pc-head-link dropdown-toggle arrow-none me-0"
                   data-bs-toggle="dropdown"
-                  href="#"
+                  href="javascript:void(0)"
                   role="button"
                   aria-haspopup="false"
                   aria-expanded="false"
@@ -331,7 +331,7 @@
                 <a
                   class="pc-head-link dropdown-toggle arrow-none me-0"
                   data-bs-toggle="dropdown"
-                  href="#"
+                  href="javascript:void(0)"
                   role="button"
                   aria-haspopup="false"
                   aria-expanded="false"
@@ -421,7 +421,7 @@
                 <a
                   class="pc-head-link dropdown-toggle arrow-none me-0"
                   data-bs-toggle="dropdown"
-                  href="#"
+                  href="javascript:void(0)"
                   role="button"
                   aria-haspopup="false"
                   data-bs-auto-close="outside"
@@ -630,9 +630,39 @@
     <script>preset_change("preset-1");</script>
     <script>font_change("Public-Sans");</script>
 
+    <!-- Latest 3.x version from jQuery CDN-->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+
     {% block extra_scripts %}{% endblock %}
+
+    <button id="btnScrollTop" type="button" class="btn btn-icon btn-outline-primary"><i class="ti ti-arrow-up"></i></button>
+
+    <script>
+      // jQuery — make sure you’ve included it before this script
+      $(function() {
+        var $btn = $('#btnScrollTop');
+
+        // 1) Show/hide button on scroll
+        $(window).on('scroll', function() {
+          if ($(this).scrollTop() > 200) {
+            $btn.fadeIn();
+          } else {
+            $btn.fadeOut();
+          }
+        });
+
+        // 2) Smooth-scroll to top on click
+        $btn.on('click', function(e) {
+          e.preventDefault();
+          $('html, body').animate({ scrollTop: 0 }, 100);
+        });
+      });
+    
+    </script>
 
   </body>
   <!-- [Body] end -->
+
+  
 
 </html>

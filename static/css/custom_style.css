@@ -1,20 +1,16 @@
 /* Force true vertical + horizontal centering */
-#inventory-add-items-modal .modal-dialog,
+#inventory-items-modal .modal-dialog,
 #pig-view-modal .modal-dialog,
 #drink-view-modal .modal-dialog,
 #drink-edit-modal .modal-dialog {
-  /* make the dialog itself a flex container */
   display: flex !important;
-  /* center along the cross-axis (vertical) */
   align-items: center !important;
-  /* center along the main-axis (horizontal) */
   justify-content: center !important;
-  /* ensure it spans the full height for centering math */
   min-height: 90vh;
 }
 
 /* make the content fill that space */
-#inventory-add-items-modal .modal-content, 
+#inventory-items-modal .modal-content, 
 #pig-view-modal .modal-content,
 #drink-view-modal .modal-content,
 #drink-edit-modal .modal-content {
@@ -23,11 +19,20 @@
 }
 
 /* ensure the body scrolls if content overflows */
-#inventory-add-items-modal .modal-body, 
+#inventory-items-modal .modal-body, 
 #pig-view-modal .modal-body,
 #drink-view-modal .modal-body,
 #drink-edit-modal .modal-body {
   overflow-y: auto;
+}
+
+
+#btnScrollTop {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: none;
+  z-index: 1000;
 }
 
 

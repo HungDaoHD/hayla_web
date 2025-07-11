@@ -1,8 +1,10 @@
 <!-- Load template html -->
 {% extends "./base.html" %}
 
+{% set str_title = 'Fixed Cost' %}
+
 <!-- Title -->
-{% block title %}Fixed Cost | Haylà{% endblock %}
+{% block title %} {{ str_title ~ ' | Haylà' }} {% endblock %}
 
 
 <!-- [ breadcrumb ] start -->
@@ -11,15 +13,16 @@
   <ul class="breadcrumb">
     <li class="breadcrumb-item"><a href="/">Home</a></li>
     <li class="breadcrumb-item"><a href="javascript: void(0)">Operation</a></li>
-    <li class="breadcrumb-item" aria-current="page">Fixed Cost</li>
+    <li class="breadcrumb-item" aria-current="page">{{ str_title }}</li>
   </ul>
 </div>
 
 <div class="col-md-12">
   <div class="page-header-title">
-    <h2 class="mb-0">Fixed Cost</h2>
+    <h2 class="mb-0">{{ str_title }}</h2>
   </div>
 </div>
+
 {% endblock %}
 <!-- [ breadcrumb ] end -->
 
@@ -28,73 +31,71 @@
 {% block main_content %}
 <div class="row">
   <div class="col-sm-12">
-    <div class="card table-card">
+    <div class="card">
       <div class="card-body">
 
-        <div class="text-end p-4 pb-0 mb-3">
+        <div class="text-end p-0 pb-0 mb-0">
           <a href="#" class="btn btn-primary d-inline-flex align-item-center" data-bs-toggle="modal" data-bs-target="#user-edit_add-modal">
             <i class="ti ti-plus f-18"></i> Add
           </a>
         </div>
+        
+        <table class="table table-hover table-sm" id="dt-fixed-cost">
 
-        <div class="table-responsive">
-          <table class="table table-hover table-sm" id="dt-fixed-cost">
+          <thead>
+            <tr>
+              <th></th>
+              <th colspan="2" class="text-center">Cost (VND)</th>
+              <th></th>
+            </tr>
 
-            <thead>
-              <tr>
-                <th></th>
-                <th colspan="2" class="text-center">Cost (VND)</th>
-                <th></th>
-              </tr>
+            <tr>
+              <th>Name</th>
+              <th class="text-center">SGN</th>
+              <th class="text-center">NTR</th>
+              <th></th>
+            </tr>
+          </thead>
 
-              <tr>
-                <th>Name</th>
-                <th class="text-center">SGN</th>
-                <th class="text-center">NTR</th>
-                <th></th>
-              </tr>
-            </thead>
+          <tbody>
 
-            <tbody>
+            {% for fix in lst_fixed_cost %}
 
-              {% for fix in lst_fixed_cost %}
-
-                <tr data-id="{{ fix.Fixed_Cost_ID }}">
-                  <td>
-                    <div class="row">
-                      <div class="col">
-                        <h6 class="mb-0">{{ fix.Fixed_Cost_Name }}</h6>
-                        <p class="text-muted f-12 mb-0">{{ fix.Fixed_Cost_ID }}</p>
-                      </div>
+              <tr data-id="{{ fix.Fixed_Cost_ID }}">
+                <td>
+                  <div class="row">
+                    <div class="col">
+                      <h6 class="mb-0">{{ fix.Fixed_Cost_Name }}</h6>
+                      <p class="text-muted f-12 mb-0">{{ fix.Fixed_Cost_ID }}</p>
                     </div>
-                  </td>
+                  </div>
+                </td>
 
-                  <td class="text-center">{{ "{:,.0f}".format(fix.Cost.SGN) }}</td>
-                  <td class="text-center">{{ "{:,.0f}".format(fix.Cost.NTR) }}</td>
+                <td class="text-center">{{ "{:,.0f}".format(fix.Cost.SGN) }}</td>
+                <td class="text-center">{{ "{:,.0f}".format(fix.Cost.NTR) }}</td>
 
-                  <td>
-                    <ul class="list-inline me-auto mb-0">
-                      <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Edit">
-                        <a href="#" class="avtar avtar-xs btn-link-primary">
-                          <i class="ti ti-edit-circle f-18"></i>
-                        </a>
-                      </li>
-                      <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Delete">
-                        <a href="#" class="avtar avtar-xs btn-link-danger">
-                          <i class="ti ti-trash f-18"></i>
-                        </a>
-                      </li>
-                    </ul>
-                  </td>
+                <td>
+                  <ul class="list-inline me-auto mb-0">
+                    <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Edit">
+                      <a href="#" class="avtar avtar-xs btn-link-primary">
+                        <i class="ti ti-edit-circle f-18"></i>
+                      </a>
+                    </li>
+                    <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Delete">
+                      <a href="#" class="avtar avtar-xs btn-link-danger">
+                        <i class="ti ti-trash f-18"></i>
+                      </a>
+                    </li>
+                  </ul>
+                </td>
 
-                </tr>
+              </tr>
 
-              {% endfor %}
+            {% endfor %}
 
-            </tbody>
+          </tbody>
 
-          </table>
-        </div>
+        </table>
       </div>
     </div>
   </div>

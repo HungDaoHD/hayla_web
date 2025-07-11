@@ -230,7 +230,7 @@ class InventoryItem(BaseModel):
     email: EmailStr
     Action: Literal["add", "get"]
     DateTime: datetime
-    Qty: float = Field(ge=-10, le=50)
+    Qty: float = Field(ge=1, le=50)
 
 
     # Reference fields
@@ -262,18 +262,9 @@ class InventoryItemInsert(BaseModel):
     Raw_Ingredient_ID: str = Field(pattern=r"^RIG\d+$")
     Location: Literal["SGN", "NTR"]
     email: str = Field(default=None)
-    Action: Literal["add", "get"] = Field(default="add")
-    DateTime: datetime = Field(default=datetime.now())
-    Qty: float = Field(ge=-10, le=50)
-
-
-
-
-
-
-
-
-
+    Action: Literal["add", "get"] = Field(default=None)
+    DateTime: datetime = Field(default=None)
+    Qty: float = Field(ge=1, le=50)
 
 
 
@@ -495,28 +486,36 @@ class Operation:
 
         df_summary = pd.DataFrame([i.model_dump() for i in lst_inventory])
 
-
         df_total_qty: pd.DataFrame = (
             df_summary
-            .groupby(['Raw_Ingredient_ID', 'Raw_Ingredient_Name', 'Location', 'Quanty', 'Unit'])['Qty']
+            .groupby(['Raw_Ingredient_ID', 'Raw_Ingredient_Name', 'Location', 'Quanty', 'Unit', 'Action'])['Qty']
             .sum()
             .reset_index(name="TotalQty")
-            .sort_values(by=['Location', 'TotalQty', 'Raw_Ingredient_ID'], ascending=[False, True, True])
+        ).pivot_table(
+            columns=['Action'],
+            values=['TotalQty'],
+            aggfunc=['sum'],
+            index=['Raw_Ingredient_ID', 'Raw_Ingredient_Name', 'Location', 'Quanty', 'Unit'],
+            fill_value=0
         )
         
+        flat_index = df_total_qty.columns.to_flat_index()
+        df_total_qty.columns = flat_index.map(lambda t: t[-1])
+        df_total_qty = df_total_qty.reset_index(drop=False)
+        df_total_qty['remain'] = df_total_qty['add'] - df_total_qty['get']
+        df_total_qty = df_total_qty.sort_values(by=['remain'], ascending=[True])
 
-        dict_total_qty = df_total_qty.to_dict(orient='records')
-
-        return dict_total_qty
+        return df_total_qty.to_dict(orient='records')
 
 
 
     async def add_inventory_items(self, lst_inv_item: list[InventoryItemInsert], current_user: UserPublic) -> list[InventoryItem]:
-
+        
         try:
             lst_inv_item_dump = list()
             for i in lst_inv_item:
                 i.email = current_user.email
+                i.DateTime = datetime.now()
                 lst_inv_item_dump.append(i.model_dump(by_alias=True, exclude_none=True))
 
             result = await self.clt_inventory.insert_many(lst_inv_item_dump)
@@ -532,11 +531,11 @@ class Operation:
 
         return lst_inventory
 
-
+    
 
 
     async def get_full_ingredients(self, current_user: UserPublic) -> list[IngredientForFil]:
-
+        
         lst_full_igr = list()
         lst_full_pig = await self.retrieve_processed_ingredient(current_user)
         lst_full_rig = await self.retrieve_raw_ingredient(current_user)

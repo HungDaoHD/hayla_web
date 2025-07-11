@@ -81,14 +81,12 @@ async def custom_http_exception_handler(request: Request, exc: StarletteHTTPExce
 
 
 
-
-
 if __name__ == '__main__':
     import uvicorn
 
     uvicorn.run(
-        app='main:app',  # <module>:<app instance>
-        # host="127.0.0.1",  # or "0.0.0.0" to listen on all interfaces
-        # port=8000,
-        reload=True,  # watch for code changes
+        app='main:app',
+        host="127.0.0.1",
+        port=8000,
+        reload=True,
     )

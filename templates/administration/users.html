@@ -28,7 +28,7 @@
 {% block main_content %}
 <div class="row">
   <div class="col-sm-12">
-    <div class="card table-card">
+    <div class="card">
       <div class="card-body">
 
         <div class="text-end p-4 pb-0">
@@ -43,10 +43,7 @@
             <thead>
               <tr>
                 <th>Name</th>
-                <th>Location</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th class="text-center">Actions</th>
+                <th>Actions</th>
               </tr>
             </thead>
 
@@ -59,34 +56,26 @@
                   <td>
                     <div class="row">
                       <div class="col">
-                        <h5 class="mb-0">{{ normal_user.firstname }} {{ normal_user.lastname }}</h5>
+                        <h5 class="mb-0">
+                          <span class="badge {{ 'bg-blue-500' if normal_user.location == 'SGN' else 'bg-orange-500' }}">{{ normal_user.location }}</span>
+                          {{ normal_user.firstname }} {{ normal_user.lastname }}
+                        </h5>
                         <p class="text-muted f-12 mb-0">{{ normal_user.email }}</p>
+                        <span class="text-muted f-12 mb-0">{{ normal_user.role }}</span>
+                        <span class="badge badge-status bg-light-{{ 'success' if normal_user.active else 'warning' }} rounded-pill f-12">
+                          {{ 'Active' if normal_user.active else 'Inactive' }}
+                        </span>
                       </div>
                     </div>
                   </td>
-
-                  <td>{{ normal_user.location }}</td>
-
-                  <td>{{ normal_user.role }}</td>
-
+                  
+                  
                   <td>
-                    <span class="badge bg-light-{{ 'success' if normal_user.active else 'warning' }} rounded-pill f-12">
-                      {{ 'Active' if normal_user.active else 'Inactive' }}
-                    </span>
-                  </td>
-
-                  <td class="text-center">
-
-                    <ul class="list-inline me-auto mb-0">
-                      <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Update Status">
-                        <a href="#" class="status-btn avtar avtar-xs btn-link-{{ 'danger' if normal_user.active else 'success' }}"
-                           data-bs-toggle="modal"
-                           data-bs-target="#loading-modal">
-                          <i class="ti ti-circle-{{ 'x' if normal_user.active else 'check' }} f-18"></i>
-                        </a>
-                      </li>
-                    </ul>
-
+                    
+                    <div class="form-check form-switch mb-2">
+                      <input type="checkbox" class="form-check-input input-primary status-btn" id="switch-active-user" {% if normal_user.active %}checked{% endif %} >
+                    </div>
+                    
                   </td>
 
                 </tr>
@@ -103,26 +92,7 @@
 
 
 
-<div class="modal fade" id="loading-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
 
-  <div class="modal-dialog modal-dialog-centered">
-
-    <div class="modal-content">
-      <div class="modal-header border-0 pb-0">
-        <h6 class="mb-0">Please wait...</h6>
-      </div>
-
-      <div class="modal-body">
-        <div class="spinner-grow text-success" role="status">
-          <span class="sr-only">Loading...</span>
-        </div>
-      </div>
-
-    </div>
-
-  </div>
-
-</div>
 
 {% endblock %}
 <!-- [ Main Content ] end -->
@@ -130,21 +100,11 @@
 
 
 {% block extra_scripts %}
-
-
-
-
-<!-- Latest 3.x version from jQuery CDN-->
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"
-  integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8="
-  crossorigin="anonymous">
-</script>
-
-
+<script src="{{ request.url_for('static', path='js/plugins/sweetalert2.all.min.js') }}"></script>
 
 <script>
   $(function() {
-    $('#pc-dt-users').on('click', '.status-btn', function(e) {
+    $('#pc-dt-users').on('change', '.status-btn', function(e) {
       e.preventDefault();
 
       const btn = $(this);
@@ -154,306 +114,74 @@
         active: row.data('active'),
       };
 
-      $.ajax({
-        url: `user/${user_id}/toggle_status`,
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(payload),
+      let timerInterval;
+      Swal.fire({
+        title: "Update User's status!",
+        html: 'Please wait in <b>2</b> seconds.',
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+        willOpen: () => {
+          Swal.showLoading();
+          timerInterval = setInterval(() => {
+            
+          }, 100);
+        }
+       
+      }).then((result) => {
+        
+        $.ajax({
+          url: `user/${user_id}/toggle_status`,
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify(payload),
 
-        success: function(resp) {
+          success: function(resp) {
 
-          row.data('active', resp.active);
-          const icon = btn.find('i');
-          const badge = row.find('td span.badge');
+            row.data('active', resp.active);
+            // const icon = btn.find('i');
+            const badge = row.find('td span.badge.badge-status');
 
-          if (resp.active == true) {
+            if (resp.active == true) {
 
-            badge
-              .removeClass('bg-light-warning')
-              .addClass('bg-light-success')
-              .text('Active');
+              badge
+                .removeClass('bg-light-warning')
+                .addClass('bg-light-success')
+                .text('Active');
+            } else {
 
-            btn
-              .removeClass('btn-link-success')
-              .addClass('btn-link-danger');
+              badge
+                .removeClass('bg-light-success')
+                .addClass('bg-light-warning')
+                .text('Inactive');
+            }
 
-            icon
-              .removeClass('ti-circle-check')
-              .addClass('ti-circle-x');
+          },
 
-          } else {
-
-            badge
-              .removeClass('bg-light-success')
-              .addClass('bg-light-warning')
-              .text('Inactive');
-
-            btn
-              .removeClass('btn-link-danger')
-              .addClass('btn-link-success');
-
-            icon
-              .removeClass('ti-circle-x')
-              .addClass('ti-circle-check');
+          error: function(xhr, status, err) {
+            console.error(xhr);
+            console.error(status);
+            console.error(err);
+            alert('Could not update status. Please try again.');
 
           }
 
-        },
+          
 
-        error: function(xhr, status, err) {
-          console.error(err);
-          alert('Could not update status. Please try again.');
+        });
 
-        },
 
-        complete() {
-          setTimeout(() => {
-            $('#loading-modal').modal('hide');
-            $('.modal-backdrop').remove();
-            $('body').removeClass('modal-open');
-          }, 3000);
-        }
 
       });
+
+
+      
+      
+      
     });
   });
 </script>
 {% endblock %}
 
-
-<!-- [Tạm thời chưa cần] start -->
-
-<!--<script src="{{ request.url_for('static', path='js/plugins/simple-datatables.js') }}"></script>-->
-
-<!--<script>-->
-<!--  const dataTable = new simpleDatatables.DataTable('#pc-dt-users', {-->
-<!--    sortable: false,-->
-<!--    perPage: 5-->
-<!--  });-->
-<!--</script>-->
-
-<!--<td class="text-center">-->
-<!--  <ul class="list-inline me-auto mb-0">-->
-<!--    <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="View">-->
-<!--      <a href="#" class="avtar avtar-xs btn-link-secondary" data-bs-toggle="modal"-->
-<!--        data-bs-target="#user-modal">-->
-<!--        <i class="ti ti-eye f-18"></i>-->
-<!--      </a>-->
-<!--    </li>-->
-<!--    <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Edit">-->
-<!--      <a href="#" class="avtar avtar-xs btn-link-primary" data-bs-toggle="modal"-->
-<!--        data-bs-target="#user-edit_add-modal">-->
-<!--        <i class="ti ti-edit-circle f-18"></i>-->
-<!--      </a>-->
-<!--    </li>-->
-<!--    <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Delete">-->
-<!--      <a href="#" class="avtar avtar-xs btn-link-danger">-->
-<!--        <i class="ti ti-trash f-18"></i>-->
-<!--      </a>-->
-<!--    </li>-->
-<!--  </ul>-->
-<!--</td>-->
-
-
-<!--<div class="modal fade" id="user-modal" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">-->
-<!--  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">-->
-<!--    <div class="modal-content">-->
-<!--      <div class="modal-header border-0 pb-0">-->
-<!--        <h5 class="mb-0">Customer Details</h5>-->
-<!--        <a href="#" class="avtar avtar-s btn-link-danger" data-bs-dismiss="modal">-->
-<!--          <i class="ti ti-x f-20"></i>-->
-<!--        </a>-->
-<!--      </div>-->
-<!--      <div class="modal-body">-->
-<!--        <div class="row">-->
-<!--          <div class="col-lg-4">-->
-<!--            <div class="card">-->
-<!--              <div class="card-body position-relative">-->
-<!--                <div class="position-absolute end-0 top-0 p-3">-->
-<!--                  <span class="badge bg-primary">Relationship</span>-->
-<!--                </div>-->
-<!--                <div class="text-center mt-3">-->
-<!--                  <div class="chat-avtar d-inline-flex mx-auto">-->
-<!--                    <img class="rounded-circle img-fluid wid-60" src="{{ request.url_for('static', path='images/user/avatar-0.jpg') }}"-->
-<!--                      alt="User image">-->
-<!--                  </div>-->
-<!--                  <h5 class="mb-0">Aaron Poole</h5>-->
-<!--                  <p class="text-muted text-sm">Manufacturing Director</p>-->
-<!--                  <hr class="my-3">-->
-<!--                  <div class="row g-3">-->
-<!--                    <div class="col-4">-->
-<!--                      <h5 class="mb-0">45</h5>-->
-<!--                      <small class="text-muted">Age</small>-->
-<!--                    </div>-->
-<!--                    <div class="col-4 border border-top-0 border-bottom-0">-->
-<!--                      <h5 class="mb-0">86%</h5>-->
-<!--                      <small class="text-muted">Progress</small>-->
-<!--                    </div>-->
-<!--                    <div class="col-4">-->
-<!--                      <h5 class="mb-0">7634</h5>-->
-<!--                      <small class="text-muted">Visits</small>-->
-<!--                    </div>-->
-<!--                  </div>-->
-<!--                  <hr class="my-3">-->
-<!--                  <div class="d-inline-flex align-items-center justify-content-between w-100 mb-3">-->
-<!--                    <i class="ti ti-mail"></i>-->
-<!--                    <p class="mb-0">bo@gmail.com</p>-->
-<!--                  </div>-->
-<!--                  <div class="d-inline-flex align-items-center justify-content-between w-100 mb-3">-->
-<!--                    <i class="ti ti-phone"></i>-->
-<!--                    <p class="mb-0">+1 (247) 849-6968</p>-->
-<!--                  </div>-->
-<!--                  <div class="d-inline-flex align-items-center justify-content-between w-100 mb-3">-->
-<!--                    <i class="ti ti-map-pin"></i>-->
-<!--                    <p class="mb-0">Lesotho</p>-->
-<!--                  </div>-->
-<!--                  <div class="d-inline-flex align-items-center justify-content-between w-100">-->
-<!--                    <i class="ti ti-link"></i>-->
-<!--                    <a href="#" class="link-primary">-->
-<!--                      <p class="mb-0">https://anshan.dh.url</p>-->
-<!--                    </a>-->
-<!--                  </div>-->
-<!--                </div>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--          <div class="col-lg-8">-->
-<!--            <div class="card">-->
-<!--              <div class="card-header">-->
-<!--                <h5>Personal Details</h5>-->
-<!--              </div>-->
-<!--              <div class="card-body">-->
-<!--                <ul class="list-group list-group-flush">-->
-<!--                  <li class="list-group-item px-0 pt-0">-->
-<!--                    <div class="row">-->
-<!--                      <div class="col-md-6">-->
-<!--                        <p class="mb-1 text-muted">Full Name</p>-->
-<!--                        <h6 class="mb-0">Aaron Poole</h6>-->
-<!--                      </div>-->
-<!--                      <div class="col-md-6">-->
-<!--                        <p class="mb-1 text-muted">Father Name</p>-->
-<!--                        <h6 class="mb-0">Mr. Ralph Sabatini</h6>-->
-<!--                      </div>-->
-<!--                    </div>-->
-<!--                  </li>-->
-<!--                  <li class="list-group-item px-0">-->
-<!--                    <div class="row">-->
-<!--                      <div class="col-md-6">-->
-<!--                        <p class="mb-1 text-muted">Country</p>-->
-<!--                        <h6 class="mb-0">Lesotho</h6>-->
-<!--                      </div>-->
-<!--                      <div class="col-md-6">-->
-<!--                        <p class="mb-1 text-muted">Zip Code</p>-->
-<!--                        <h6 class="mb-0">247 849</h6>-->
-<!--                      </div>-->
-<!--                    </div>-->
-<!--                  </li>-->
-<!--                  <li class="list-group-item px-0 pb-0">-->
-<!--                    <p class="mb-1 text-muted">Address</p>-->
-<!--                    <h6 class="mb-0">647 Punam Center, Ulabifgu, Myanmar (Burma) - 41487</h6>-->
-<!--                  </li>-->
-<!--                </ul>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--            <div class="card">-->
-<!--              <div class="card-header">-->
-<!--                <h5>About me</h5>-->
-<!--              </div>-->
-<!--              <div class="card-body">-->
-<!--                <p class="mb-0">Hello, I’m Aaron Poole Manufacturing Director based in international company, Void-->
-<!--                  jiidki me na fep juih ced gihhiwi launke cu mig tujum peodpo.</p>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  </div>-->
-<!--</div>-->
-
-
-
-<!--<div class="modal fade" id="user-edit_add-modal" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">-->
-<!--  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">-->
-<!--    <div class="modal-content">-->
-<!--      <div class="modal-header">-->
-<!--        <h5 class="mb-0">Edit Customer</h5>-->
-<!--        <a href="#" class="avtar avtar-s btn-link-danger" data-bs-dismiss="modal">-->
-<!--          <i class="ti ti-x f-20"></i>-->
-<!--        </a>-->
-<!--      </div>-->
-<!--      <div class="modal-body">-->
-<!--        <div class="row">-->
-<!--          <div class="col-sm-3 text-center mb-3">-->
-<!--            <div class="user-upload wid-75">-->
-<!--              <img src="{{ request.url_for('static', path='images/user/avatar-0.jpg') }}" alt="img" class="img-fluid">-->
-<!--              <label for="uplfile" class="img-avtar-upload">-->
-<!--                <i class="ti ti-camera f-24 mb-1"></i>-->
-<!--                <span>Upload</span>-->
-<!--              </label>-->
-<!--              <input type="file" id="uplfile" class="d-none">-->
-<!--            </div>-->
-<!--          </div>-->
-<!--          <div class="col-sm-9">-->
-<!--            <div class="form-group">-->
-<!--              <label class="form-label">Name</label>-->
-<!--              <input type="text" class="form-control" placeholder="Name">-->
-<!--            </div>-->
-<!--            <div class="form-group">-->
-<!--              <label class="form-label">Email</label>-->
-<!--              <input type="text" class="form-control" placeholder="Email">-->
-<!--            </div>-->
-<!--            <div class="form-group">-->
-<!--              <label class="form-label">Status</label>-->
-<!--              <select class="form-select">-->
-<!--                <option>Select Status</option>-->
-<!--                <option>Complicated</option>-->
-<!--                <option>Single</option>-->
-<!--                <option>Relationship</option>-->
-<!--              </select>-->
-<!--            </div>-->
-<!--            <div class="form-group">-->
-<!--              <label class="form-label">Location</label>-->
-<!--              <textarea class="form-control" rows="3" placeholder="Enter Location"></textarea>-->
-<!--            </div>-->
-<!--            <div class="form-check form-switch d-flex align-items-center justify-content-between p-0">-->
-<!--              <label class="form-check-label h5 pe-3 mb-0" for="customSwitchemlnot1">Make Contact Info Public-->
-<!--                <span class="text-muted w-75 d-block text-sm f-w-400 mt-2">Means that anyone viewing your profile will-->
-<!--                  be able to see your contacts details</span>-->
-<!--              </label>-->
-<!--              <input class="form-check-input h4 m-0 position-relative" type="checkbox" id="customSwitchemlnot1"-->
-<!--                checked="">-->
-<!--            </div>-->
-<!--            <hr class="my-3">-->
-<!--            <div class="form-check form-switch d-flex align-items-center justify-content-between p-0">-->
-<!--              <label class="form-check-label h5 pe-3 mb-0" for="customSwitchemlnot2">Available to hire-->
-<!--                <span class="text-muted w-75 d-block text-sm f-w-400 mt-2">Toggling this will let your teammates know-->
-<!--                  that you are available for acquiring new projects</span>-->
-<!--              </label>-->
-<!--              <input class="form-check-input h4 m-0 position-relative" type="checkbox" id="customSwitchemlnot2"-->
-<!--                checked="">-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--      <div class="modal-footer justify-content-between">-->
-<!--        <ul class="list-inline me-auto mb-0">-->
-<!--          <li class="list-inline-item align-bottom">-->
-<!--            <a href="#" class="avtar avtar-s btn-link-danger w-sm-auto" data-bs-toggle="tooltip" title="Delete">-->
-<!--              <i class="ti ti-trash f-18"></i>-->
-<!--            </a>-->
-<!--          </li>-->
-<!--        </ul>-->
-<!--        <div class="flex-grow-1 text-end">-->
-<!--          <button type="button" class="btn btn-link-danger" data-bs-dismiss="modal">Cancel</button>-->
-<!--          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Save</button>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  </div>-->
-<!--</div>-->
-
-
-<!-- [Tạm thời chưa cần] end -->
 
 
