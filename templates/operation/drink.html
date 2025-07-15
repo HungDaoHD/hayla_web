@@ -1048,8 +1048,10 @@
 
           },
           error: function(xhr, status, err) {
+            console.error(xhr);
+            console.error(status);
             console.error(err);
-            Swal.fire('Changes are not saved', `Could not update drink "${obj_drink.Drink_Name}". Please try again.`, 'error');
+            Swal.fire(`Could not update drink "${obj_drink.Drink_Name}". Please try again.`, xhr.responseText || 'Error', 'error');
           }
         });
 

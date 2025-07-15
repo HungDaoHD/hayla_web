@@ -14,22 +14,31 @@
     <meta name="author" content="CodedThemes">
 
     <!-- [Favicon] icon -->
-    <link rel="icon" href="{{ request.url_for('static', path='images/favicon.svg') }}" type="image/x-icon"> <!-- [Google Font] Family -->
-<!--    <link rel="icon" href="{{ request.url_for('static', path='images/hayla_favicon.png') }}" type="image/x-icon"> &lt;!&ndash; [Google Font] Family &ndash;&gt;-->
+    <link rel="icon" href="{{ request.url_for('static', path='images/favicon.svg') }}" type="image/x-icon"> 
+    <!--    <link rel="icon" href="{{ request.url_for('static', path='images/hayla_favicon.png') }}" type="image/x-icon"> -->
 
+    <!-- [Google Font] Family -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" id="main-font-link">
+    
     <!-- [Tabler Icons] https://tablericons.com -->
     <link rel="stylesheet" href="{{ request.url_for('static', path='fonts/tabler-icons.min.css') }}" >
+    
     <!-- [Feather Icons] https://feathericons.com -->
     <link rel="stylesheet" href="{{ request.url_for('static', path='/fonts/feather.css') }}" >
+    
     <!-- [Font Awesome Icons] https://fontawesome.com/icons -->
     <link rel="stylesheet" href="{{ request.url_for('static', path='/fonts/fontawesome.css') }}" >
+    
     <!-- [Material Icons] https://fonts.google.com/icons -->
     <link rel="stylesheet" href="{{ request.url_for('static', path='/fonts/material.css') }}" >
+    
     <!-- [Template CSS Files] -->
     <link rel="stylesheet" href="{{ request.url_for('static', path='/css/style.css') }}" id="main-style-link" >
     <link rel="stylesheet" href="{{ request.url_for('static', path='/css/style-preset.css') }}" >
-
+    
+    <!-- [Page specific CSS] start -->
+    <link rel="stylesheet" href="{{ request.url_for('static', path='/css/plugins/uppy.min.css') }}">
+    
     <!-- my css-->
     <link rel="stylesheet" href="{{ request.url_for('static', path='/css/custom_style.css') }}" >
 

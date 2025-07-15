@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status, Request, Form, HTTPException
+from fastapi import APIRouter, Depends, status, Request, Form, HTTPException, UploadFile, File
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -116,4 +116,31 @@ async def inventory_add_items(lst_inv_item: list[InventoryItemInsert], current_u
     lst_inv = await opt.add_inventory_items(lst_inv_item, current_user)
 
     return JSONResponse(content=[i.model_dump(mode='json') for i in lst_inv])
+
+
+
+@router.get('/receipt', response_class=HTMLResponse)
+async def retrieve_receipt(request: Request, current_user: UserPublic = Depends(require_role(role=lst_role))):
+
+    return templates.TemplateResponse('operation/receipt.html', {
+        'request': request,
+        'user': current_user.model_dump(),
+    })
+
+
+
+@router.post('/receipt/upload', response_class=JSONResponse)
+async def upload_receipt(upload_file: UploadFile = File(...), current_user: UserPublic = Depends(require_role(role=['Admin']))):
+
+    filename = upload_file.filename or ""
+    if not filename.lower().endswith(".xlsx"):
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid file extension. Only *.xlsx files are allowed."
+        )
+    
+    opt = Operation()
+    dict_upload_status = await opt.upload_receipts(upload_file)
+
+    return dict_upload_status
 

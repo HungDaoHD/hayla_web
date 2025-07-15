@@ -1,10 +1,11 @@
 import pandas as pd
+import numpy as np
 from pydantic import BaseModel, Field, field_validator, model_validator, computed_field, EmailStr
 from typing import Optional, Literal, Union, Dict, List, Annotated
 from bson import ObjectId
-from pymongo import ReturnDocument
+from pymongo import ReturnDocument, UpdateOne
 from datetime import datetime
-from fastapi import HTTPException
+from fastapi import HTTPException, UploadFile
 from fastapi.encoders import jsonable_encoder
 
 from mvc.database import mongo_db
@@ -268,6 +269,27 @@ class InventoryItemInsert(BaseModel):
 
 
 
+class ReceiptItem(BaseModel):
+    Product_Code: str = Field(pattern=r"^DRK\d+$")
+    Quantity: int = Field(ge=1)
+    Unit: Literal["Size_S", "Size_M", "Size_L"]
+    Topping: Annotated[Optional[str], Field(min_length=2)] = None
+    
+
+
+class ReceiptInsert(BaseModel):
+    Location: Literal["SGN", "NTR"]
+    Order_Day: str = Field(pattern=r"^(?:\d{4})-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])$")
+    Order_Code: str = Field(pattern=r"^BH\d+$")
+    Payment_Time: datetime
+    Payment_Method: Literal["Cash", "Tranfer", "Shopee"]
+    Amount: float = Field(ge=0)
+    Items: List[ReceiptItem] = Field(min_length=1)
+
+
+
+
+
 
 class Operation:
 
@@ -278,6 +300,7 @@ class Operation:
         self.clt_drink = mongo_db.hayladb['drink']
         self.clt_fixed_cost = mongo_db.hayladb['fixed_cost']
         self.clt_inventory = mongo_db.hayladb['inventory']
+        self.clt_receipt = mongo_db.hayladb['receipt']
 
 
 
@@ -414,8 +437,8 @@ class Operation:
 
         try:
             oid = ObjectId(oid)
-        except Exception:
-            raise HTTPException(status_code=400, detail='Invalid drink_oid')
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f'Invalid drink_oid: {e}')
 
         update_data = {k: v for k, v in obj_drink.model_dump().items() if v is not None}
 
@@ -521,7 +544,7 @@ class Operation:
             result = await self.clt_inventory.insert_many(lst_inv_item_dump)
 
         except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=400, detail=str(e))
 
 
         lst_inventory = list()
@@ -549,4 +572,113 @@ class Operation:
         return lst_full_igr
 
 
+
+    async def convert_receipt_file_2_dataframe(self, upload_file: UploadFile) -> List[ReceiptInsert]:
+
+        try:
+            df_receipt = pd.read_excel(upload_file.file, header=7)
+
+            dict_sel_col = {
+                'Shop name': 'Location',
+                'Day': 'Order_Day',
+                'Order code': 'Order_Code',
+                
+                'Payment time': 'Payment_Time',
+                'Product code': 'Product_Code',
+                'Quantity': 'Quantity',
+                'Unit': 'Unit',
+                'Topping': 'Topping',
+                'Amount after invoice discount': 'Amount',
+                'Payment method': 'Payment_Method',
+            }
+
+            df_receipt: pd.DataFrame = df_receipt.loc[df_receipt.eval("~`Payment time`.isnull() & Status != 'Hủy'"), dict_sel_col.keys()]
+            df_receipt = df_receipt.rename(columns=dict_sel_col)
+            df_receipt = df_receipt.loc[df_receipt['Product_Code'].str.startswith('DRK')]
+            
+            df_receipt['Topping'] = df_receipt['Topping'].replace({np.nan: None})
+            df_receipt['Payment_Time'] = pd.to_datetime(df_receipt['Payment_Time'], format="%Y-%m-%d %H:%M:%S")
+            df_receipt['Order_Day'] = df_receipt['Order_Day'].astype(str)
+            df_receipt['Amount'] = df_receipt['Amount'].astype(str).str.replace(',', '', regex=False).astype(float)
+            df_receipt['Location'] = df_receipt['Location'].replace({'Haylà cafe': 'SGN', 'Haylà. express': 'NTR'})
+            
+            df_receipt['Payment_Method'] = df_receipt['Payment_Method'].replace({'Tiền mặt': 'Cash', 'Chuyển khoản': 'Tranfer'})
+            df_receipt.loc[df_receipt.eval("Payment_Method.str.contains('Chuyển khoản: 0')"), 'Payment_Method'] = 'Cash'
+            df_receipt.loc[df_receipt.eval("Payment_Method.str.contains('Tiền mặt: 0')"), 'Payment_Method'] = 'Tranfer'
+
+            df_receipt['Unit'] = df_receipt['Unit'].str.replace('Size ', 'Size_').replace('ly', 'Size_M')
+
+            lst_documents = list()
+            for (loc, day, code), group in df_receipt.groupby(['Location', 'Order_Day', 'Order_Code']):
+                
+                ts: pd.Timestamp = group['Payment_Time'].iloc[0]
+                payment_time = ts.to_pydatetime()
+
+                data = {
+                    'Location': loc,
+                    'Order_Day': day,
+                    'Order_Code': code,
+                    
+                    'Payment_Time': payment_time,
+                    'Payment_Method': group['Payment_Method'].iloc[0],
+                    'Amount': float(group['Amount'].iloc[0]),
+                    
+                    'Items': group[['Product_Code', 'Quantity', 'Unit', 'Topping']].to_dict(orient='records')
+                }
+
+                receipt_data = ReceiptInsert(**data)
+                lst_documents.append(receipt_data)
+        
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Could not parse Excel: {e}")
+
+
+        return lst_documents
+    
+
+
+    async def upload_receipts(self, upload_file: UploadFile) -> dict:
+        
+        try:
+            lst_documents = await self.convert_receipt_file_2_dataframe(upload_file=upload_file)
+            docs = [d.model_dump(by_alias=True, exclude_none=True) for d in lst_documents]
+
+            ops = list()
+            for doc in docs:
+
+                # $setOnInsert ensures we only insert when there is no match
+                ops.append(
+                    UpdateOne(
+                        # Filter
+                        {
+                            'Location': doc['Location'],
+                            'Order_Day': doc['Order_Day'],
+                            'Order_Code': doc['Order_Code'],
+                        },
+                        
+                        # Insert values
+                        {"$setOnInsert": doc},
+                        upsert=True
+                    )
+                )
+
+            if not ops:
+                return {"inserted_count": 0}
+
+            
+            result = await self.clt_receipt.bulk_write(ops, ordered=False)
+
+            return {
+                'inserted_count': result.matched_count + result.upserted_count,
+                'matched':  result.matched_count,
+                'upserted': result.upserted_count
+            }
+
+
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Upload receipts error: {str(e)}")
+        
+
+
+        
 

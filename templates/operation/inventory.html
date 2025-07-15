@@ -608,9 +608,9 @@
             
           },
           error: function(xhr, status, err) {
-            console.error(err);
             console.error(xhr);
             console.error(status);
+            console.error(err);
             Swal.fire('Changes are not saved.', xhr.responseJSON.detail[0].msg, 'error');
           }
         });
