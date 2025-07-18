@@ -64,7 +64,7 @@ async def retrieve_processed_ingredient(request: Request, current_user: UserPubl
 async def retrieve_drink(request: Request, current_user: UserPublic = Depends(require_role(role=lst_role))):
 
     opt = Operation()
-    dict_drink = await opt.retrieve_drink(current_user)
+    dict_drink = await opt.retrieve_drink(groupby='group', current_user=current_user)
     lst_full_igr = await opt.get_full_ingredients(current_user)
 
     js_drinks = {k: [i.model_dump() for i in v] for k, v in dict_drink.items()}
@@ -119,10 +119,24 @@ async def inventory_add_items(lst_inv_item: list[InventoryItemInsert], current_u
 
 
 
-@router.get('/receipt', response_class=HTMLResponse)
-async def retrieve_receipt(request: Request, current_user: UserPublic = Depends(require_role(role=lst_role))):
+@router.get('/receipt/data', response_class=HTMLResponse)
+async def retrieve_receipt_data(request: Request, current_user: UserPublic = Depends(require_role(role=lst_role))):
 
-    return templates.TemplateResponse('operation/receipt.html', {
+    opt = Operation()
+    lst_receipt = await opt.retrieve_receipt(dict_filter={'Location': ['SGN', 'NTR']}, current_user=current_user)
+    
+    return templates.TemplateResponse('operation/receipt_data.html', {
+        'request': request,
+        'user': current_user.model_dump(),
+        'lst_receipt': lst_receipt
+    })
+
+
+
+@router.get('/receipt/upload', response_class=HTMLResponse)
+async def retrieve_receipt_upload(request: Request, current_user: UserPublic = Depends(require_role(role=lst_role))):
+
+    return templates.TemplateResponse('operation/receipt_upload.html', {
         'request': request,
         'user': current_user.model_dump(),
     })

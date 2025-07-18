@@ -26,7 +26,6 @@
   overflow-y: auto;
 }
 
-
 #btnScrollTop {
   position: fixed;
   bottom: 20px;
@@ -34,6 +33,32 @@
   display: none;
   z-index: 1000;
 }
+
+/* Make the “Show [ 10 ] entries” stay on one line */
+.dataTables_length {
+  display: flex !important;
+  align-items: center;
+  white-space: nowrap;
+}
+
+/* Keep the dropdown from stretching full width */
+.dataTables_length select {
+  display: inline-block !important;
+  width: auto !important;
+  margin: 0 .5rem;   /* a little breathing room */
+}
+
+/* make the search input span 100% of its wrapper */
+.dataTables_filter input.form-control {
+  width: 100% !important;
+}
+
+.dataTables_wrapper .dataTables_paginate {
+  display: flex !important;
+  justify-content: center;
+  width: auto;
+}
+
 
 
 

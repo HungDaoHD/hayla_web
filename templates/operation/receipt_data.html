@@ -1,0 +1,244 @@
+<!-- Load template html -->
+{% extends "./base.html" %}
+
+{% set str_title = 'Receipt' %}
+
+<!-- Title -->
+{% block title %} {{ str_title ~ ' | Haylà' }} {% endblock %}
+
+
+<!-- [ breadcrumb ] start -->
+{% block breadcrumb %}
+<div class="col-md-12">
+  <ul class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/">Home</a></li>
+    <li class="breadcrumb-item"><a href="javascript: void(0)">Operation</a></li>
+    <li class="breadcrumb-item">{{ str_title }}</li>
+    <li class="breadcrumb-item" aria-current="page">Data</li>
+  </ul>
+</div>
+
+<div class="col-md-12">
+  <div class="page-header-title">
+    <h2 class="mb-0">{{ str_title }}</h2>
+  </div>
+</div>
+
+{% endblock %}
+<!-- [ breadcrumb ] end -->
+
+
+<!-- [ Main Content ] start -->
+{% block main_content %}
+<div class="row">
+  <div class="col-sm-12">
+    <div class="card">
+      <div class="card-body">
+        
+        <!-- Data Table | Receipt -->
+        <div class="dt-responsive table-responsive p-1">
+          
+          <table id="dt-receipt" class="table table-striped table-bordered table-sm">
+            
+            <thead>
+              <tr>
+                <th>Location</th>
+                <th>Order Day</th>
+                <th>Order Code</th>
+                <th>Payment Method</th>
+                <th>Amount</th>
+                <th>Items</th>
+              </tr>
+            </thead>
+
+            <tbody>
+
+              {% for receipt in lst_receipt %}
+
+                {% set bg_loc_color = 'bg-blue-500' if receipt.Location == 'SGN' else 'bg-orange-500' %}
+
+                <tr data-id="{{ receipt.id }}" class="f-12">
+                  <td>
+                    <span class="badge {{ bg_loc_color }}">{{ receipt.Location }}</span>
+                  </td>
+
+                  <td>{{ receipt.Order_Day }}</td>
+                  <td>{{ receipt.Order_Code }}</td>
+                  <td>{{ receipt.Payment_Method }}</td>
+                  
+                  <td>{{ "{:,.0f}".format(receipt.Amount) }}<span class="text-muted f-10 mb-0"> đ</span></td>
+                  <td>
+                      {% for item in receipt.Items %}
+
+                        {% if item.Group in ['Trà trái cây'] %}
+                          {% set bg_group_color = 'bg-red-600' %}
+                        {% elif item.Group in ['Trà sữa'] %}
+                          {% set bg_group_color = 'bg-green-600' %}
+                        {% else %}
+                          {% set bg_group_color = 'bg-yellow-600' %}
+                        {% endif %}
+
+                        <span class="badge {{ bg_group_color }}">
+                          {{ item.Quantity ~ 'x ' ~ item.Drink_Name ~ ' (' ~ item.Size.replace('Size_', '') ~ ')' }}
+                        </span>
+                        
+                        <!-- {{ item.Quantity ~ 'x ' ~ item.Product_Code ~ '-' ~ item.Drink_Name ~ '-' ~ item.Group ~ '(' ~ item.Price_By_Size ~ '-' ~ item.Total_Cost_By_Size ~ '-' ~ item.Size ~ ') | ' ~ item.Topping  }} -->
+                        <!-- Ingredients_By_Size: Annotated[List[DrinkIngredientItem], Field(min_length=1, default=None)] -->
+                        
+                      {% endfor %}
+                    </ul>
+                  </td>
+                </tr>
+              {% endfor %}
+              
+            </tbody>
+            
+          </table>
+        </div>
+
+        <!-- Search Table -->
+        <!-- <div class="dt-responsive table-responsive">  
+          <table class="table table-striped table-bordered table-sm nowrap">
+            <thead>
+              <tr>
+                <th>Target</th>
+                <th>Search text</th>
+              </tr>
+            </thead>
+            
+            <tbody class="search-api">
+              <tr id="filter_global">
+                <td>Global search</td>
+                <td>
+                  <input type="text" class="global_filter form-control" id="global_filter">
+                </td>
+              </tr>
+
+              <tr id="filter_col1" data-column="0">
+                <td>Column - Name</td>
+                <td>
+                  <input type="text" class="column_filter form-control" id="col0_filter">
+                </td>
+              </tr>
+
+              <tr id="filter_col2" data-column="1">
+                <td>Column - Position</td>
+                <td>
+                  <input type="text" class="column_filter form-control" id="col1_filter">
+                </td>
+              </tr>
+
+              <tr id="filter_col3" data-column="2">
+                <td>Column - Office</td>
+                <td>
+                  <input type="text" class="column_filter form-control" id="col2_filter">
+                </td>
+              </tr>
+
+              <tr id="filter_col4" data-column="3">
+                <td>Column - Age</td>
+                <td>
+                  <input type="text" class="column_filter form-control" id="col3_filter">
+                </td>
+              </tr>
+
+              <tr id="filter_col5" data-column="4">
+                <td>Column - Start date</td>
+                <td>
+                  <input type="text" class="column_filter form-control" id="col4_filter">
+                </td>
+              </tr>
+
+              <tr id="filter_col6" data-column="5">
+                <td>Column - Salary</td>
+                <td>
+                  <input type="text" class="column_filter form-control" id="col5_filter">
+                </td>
+              </tr>
+              
+            </tbody>
+          </table>
+        </div> -->
+        
+        
+      
+      
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+<!-- [ Main Content ] end -->
+
+
+<!-- [ Extra Script ] start -->
+{% block extra_scripts %}
+
+<script src="{{ request.url_for('static', path='js/plugins/choices.min.js') }}"></script>
+<script src="{{ request.url_for('static', path='js/plugins/bouncer.min.js') }}"></script>
+<script src="{{ request.url_for('static', path='js/pages/form-validation.js') }}"></script>
+<script src="{{ request.url_for('static', path='js/plugins/sweetalert2.all.min.js') }}"></script>
+
+<script src="{{ request.url_for('static', path='js/plugins/jquery.dataTables.min.js') }}"></script>
+<script src="{{ request.url_for('static', path='js/plugins/dataTables.bootstrap5.min.js') }}"></script>
+
+<script>
+  
+  const $dt_recept = $('#dt-receipt').DataTable({
+    // responsive: true,  // let DataTables auto‑shrink & wrap columns
+    // scrollX:    false, // disable the horizontal scroll
+    // autoWidth:  true,  // allows table to grow to 100%
+
+    // 1) Custom DOM: length + filter row on top, info + paginate row on bottom
+    dom:
+      "<'row g-2 p-2 mb-3'" +
+      "<'col-sm-8'l>" +   // length menu here
+      "<'col-sm-4'f>" +   // filter input here
+      ">" +
+      "t" +                 // the table itself
+      "<'row g-2 p-2 mt-3'" +
+        "<'col-sm-8'i>" +   // table info here
+        "<'col-sm-4'p>" +   // pagination here
+      ">",
+    
+    // 2) Language tweaks
+    language: {
+      lengthMenu: 'Show _MENU_ entries',
+      search: '', // remove default “Search:” label
+      searchPlaceholder: 'Search…',
+      paginate: {
+        first:    '<i class="ti ti-chevrons-left"></i>',
+        previous: '<i class="ti ti-chevron-left"></i>',
+        next:     '<i class="ti ti-chevron-right"></i>',
+        last:     '<i class="ti ti-chevrons-right"></i>'
+      }
+    },
+    // 3) Optional: how many rows by default
+    pageLength: 10
+
+  });
+
+  $('.dataTables_length select').addClass('form-select form-select-sm');
+
+  $('.dataTables_filter label').addClass('d-flex justify-content-end');
+  $('.dataTables_filter input').addClass('form-control form-control-sm');
+
+  
+
+
+  // function filterColumn(i) {
+  //   $('#dt-receipt')
+  //     .DataTable()
+  //     .column(i)
+  //     .search($('#col' + i + '_filter').val())
+  //     .draw();
+  // }
+
+  // $('input.column_filter').on('keyup click', function () {
+  //   filterColumn($(this).parents('tr').attr('data-column'));
+  // });
+
+
+</script>
+{% endblock %}
+<!-- [ Extra Script ] end -->

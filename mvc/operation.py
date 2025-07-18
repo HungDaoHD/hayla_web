@@ -269,15 +269,44 @@ class InventoryItemInsert(BaseModel):
 
 
 
+class ReceiptItemUpload(BaseModel):
+    Product_Code: str = Field(pattern=r"^DRK\d+$")
+    Quantity: int = Field(ge=1)
+    Size: Literal["Size_S", "Size_M", "Size_L"]
+    Topping: Annotated[Optional[str], Field(min_length=2)] = None
+
+
+
+class ReceiptUpload(BaseModel):
+    Location: Literal["SGN", "NTR"]
+    Order_Day: str = Field(pattern=r"^(?:\d{4})-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])$")
+    Order_Code: str = Field(pattern=r"^BH\d+$")
+    Payment_Time: datetime
+    Payment_Method: Literal["Cash", "Tranfer", "Shopee"]
+    Amount: float = Field(ge=0)
+    Items: List[ReceiptItemUpload] = Field(min_length=1)
+
+
+
 class ReceiptItem(BaseModel):
     Product_Code: str = Field(pattern=r"^DRK\d+$")
     Quantity: int = Field(ge=1)
-    Unit: Literal["Size_S", "Size_M", "Size_L"]
+    Size: Literal["Size_S", "Size_M", "Size_L"]
     Topping: Annotated[Optional[str], Field(min_length=2)] = None
     
+    # Reference fields from Drink
+    Group: Annotated[str, Field(min_length=3, default=None)]
+    Drink_Name: Annotated[str, Field(min_length=3, default=None)]
+
+    # Calculated fields based on Size (Unit)
+    Price_By_Size: Annotated[Union[float, int], Field(ge=10000)] | Literal[0] = 0
+    Total_Cost_By_Size: Annotated[float, Field(ge=1, default=0)]
+    Ingredients_By_Size: Annotated[List[DrinkIngredientItem], Field(min_length=1, default=[])]
 
 
-class ReceiptInsert(BaseModel):
+
+class Receipt(BaseModel):
+    id: str = Field(default_factory=ObjectId, alias='_id')
     Location: Literal["SGN", "NTR"]
     Order_Day: str = Field(pattern=r"^(?:\d{4})-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])$")
     Order_Code: str = Field(pattern=r"^BH\d+$")
@@ -285,6 +314,15 @@ class ReceiptInsert(BaseModel):
     Payment_Method: Literal["Cash", "Tranfer", "Shopee"]
     Amount: float = Field(ge=0)
     Items: List[ReceiptItem] = Field(min_length=1)
+    
+    
+    model_config = {
+        'populate_by_name': True,
+        'arbitrary_types_allowed': True,
+        'json_encoders': {ObjectId: lambda oid: str(oid)},
+    }
+
+
 
 
 
@@ -411,7 +449,7 @@ class Operation:
 
 
 
-    async def retrieve_drink(self, current_user: UserPublic) -> Dict[str, list[Drink]]:
+    async def retrieve_drink(self, groupby: str, current_user: UserPublic) -> Dict[str, list[Drink] | Drink] | None:
 
         dict_drink = dict()
 
@@ -422,13 +460,18 @@ class Operation:
 
             drk_data = await self.convert_drink(drk, current_user)
 
-            if not dict_drink.get(drk_data.Group):
-                dict_drink.update({drk_data.Group: [drk_data]})
-
+            if groupby.upper() == 'GROUP':
+                group_key = drk_data.Group
+                dict_drink.setdefault(group_key, []).append(drk_data)
+            
+            elif groupby.upper() == 'ID':
+                group_key = drk_data.Drink_ID
+                dict_drink.update({group_key: drk_data})
+            
             else:
-                dict_drink[drk_data.Group].append(drk_data)
-
-
+                return None
+            
+        
         return dict_drink
 
 
@@ -573,7 +616,7 @@ class Operation:
 
 
 
-    async def convert_receipt_file_2_dataframe(self, upload_file: UploadFile) -> List[ReceiptInsert]:
+    async def convert_receipt_file_2_dataframe(self, upload_file: UploadFile) -> List[ReceiptUpload]:
 
         try:
             df_receipt = pd.read_excel(upload_file.file, header=7)
@@ -586,7 +629,7 @@ class Operation:
                 'Payment time': 'Payment_Time',
                 'Product code': 'Product_Code',
                 'Quantity': 'Quantity',
-                'Unit': 'Unit',
+                'Unit': 'Size',
                 'Topping': 'Topping',
                 'Amount after invoice discount': 'Amount',
                 'Payment method': 'Payment_Method',
@@ -606,14 +649,14 @@ class Operation:
             df_receipt.loc[df_receipt.eval("Payment_Method.str.contains('Chuyển khoản: 0')"), 'Payment_Method'] = 'Cash'
             df_receipt.loc[df_receipt.eval("Payment_Method.str.contains('Tiền mặt: 0')"), 'Payment_Method'] = 'Tranfer'
 
-            df_receipt['Unit'] = df_receipt['Unit'].str.replace('Size ', 'Size_').replace('ly', 'Size_M')
+            df_receipt['Size'] = df_receipt['Size'].str.replace('Size ', 'Size_').replace('ly', 'Size_M')
 
             lst_documents = list()
             for (loc, day, code), group in df_receipt.groupby(['Location', 'Order_Day', 'Order_Code']):
                 
                 ts: pd.Timestamp = group['Payment_Time'].iloc[0]
                 payment_time = ts.to_pydatetime()
-
+                                
                 data = {
                     'Location': loc,
                     'Order_Day': day,
@@ -621,12 +664,12 @@ class Operation:
                     
                     'Payment_Time': payment_time,
                     'Payment_Method': group['Payment_Method'].iloc[0],
-                    'Amount': float(group['Amount'].iloc[0]),
+                    'Amount': float(group['Amount'].sum()),
                     
-                    'Items': group[['Product_Code', 'Quantity', 'Unit', 'Topping']].to_dict(orient='records')
+                    'Items': group[['Product_Code', 'Quantity', 'Size', 'Topping']].to_dict(orient='records')
                 }
 
-                receipt_data = ReceiptInsert(**data)
+                receipt_data = ReceiptUpload(**data)
                 lst_documents.append(receipt_data)
         
         except Exception as e:
@@ -680,5 +723,85 @@ class Operation:
         
 
 
-        
 
+    async def convert_receipt(self, receipt: dict, dict_drink: Dict[str, Drink], current_user: UserPublic) -> Receipt:
+        receipt_data = jsonable_encoder(receipt, custom_encoder={ObjectId: str})
+        receipt_data = Receipt(**receipt_data)
+        
+        num_extra_cost = 4000 if receipt_data.Location in ['NTR'] else 0
+        
+        
+        for item in receipt_data.Items:
+            
+            obj_drink = dict_drink.get(item.Product_Code)
+            num_weight = obj_drink.Weighting.get(receipt_data.Location).get(item.Size)
+            
+            
+            # Reference fields from Drink
+            item.Group = obj_drink.Group
+            item.Drink_Name = obj_drink.Drink_Name
+            
+            # Calculated fields based on Size
+            item.Price_By_Size = getattr(getattr(obj_drink.Price, receipt_data.Location), item.Size)
+            item.Total_Cost_By_Size = (obj_drink.Total_Cost * num_weight) + num_extra_cost
+            
+            for igr in obj_drink.Ingredients:
+                igr_data = DrinkIngredientItem(
+                    Ingredient_ID=igr.Ingredient_ID,
+                    Ingredient_Name=igr.Ingredient_Name,
+                    Unit=igr.Unit,
+                    Ingredient_Quanty=igr.Ingredient_Quanty * num_weight,
+                    Cost_Per_Unit=igr.Cost_Per_Unit * num_weight,
+                    Total_Cost=igr.Total_Cost * num_weight,
+                )
+                
+                item.Ingredients_By_Size.append(igr_data)
+            
+        
+        return receipt_data
+
+
+
+    async def retrieve_receipt(self, dict_filter: dict, current_user: UserPublic) -> List[Receipt]:
+        
+        lst_receipt = list()
+
+        # # Compute bounds for this month
+        # now   = datetime.now()
+        # start = datetime(now.year, now.month, 1)
+        
+        # # advance to the first of next month:
+        # if now.month == 12:
+        #     end = datetime(now.year + 1, 1, 1)
+        # else:
+        #     end = datetime(now.year, now.month + 1, 1)
+
+        # Get all drink to add information to Receipt Items Object
+        dict_drink = await self.retrieve_drink(groupby='id', current_user=current_user)
+        
+        dict_filter_mongodb = {
+            'Location': {'$in': dict_filter['Location']},
+        }
+        
+        
+        # async for receipt in self.clt_receipt.find({"Payment_Time": {"$gte": start, "$lt": end}}).sort({'Payment_Time': -1}):
+        async for receipt in self.clt_receipt.find(dict_filter_mongodb).sort({'Payment_Time': -1}):
+            receipt_data = await self.convert_receipt(receipt=receipt, dict_drink=dict_drink, current_user=current_user)
+            lst_receipt.append(receipt_data)
+
+        return lst_receipt
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

@@ -39,6 +39,9 @@
     <!-- [Page specific CSS] start -->
     <link rel="stylesheet" href="{{ request.url_for('static', path='/css/plugins/uppy.min.css') }}">
     
+    <!-- [Page specific CSS] start -->
+    <link rel="stylesheet" href="{{ request.url_for('static', path='/css/plugins/flatpickr.min.css') }}">
+    
     <!-- my css-->
     <link rel="stylesheet" href="{{ request.url_for('static', path='/css/custom_style.css') }}" >
 
@@ -75,7 +78,7 @@
 
             <!-- [ Sidebar Menu - Dashboard ] start -->
             <li class="pc-item">
-              <a href="/dashboard" class="pc-link">
+              <a href="/dashboard/index" class="pc-link">
                 <span class="pc-micon"><i class="ti ti-dashboard"></i></span>
                 <span class="pc-mtext">Dashboard</span>
               </a>
@@ -104,13 +107,29 @@
                 <label>Operation</label>
                 <i class="ti ti-table"></i>
               </li>
-
-              <li class="pc-item">
-                <a href="/operation/receipt" class="pc-link">
+              
+              <li class="pc-item pc-hasmenu">
+                
+                <a href="javascript: void(0)" class="pc-link">
                   <span class="pc-micon"><i class="ti ti-receipt"></i></span>
                   <span class="pc-mtext">Receipt</span>
+                  <span class="pc-arrow"><i data-feather="chevron-right"></i></span>
                 </a>
+                
+                <ul class="pc-submenu">
+                  
+                  <li class="pc-item">
+                    <a class="pc-link" href="/operation/receipt/data"><i class="ti ti-receipt-2"></i> Data</a>
+                  </li>
+                  
+                  <li class="pc-item">
+                    <a class="pc-link" href="/operation/receipt/upload"><i class="ti ti-upload"></i> Upload</a>
+                  </li>
+                  
+                </ul>
+                
               </li>
+              
 
               <li class="pc-item">
                 <a href="/operation/inventory" class="pc-link">
@@ -638,7 +657,7 @@
     <script>layout_rtl_change('false');</script>
     <script>preset_change("preset-1");</script>
     <script>font_change("Public-Sans");</script>
-
+    
     <!-- Latest 3.x version from jQuery CDN-->
     <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
 

@@ -10,12 +10,15 @@ from routers.auth import authentication
 from routers.auth.oauth2 import UserPublic, get_current_user_cookie, validate_current_user_cookie, require_role
 from routers.administration import users
 from routers.operation import operation
+from routers.dashboard import dashboard
+
 
 
 app = FastAPI()
 app.include_router(authentication.router)
 app.include_router(users.router)
 app.include_router(operation.router)
+app.include_router(dashboard.router)
 
 
 app.mount('/static', StaticFiles(directory='static'), name='static')
@@ -30,15 +33,6 @@ async def home(request: Request):
     current_user: UserPublic = await validate_current_user_cookie(request)
 
     return templates.TemplateResponse('home.html', {
-        'request': request,
-        'user': current_user.model_dump(),
-    })
-
-
-
-@app.get('/dashboard', response_class=HTMLResponse, dependencies=[Depends(require_role(role=['Admin']))])
-async def dashboard(request: Request, current_user: UserPublic = Depends(get_current_user_cookie)):
-    return templates.TemplateResponse('dashboard/index.html', {
         'request': request,
         'user': current_user.model_dump(),
     })

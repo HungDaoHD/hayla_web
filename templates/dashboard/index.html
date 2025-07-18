@@ -1,34 +1,96 @@
 <!-- Load template html -->
 {% extends "./base.html" %}
-
+{% set str_title = 'Dashboard' %}
 
 <!-- Title -->
-{% block title %}Dashboard | Haylà{% endblock %}
-
+{% block title %} {{ str_title ~ ' | Haylà' }} {% endblock %}
 
 <!-- [ breadcrumb ] start -->
 {% block breadcrumb %}
 <div class="col-md-12">
   <ul class="breadcrumb">
     <li class="breadcrumb-item"><a href="/">Home</a></li>
-<!--    <li class="breadcrumb-item"><a href="javascript: void(0)">Application</a></li>-->
-    <li class="breadcrumb-item" aria-current="page">Dashboard</li>
+    <li class="breadcrumb-item"><a href="javascript: void(0)">{{ str_title }}</a></li>
+    <li class="breadcrumb-item" aria-current="page">Index</li>
   </ul>
 </div>
 
 <div class="col-md-12">
   <div class="page-header-title">
-    <h2 class="mb-0">Dashboard</h2>
+    <h2 class="mb-0">{{ str_title }}</h2>
   </div>
 </div>
+
 {% endblock %}
 <!-- [ breadcrumb ] end -->
 
 
 <!-- [ Main Content ] start -->
 {% block main_content %}
-<div class="row">
 
+<!-- [ Filtering Area ] start -->
+<div class="row">
+  <div class="col-lg-12">
+    <div class="card">
+      
+      <div class="card-header">
+        <h5>Dashboard Filtering</h5>
+      </div>
+      
+      <div class="card-body">
+        <form id="form-dashboard_filter" action="/dashboard/filter" enctype="multipart/form-data">
+
+          <div class="row">
+            <div class="col-lg-6">
+              <div class="form-group">
+                <label class="col-form-label">Location</label>
+                <select class="form-control" name="choice-loc-filter" id="choice-loc-filter" multiple required>
+                  <option value="SGN" selected>Haylà.cafe (SGN)</option>
+                  <option value="NTR" selected>Haylà.express (NTR)</option>
+                </select>
+                <small class="form-text text-muted">Please enter location</small>
+              </div>
+            </div>  
+          
+            <div class="col-lg-6">
+              <div class="form-group">
+                <label class="col-form-label">Period</label>
+                <div class="input-group">
+                  <input type="text" id="dashboard-date-filter" class="form-control" placeholder="Select date range">
+                  <span class="input-group-text"><i class="feather icon-calendar"></i></span>
+                </div>
+              </div>
+            </div>
+          
+          </div>
+          
+          <button id="btn-submit-filter" class="btn btn-primary">Submit</button>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- [ Filtering Area ] end -->
+
+
+
+<div class="row">
+  <div class="col-md-6 col-xl-3">
+    <div class="card">
+      <div class="card-body">
+        <h6 class="mb-2 f-w-400 text-muted">Revenue</h6>
+        <h4 class="mb-3">"{:,.0f}".format(dict_dashboard.revenue) <span class="badge bg-light-primary border border-primary">
+          <i class="ti ti-trending-up"></i>xxx</span></h4>
+        <p class="mb-0 text-muted text-sm">You made an extra <span class="text-primary">xx,000</span> this year
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- <div class="row">
   <div class="col-md-6 col-xl-3">
     <div class="card">
       <div class="card-body">
@@ -316,15 +378,75 @@
     </div>
   </div>
 
-</div>
+</div> -->
 {% endblock %}
 <!-- [ Main Content ] end -->
 
 {% block charting_scripts %}
   <!-- [Page Specific JS] start -->
-  <script src="{{ request.url_for('static', path='js/plugins/apexcharts.min.js') }}"></script>
-  <script src="{{ request.url_for('static', path='js/pages/dashboard-default.js') }}"></script>
+  <script src="{{ request.url_for('static', path='js/plugins/choices.min.js') }}"></script>
+  <script src="{{ request.url_for('static', path='js/plugins/bouncer.min.js') }}"></script>
+  <script src="{{ request.url_for('static', path='js/pages/form-validation.js') }}"></script>
+  <script src="{{ request.url_for('static', path='js/plugins/sweetalert2.all.min.js') }}"></script>
+  <script src="{{ request.url_for('static', path='js/plugins/flatpickr.min.js') }}"></script>
+
+  <!-- <script src="{{ request.url_for('static', path='js/plugins/apexcharts.min.js') }}"></script> -->
+  <!-- <script src="{{ request.url_for('static', path='js/pages/dashboard-default.js') }}"></script> -->
   <!-- [Page Specific JS] end -->
+
+  <script>
+    var editDrinkLocation = new Choices('#choice-loc-filter', {
+      placeholderValue: 'Location',
+      searchPlaceholderValue: 'Search',
+      allowHTML: true,
+      removeItemButton: true,
+      shouldSort: false,
+      shouldSortItems: false,
+      maxItemCount: 2
+    });
+
+    flatpickr(document.querySelector('#dashboard-date-filter'),{
+      mode: 'range'
+    });
+
+
+    // $(function(){
+    //   $('#receipt-data-upload-form').on('submit', function(e){
+    //     e.preventDefault();
+        
+    //     const $btn = $('#btn-receipt-upload');
+
+    //     $btn.prop('disabled', true).text('Uploading…');
+
+    //     const formData = new FormData(this);
+        
+    //     $.ajax({
+    //       url: this.action,
+    //       type: 'POST',
+    //       data: formData,
+    //       processData: false,  // tell jQuery not to touch the data
+    //       contentType: false,  // tell jQuery not to set content-type
+          
+    //       success(resp) {
+            
+    //         Swal.fire('Uploaded!', `Receipt count: ${resp.inserted_count}, duplicated: ${resp.matched}, uploaded: ${resp.upserted}`, 'success').then(() => {
+    //           window.location.href = '/operation/receipt/data';
+    //         });
+            
+    //       },
+          
+    //       error(xhr) {
+    //         Swal.fire('Upload failed', xhr.responseText || 'Error', 'error');
+    //         $btn.prop('disabled', false).text('Upload');
+    //       }
+    //     });
+
+    //   });
+    // });
+
+
+
+  </script>
 {% endblock %}
 
 

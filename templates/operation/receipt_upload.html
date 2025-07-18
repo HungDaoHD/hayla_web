@@ -13,7 +13,8 @@
   <ul class="breadcrumb">
     <li class="breadcrumb-item"><a href="/">Home</a></li>
     <li class="breadcrumb-item"><a href="javascript: void(0)">Operation</a></li>
-    <li class="breadcrumb-item" aria-current="page">{{ str_title }}</li>
+    <li class="breadcrumb-item">{{ str_title }}</li>
+    <li class="breadcrumb-item" aria-current="page">Upload</li>
   </ul>
 </div>
 
@@ -41,7 +42,7 @@
             <label class="input-group-text" for="xlsxReceiptFile" id="xlsxReceiptFileLabel">*.xlsx</label>
           </div>
           
-          <button class="btn btn-primary">Upload</button>
+          <button id="btn-receipt-upload" class="btn btn-primary">Upload</button>
           
         </form>
 
@@ -96,6 +97,10 @@
   $(function(){
     $('#receipt-data-upload-form').on('submit', function(e){
       e.preventDefault();
+      
+      const $btn = $('#btn-receipt-upload');
+
+      $btn.prop('disabled', true).text('Uploading…');
 
       const formData = new FormData(this);
       
@@ -109,21 +114,19 @@
         success(resp) {
           
           Swal.fire('Uploaded!', `Receipt count: ${resp.inserted_count}, duplicated: ${resp.matched}, uploaded: ${resp.upserted}`, 'success').then(() => {
-            window.location.reload();
+            window.location.href = '/operation/receipt/data';
           });
           
         },
         
         error(xhr) {
           Swal.fire('Upload failed', xhr.responseText || 'Error', 'error');
+          $btn.prop('disabled', false).text('Upload');
         }
       });
 
     });
   });
-
-
-
 
 </script>
 {% endblock %}
