@@ -284,14 +284,13 @@
                       <td></td>
                       <td></td>
                     {% endif %}
-
-
-
+                    
                     {% if 'NTR' in drink.Location %}
 
                       {% for size in drink.Price['NTR'] %}
 
-                        {% set cost = (drink.Total_Cost * drink.Weighting.NTR[size[0]]) + 4000 %}
+                        {% set cost = (drink.Total_Cost * drink.Weighting.NTR[size[0]]) + drink.Extra_Cost.NTR %}
+
                         {% set price = drink.Price.NTR[size[0]] %}
 
                         {% if price > 0 %}
@@ -705,12 +704,8 @@
 
     const num_weighting = obj_drink.Weighting[str_sel_loc][`Size_${$(this).data('size')}`]
     const num_total_cost = obj_drink.Total_Cost * num_weighting;
-    var num_extra_cost = 0;
-
-    if(str_sel_loc == 'NTR') {
-      num_extra_cost = 4000;
-    }
-
+    const num_extra_cost = obj_drink.Extra_Cost[str_sel_loc];
+    
     const num_price = obj_drink.Price[str_sel_loc][`Size_${$(this).data('size')}`]
     const num_margin = ((num_price - (num_total_cost + num_extra_cost)) / num_price) * 100
 

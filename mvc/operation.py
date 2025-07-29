@@ -31,7 +31,7 @@ class FixedCost(BaseModel):
         'arbitrary_types_allowed': True,
         'json_encoders': {ObjectId: lambda oid: str(oid)},
     }
-
+    
 
 
 class RawIngredient(BaseModel):
@@ -186,18 +186,8 @@ class Drink(BaseModel):
 
     # Calculated fields
     Total_Cost: Annotated[float, Field(ge=1, default=0)]
-    Weighting: Annotated[dict, Field(default={
-        'SGN': {
-            'Size_S': 0,
-            'Size_M': 1,
-            'Size_L': 0,
-        },
-        'NTR': {
-            'Size_S': 0,
-            'Size_M': 0,
-            'Size_L': 0,
-        },
-    })]
+    Weighting: Annotated[dict, Field(default={'SGN': {'Size_S': 0, 'Size_M': 1, 'Size_L': 0}, 'NTR': {'Size_S': 0, 'Size_M': 0, 'Size_L': 0}})]
+    Extra_Cost: Annotated[dict, Field(description="Ly nhựa, ống hút, trà đá", default={'SGN': 0, 'NTR': 2000})]
 
 
     model_config = {
@@ -205,8 +195,8 @@ class Drink(BaseModel):
         'arbitrary_types_allowed': True,
         'json_encoders': {ObjectId: lambda oid: str(oid)},
     }
-
-
+    
+    
 
 class DrinkIngredientItemUpdate(BaseModel):
     Ingredient_ID: str = Field(pattern=r"^(RIG|PIG)\d+$")
@@ -405,7 +395,7 @@ class Operation:
 
         drk_data = jsonable_encoder(drk, custom_encoder={ObjectId: str})
         drk_data = Drink(**drk_data)
-
+        
         for item in drk_data.Ingredients:
 
             if str(item.Ingredient_ID)[:3].upper() == 'RIG':
@@ -427,18 +417,21 @@ class Operation:
             drk_data.Total_Cost += item.Total_Cost
 
             for loc in drk_data.Location:
-
+                
                 if loc == 'SGN':
                     continue
 
                 obj_price_loc = getattr(drk_data.Price, loc)
                 dict_weighting: dict = drk_data.Weighting.get(loc)
-
+                
+                if drk_data.Drink_ID in ['DRK31', 'DRK32']:
+                    drk_data.Extra_Cost[loc] = 4000
+                
                 if obj_price_loc.Size_S > 0:
                     dict_weighting['Size_S'] = 1
                     dict_weighting['Size_M'] = 1.5
                     dict_weighting['Size_L'] = 1.5 * 1.5
-
+                
                 elif obj_price_loc.Size_S == 0 and obj_price_loc.Size_M > 0:
                     dict_weighting['Size_S'] = 0
                     dict_weighting['Size_M'] = 1
@@ -535,10 +528,13 @@ class Operation:
 
 
 
-    async def retrieve_inventory(self) -> list[InventoryItem]:
+    async def retrieve_inventory(self, dict_filter_mongodb: dict) -> list[InventoryItem]:
         lst_inventory = list()
 
-        async for inv in self.clt_inventory.find({'Raw_Ingredient_ID': {'$exists': True, '$ne': None}}).sort({'DateTime': -1}):
+        async for inv in self.clt_inventory.find({
+                'Raw_Ingredient_ID': {'$exists': True, '$ne': None}
+            } | dict_filter_mongodb).sort({'DateTime': -1}):
+            
             inv_data = await self.convert_inventory(inv)
             lst_inventory.append(inv_data)
 
@@ -548,7 +544,7 @@ class Operation:
 
 
     @staticmethod
-    def analyze_inventory(lst_inventory: list[InventoryItem]):
+    def analyze_inventory(lst_inventory: list[InventoryItem], is_export_df: bool = False) -> list[dict] | pd.DataFrame:
 
         df_summary = pd.DataFrame([i.model_dump() for i in lst_inventory])
 
@@ -571,7 +567,7 @@ class Operation:
         df_total_qty['remain'] = df_total_qty['add'] - df_total_qty['get']
         df_total_qty = df_total_qty.sort_values(by=['remain'], ascending=[True])
 
-        return df_total_qty.to_dict(orient='records')
+        return df_total_qty.to_dict(orient='records') if not is_export_df else df_total_qty
 
 
 
@@ -587,7 +583,7 @@ class Operation:
             result = await self.clt_inventory.insert_many(lst_inv_item_dump)
 
         except Exception as e:
-            raise HTTPException(status_code=400, detail=str(e))
+            raise HTTPException(status_code=400, detail=f"Could not add inventory item(s): {e}")
 
 
         lst_inventory = list()
@@ -616,7 +612,7 @@ class Operation:
 
 
 
-    async def convert_receipt_file_2_dataframe(self, upload_file: UploadFile) -> List[ReceiptUpload]:
+    async def convert_receipt_file_to_dataframe(self, upload_file: UploadFile) -> List[ReceiptUpload]:
 
         try:
             df_receipt = pd.read_excel(upload_file.file, header=7)
@@ -683,7 +679,7 @@ class Operation:
     async def upload_receipts(self, upload_file: UploadFile) -> dict:
         
         try:
-            lst_documents = await self.convert_receipt_file_2_dataframe(upload_file=upload_file)
+            lst_documents = await self.convert_receipt_file_to_dataframe(upload_file=upload_file)
             docs = [d.model_dump(by_alias=True, exclude_none=True) for d in lst_documents]
 
             ops = list()
@@ -719,17 +715,14 @@ class Operation:
 
 
         except Exception as e:
-            raise HTTPException(status_code=400, detail=f"Upload receipts error: {str(e)}")
+            raise HTTPException(status_code=400, detail=f"Upload receipts error: {e}")
         
 
 
 
-    async def convert_receipt(self, receipt: dict, dict_drink: Dict[str, Drink], current_user: UserPublic) -> Receipt:
+    async def convert_receipt(self, receipt: dict, dict_drink: Dict[str, Drink], is_convert_pig_to_rig: bool, dict_pig: dict, current_user: UserPublic) -> Receipt:
         receipt_data = jsonable_encoder(receipt, custom_encoder={ObjectId: str})
         receipt_data = Receipt(**receipt_data)
-        
-        num_extra_cost = 4000 if receipt_data.Location in ['NTR'] else 0
-        
         
         for item in receipt_data.Items:
             
@@ -743,54 +736,74 @@ class Operation:
             
             # Calculated fields based on Size
             item.Price_By_Size = getattr(getattr(obj_drink.Price, receipt_data.Location), item.Size)
-            item.Total_Cost_By_Size = (obj_drink.Total_Cost * num_weight) + num_extra_cost
+            item.Total_Cost_By_Size = (obj_drink.Total_Cost * num_weight) + obj_drink.Extra_Cost.get(receipt_data.Location) 
+            
             
             for igr in obj_drink.Ingredients:
-                igr_data = DrinkIngredientItem(
-                    Ingredient_ID=igr.Ingredient_ID,
-                    Ingredient_Name=igr.Ingredient_Name,
-                    Unit=igr.Unit,
-                    Ingredient_Quanty=igr.Ingredient_Quanty * num_weight,
-                    Cost_Per_Unit=igr.Cost_Per_Unit * num_weight,
-                    Total_Cost=igr.Total_Cost * num_weight,
-                )
                 
-                item.Ingredients_By_Size.append(igr_data)
-            
+                if is_convert_pig_to_rig and igr.Ingredient_ID[:3] == 'PIG':
+                    
+                    # CONVERT PIG TO RIG
+                    pig = dict_pig.get(igr.Ingredient_ID)
+                    pig_qty_ratio = igr.Ingredient_Quanty / pig.Quanty
+                    
+                    for rig in pig.Raw_Ingredients:
+                        
+                        igr_data = DrinkIngredientItem(
+                            Ingredient_ID=rig.Raw_Ingredient_ID,
+                            Ingredient_Name=rig.Raw_Ingredient_Name,
+                            Unit=rig.Unit,
+                            Ingredient_Quanty=rig.Raw_Ingredient_Quanty * pig_qty_ratio * num_weight,
+                            Cost_Per_Unit=rig.Cost_Per_Unit,
+                            Total_Cost=rig.Total_Cost * pig_qty_ratio * num_weight,
+                        )
+                    
+                        item.Ingredients_By_Size.append(igr_data)
+
+                else:
+                    
+                    # GET BOTH PIG & RIG INFORMATION
+                    igr_data = DrinkIngredientItem(
+                        Ingredient_ID=igr.Ingredient_ID,
+                        Ingredient_Name=igr.Ingredient_Name,
+                        Unit=igr.Unit,
+                        Ingredient_Quanty=igr.Ingredient_Quanty * num_weight,
+                        Cost_Per_Unit=igr.Cost_Per_Unit,
+                        Total_Cost=igr.Total_Cost * num_weight,
+                    )
+                    
+                    item.Ingredients_By_Size.append(igr_data)
+                    
+                    
+                
         
         return receipt_data
 
 
 
-    async def retrieve_receipt(self, dict_filter: dict, current_user: UserPublic) -> List[Receipt]:
+    async def retrieve_receipt(self, dict_filter_mongodb: dict, is_convert_pig_to_rig: bool, current_user: UserPublic) -> List[Receipt]:
         
         lst_receipt = list()
-
-        # # Compute bounds for this month
-        # now   = datetime.now()
-        # start = datetime(now.year, now.month, 1)
         
-        # # advance to the first of next month:
-        # if now.month == 12:
-        #     end = datetime(now.year + 1, 1, 1)
-        # else:
-        #     end = datetime(now.year, now.month + 1, 1)
-
         # Get all drink to add information to Receipt Items Object
         dict_drink = await self.retrieve_drink(groupby='id', current_user=current_user)
+        dict_pig = dict()
         
-        dict_filter_mongodb = {
-            'Location': {'$in': dict_filter['Location']},
-        }
+        if is_convert_pig_to_rig:
+            lst_pig = await self.retrieve_processed_ingredient(current_user)
+            dict_pig = {item.Processed_Ingredient_ID: item for item in lst_pig}
+        
         
         
         # async for receipt in self.clt_receipt.find({"Payment_Time": {"$gte": start, "$lt": end}}).sort({'Payment_Time': -1}):
         async for receipt in self.clt_receipt.find(dict_filter_mongodb).sort({'Payment_Time': -1}):
-            receipt_data = await self.convert_receipt(receipt=receipt, dict_drink=dict_drink, current_user=current_user)
+            receipt_data = await self.convert_receipt(receipt=receipt, dict_drink=dict_drink, is_convert_pig_to_rig=is_convert_pig_to_rig, dict_pig=dict_pig, current_user=current_user)
             lst_receipt.append(receipt_data)
 
+        
+        
         return lst_receipt
-    
+        
     
     
     

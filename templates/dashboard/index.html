@@ -38,25 +38,28 @@
       </div>
       
       <div class="card-body">
-        <form id="form-dashboard_filter" action="/dashboard/filter" enctype="multipart/form-data">
+        <form id="form-dashboard-filter">
+          
+          {% set id_locs_elm = 'dashboard-filter-locs' %}
+          {% set id_date_elm = 'dashboard-filter-date' %}
 
           <div class="row">
             <div class="col-lg-6">
               <div class="form-group">
                 <label class="col-form-label">Location</label>
-                <select class="form-control" name="choice-loc-filter" id="choice-loc-filter" multiple required>
-                  <option value="SGN" selected>Haylà.cafe (SGN)</option>
-                  <option value="NTR" selected>Haylà.express (NTR)</option>
+                <select class="form-control" name="{{ id_locs_elm }}" id="{{ id_locs_elm }}" multiple required>
+                  <option value="SGN">SGN</option>
+                  <option value="NTR">NTR</option>
                 </select>
                 <small class="form-text text-muted">Please enter location</small>
               </div>
-            </div>  
+            </div>
           
             <div class="col-lg-6">
               <div class="form-group">
-                <label class="col-form-label">Period</label>
+                <label class="col-form-label">Date</label>
                 <div class="input-group">
-                  <input type="text" id="dashboard-date-filter" class="form-control" placeholder="Select date range">
+                  <input type="text" id="{{ id_date_elm }}" class="form-control" placeholder="Select date range">
                   <span class="input-group-text"><i class="feather icon-calendar"></i></span>
                 </div>
               </div>
@@ -64,8 +67,13 @@
           
           </div>
           
-          <button id="btn-submit-filter" class="btn btn-primary">Submit</button>
+          <div class="row mt-3">
+            <div class="col text-end">
+              <button id="btn-submit-filter" class="btn btn-primary">Submit</button>
+            </div>
+          </div>
 
+          
         </form>
       </div>
     </div>
@@ -73,71 +81,92 @@
 </div>
 <!-- [ Filtering Area ] end -->
 
-
-
+<!-- [ Dashboard main content ] start -->
 <div class="row">
+  
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h5 class="mb-0">General</h5>
+  </div>
+
   <div class="col-md-6 col-xl-3">
     <div class="card">
-      <div class="card-body">
+      <div id="dashboard-revenue" class="card-body">
         <h6 class="mb-2 f-w-400 text-muted">Revenue</h6>
-        <h4 class="mb-3">"{:,.0f}".format(dict_dashboard.revenue) <span class="badge bg-light-primary border border-primary">
-          <i class="ti ti-trending-up"></i>xxx</span></h4>
-        <p class="mb-0 text-muted text-sm">You made an extra <span class="text-primary">xx,000</span> this year
-        </p>
+        <div>
+          <h4 class="mb-3">[xx,xxx,xxx] <span class="badge bg-light-secondary border border-secondary">
+          <i class="ti ti-trending-up"></i> xx </span></h4>
+          <p class="mb-0 text-muted text-sm">You made an extra <b>[xx,xxx,xxx]</b> last period</p>
+        </div>
       </div>
     </div>
   </div>
+
+  <div class="col-md-6 col-xl-3">
+    <div class="card">
+      <div id="dashboard-directcost" class="card-body">
+        <h6 class="mb-2 f-w-400 text-muted">Direct Cost</h6>
+        <h4 class="mb-3">[xx,xxx,xxx] <span class="badge bg-light-secondary border border-secondary">
+        <i class="ti ti-trending-up"></i> xx </span></h4>
+        <p class="mb-0 text-muted text-sm">You made an extra <b>[xx,xxx,xxx]</b> last period</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-xl-3">
+    <div class="card">
+      <div id="dashboard-fixedcost" class="card-body">
+        <h6 class="mb-2 f-w-400 text-muted">Fixed Cost</h6>
+        <h4 class="mb-3">[xx,xxx,xxx] <span class="badge bg-light-secondary border border-secondary">
+        <i class="ti ti-trending-up"></i> xx </span></h4>
+        <p class="mb-0 text-muted text-sm">You made an extra <b>[xx,xxx,xxx]</b> last period</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-xl-3">
+    <div class="card">
+      <div id="dashboard-netprofit" class="card-body">
+        <h6 class="mb-2 f-w-400 text-muted">Net Profit</h6>
+        <h4 class="mb-3">[xx,xxx,xxx] <span class="badge bg-light-secondary border border-secondary">
+        <i class="ti ti-trending-up"></i> xx </span></h4>
+        <p class="mb-0 text-muted text-sm">You made an extra <b>[xx,xxx,xxx]</b> last period</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-12 col-xl-12">
+    
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h5 class="mb-0">Revenue & Direct Cost</h5>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <div id="chart-revenue-direct-cost"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-12 col-xl-12">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h5 class="mb-0">Raw Ingredients Usage</h5>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <div id="container-rig-usage" class="dt-responsive table-responsive"></div>
+      </div>
+    </div>
+  </div>
+  
 </div>
+<!-- [ Dashboard main content ] end -->
 
-
-<!-- <div class="row">
-  <div class="col-md-6 col-xl-3">
-    <div class="card">
-      <div class="card-body">
-        <h6 class="mb-2 f-w-400 text-muted">Total Page Views</h6>
-        <h4 class="mb-3">4,42,236 <span class="badge bg-light-primary border border-primary"><i
-              class="ti ti-trending-up"></i> 59.3%</span></h4>
-        <p class="mb-0 text-muted text-sm">You made an extra <span class="text-primary">35,000</span> this year
-        </p>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-md-6 col-xl-3">
-    <div class="card">
-      <div class="card-body">
-        <h6 class="mb-2 f-w-400 text-muted">Total Users</h6>
-        <h4 class="mb-3">78,250 <span class="badge bg-light-success border border-success"><i
-              class="ti ti-trending-up"></i> 70.5%</span></h4>
-        <p class="mb-0 text-muted text-sm">You made an extra <span class="text-success">8,900</span> this year</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-md-6 col-xl-3">
-    <div class="card">
-      <div class="card-body">
-        <h6 class="mb-2 f-w-400 text-muted">Total Order</h6>
-        <h4 class="mb-3">18,800 <span class="badge bg-light-warning border border-warning"><i
-              class="ti ti-trending-down"></i> 27.4%</span></h4>
-        <p class="mb-0 text-muted text-sm">You made an extra <span class="text-warning">1,943</span> this year</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-md-6 col-xl-3">
-    <div class="card">
-      <div class="card-body">
-        <h6 class="mb-2 f-w-400 text-muted">Total Sales</h6>
-        <h4 class="mb-3">$35,078 <span class="badge bg-light-danger border border-danger"><i
-              class="ti ti-trending-down"></i> 27.4%</span></h4>
-        <p class="mb-0 text-muted text-sm">You made an extra <span class="text-danger">$20,395</span> this year
-        </p>
-      </div>
-    </div>
-  </div>
-
+<!-- DEMO----------------------------------------------------------------------------------------------------------------------------------------------- -->
+<div class="row">
+  
   <div class="col-md-12 col-xl-8">
+    
     <div class="d-flex align-items-center justify-content-between mb-3">
       <h5 class="mb-0">Unique Visitor</h5>
       <ul class="nav nav-pills justify-content-end mb-0" id="chart-tab-tab" role="tablist">
@@ -152,6 +181,7 @@
         </li>
       </ul>
     </div>
+
     <div class="card">
       <div class="card-body">
         <div class="tab-content" id="chart-tab-tabContent">
@@ -167,7 +197,7 @@
       </div>
     </div>
   </div>
-
+    
   <div class="col-md-12 col-xl-4">
     <h5 class="mb-3">Income Overview</h5>
     <div class="card">
@@ -378,24 +408,34 @@
     </div>
   </div>
 
-</div> -->
+</div>
+
+
 {% endblock %}
 <!-- [ Main Content ] end -->
 
 {% block charting_scripts %}
   <!-- [Page Specific JS] start -->
+  <script src="{{ request.url_for('static', path='js/plugins/apexcharts.min.js') }}"></script>
+  <script src="{{ request.url_for('static', path='js/pages/dashboard-default.js') }}"></script>
+  <!-- [Page Specific JS] end -->
+{% endblock %}
+
+
+{% block extra_scripts %}
   <script src="{{ request.url_for('static', path='js/plugins/choices.min.js') }}"></script>
   <script src="{{ request.url_for('static', path='js/plugins/bouncer.min.js') }}"></script>
   <script src="{{ request.url_for('static', path='js/pages/form-validation.js') }}"></script>
   <script src="{{ request.url_for('static', path='js/plugins/sweetalert2.all.min.js') }}"></script>
   <script src="{{ request.url_for('static', path='js/plugins/flatpickr.min.js') }}"></script>
-
-  <!-- <script src="{{ request.url_for('static', path='js/plugins/apexcharts.min.js') }}"></script> -->
-  <!-- <script src="{{ request.url_for('static', path='js/pages/dashboard-default.js') }}"></script> -->
-  <!-- [Page Specific JS] end -->
+  <script src="{{ request.url_for('static', path='js/plugins/jquery.dataTables.min.js') }}"></script>
+  <script src="{{ request.url_for('static', path='js/plugins/dataTables.bootstrap5.min.js') }}"></script>
 
   <script>
-    var editDrinkLocation = new Choices('#choice-loc-filter', {
+    const id_locs_elm = 'dashboard-filter-locs';
+    const id_date_elm = 'dashboard-filter-date';
+
+    var editDrinkLocation = new Choices(`#${id_locs_elm}`, {
       placeholderValue: 'Location',
       searchPlaceholderValue: 'Search',
       allowHTML: true,
@@ -405,48 +445,222 @@
       maxItemCount: 2
     });
 
-    flatpickr(document.querySelector('#dashboard-date-filter'),{
+    flatpickr(document.querySelector(`#${id_date_elm}`),{
       mode: 'range'
     });
 
+    
 
-    // $(function(){
-    //   $('#receipt-data-upload-form').on('submit', function(e){
-    //     e.preventDefault();
+
+    $(function(){
+      $('#btn-submit-filter').on('click', function(e){
+        e.preventDefault();
         
-    //     const $btn = $('#btn-receipt-upload');
-
-    //     $btn.prop('disabled', true).text('Uploading…');
-
-    //     const formData = new FormData(this);
+        const $fil_loc = $(`#${id_locs_elm}`);
+        const $fil_date = $(`#${id_date_elm}`);
+        const $btn_submit = $(this);
         
-    //     $.ajax({
-    //       url: this.action,
-    //       type: 'POST',
-    //       data: formData,
-    //       processData: false,  // tell jQuery not to touch the data
-    //       contentType: false,  // tell jQuery not to set content-type
-          
-    //       success(resp) {
-            
-    //         Swal.fire('Uploaded!', `Receipt count: ${resp.inserted_count}, duplicated: ${resp.matched}, uploaded: ${resp.upserted}`, 'success').then(() => {
-    //           window.location.href = '/operation/receipt/data';
-    //         });
-            
-    //       },
-          
-    //       error(xhr) {
-    //         Swal.fire('Upload failed', xhr.responseText || 'Error', 'error');
-    //         $btn.prop('disabled', false).text('Upload');
-    //       }
-    //     });
+        if (!$fil_loc.val()?.length) {
+          Swal.fire('Please choose location', '', 'error');
+          return;
+        }
+        
+        if (!$fil_date.val()?.length) {
+          Swal.fire('Please choose date', '', 'error');
+          return;
+        }
+        
+        $btn_submit.prop('disabled', true).text('Processing…');
+        
+        if ($fil_date.val().includes(" to ")) {
 
-    //   });
-    // });
+          var [startStr, endStr] = $fil_date.val().split(" to ").map(s => s.trim());
+
+        }
+        else {
+          var [startStr, endStr] = [$fil_date.val(), $fil_date.val()];
+        }
+
+        const dboard_filter_input = {
+          Location: $fil_loc.val(),
+          Payment_Time: [startStr, endStr]
+        };
+        
+        let timerInterval;
+
+        Swal.fire({
+          title: 'Processing...',
+          html: 'Please wait for <b></b> seconds.',
+          timer: 5000,               // 5 seconds total
+          timerProgressBar: true,
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();      // optional spinner
+            
+            $.ajax({
+              url: '/dashboard/filter',
+              method: 'POST',
+              contentType: 'application/json',
+              data: JSON.stringify(dboard_filter_input),
+              
+              success: function(response) {
+                console.log('Filter applied:', response);
+                //ChartRevDcost
+                
+                setTimeout(() => {
+                  
+                  ['Revenue', 'DirectCost', 'FixedCost', 'NetProfit'].forEach(item => {
+                  
+                  const prev_val = response.Previous[item];
+                  const curr_val = response.Current[item];
+                  var delta_val = 0;
+                  
+                  if (prev_val != 0) {
+                    delta_val = (curr_val - prev_val) / Math.abs(prev_val) * 100;
+                  }
+                  
+                  let txt_color = '';
+                  let txt_icon = '';
+
+                  if (delta_val < 0) {
+                    txt_color = 'danger';
+                    txt_icon = 'ti ti-trending-down';
+
+                  }
+                  else if (delta_val > 0) {
+                    txt_color = 'success';
+                    txt_icon = 'ti ti-trending-up';
+                  
+                  }
+                  else {
+                    txt_color = 'secondary';
+                    txt_icon = '';
+                  
+                  }
+                  
+                  $(`#dashboard-${item.toLowerCase()}`).html(`
+                    <h6 class="mb-2 f-w-400 text-muted">${item}</h6>
+
+                    <h4 class="mb-3"> ${Number(Math.round(curr_val)).toLocaleString('en-US')} 
+                      <span class="badge bg-light-${txt_color} border border-${txt_color}">
+                      <i class="${txt_icon}"></i> ${Number(Math.round(delta_val))} % </span>
+                    </h4>
+                    
+                    <p class="mb-0 text-muted text-sm">You made <span class="text-muted">${Number(Math.round(prev_val)).toLocaleString('en-US')}</span> last period ${response.Previous.Period}</p>
+                    
+                    `);
+                  
+                });
+
+                  var options = {
+                    chart: {
+                      height: 450,
+                      type: 'line',
+                      toolbar: {show: false}
+                    },
+                    dataLabels: {enabled: false},
+                    colors: response.ChartRevDcost.Colors,
+                    series: response.ChartRevDcost.Series,
+                    stroke: {curve: 'smooth', width: 2},
+                    fill: {opacity: [0.35, 0.35, 0.35, 1]},
+                    xaxis: response.ChartRevDcost.Xaxis,
+                    yaxis: {
+                      labels: {
+                        formatter: function (val) {
+                          if (Math.abs(val) >= 1e6) {
+                            return (val / 1e6).toFixed(1) + 'M';
+                          }
+                          if (Math.abs(val) >= 1e3) {
+                            return (val / 1e3).toFixed(0) + 'K';
+                          }
+                          return val.toLocaleString('en-US');
+                        },
+                      },
+                    }
+                  };
+                  
+                  var chart_revenue_direct_cost = new ApexCharts(document.querySelector('#chart-revenue-direct-cost'), options);
+                  chart_revenue_direct_cost.render();
+                  
+                  $('#container-rig-usage').html(response.HTML_RawIngredientUsage);
+                  
+                  const $dt_rig_usage = $('#dt-rig-usage').DataTable({
+                    dom:
+                      "<'row g-2 p-2 mb-3'" +
+                      "<'col-sm-8'l>" +   // length menu here
+                      "<'col-sm-4'f>" +   // filter input here
+                      ">" +
+                      "t" +                 // the table itself
+                      "<'row g-2 p-2 mt-3'" +
+                        "<'col-sm-8'i>" +   // table info here
+                        "<'col-sm-4'p>" +   // pagination here
+                      ">",
+                    order: [[5, 'desc']],
+                    language: {
+                      lengthMenu: 'Show _MENU_ entries',
+                      search: '',
+                      searchPlaceholder: 'Search…',
+                      paginate: {
+                        first:    '<i class="ti ti-chevrons-left"></i>',
+                        previous: '<i class="ti ti-chevron-left"></i>',
+                        next:     '<i class="ti ti-chevron-right"></i>',
+                        last:     '<i class="ti ti-chevrons-right"></i>'
+                      }
+                    },
+                    pageLength: 10
+                  });
+                  
+                  $('.dataTables_length select').addClass('form-select form-select-sm');
+                  $('.dataTables_filter label').addClass('d-flex justify-content-end');
+                  $('.dataTables_filter input').addClass('form-control form-control-sm');
+                  
+                }, 3000);
+                
+              },
+              
+              error: function(xhr, status, err) {
+                // console.error('Filter error:', xhr, status, err);
+
+                Swal.fire('Dashborad filter failed', xhr.responseJSON?.detail || 'Error', 'error');
+              },
+              
+              complete: function() {
+                $btn_submit.prop('disabled', false).text('Submit');
+              },
+              
+            });
+
+            // grab the <b> in the html and start a small interval
+            const b = Swal.getHtmlContainer().querySelector('b');
+            b.textContent = Math.ceil(Swal.getTimerLeft()/1000);
+
+            timerInterval = setInterval(() => {
+              const t = Swal.getTimerLeft();
+              // update the bolded seconds
+              b.textContent = Math.ceil(t/1000);
+            }, 100);
+          },
+          willClose: () => {
+            clearInterval(timerInterval);
+          }
+
+        })
+        .then((result) => {
+          if (result.dismiss === Swal.DismissReason.timer) {
+            Swal.fire('Successful filter!', '', 'success');
+          }
+        });
+        
+      
+      });
+    });
+
+
 
 
 
   </script>
+
 {% endblock %}
 
 

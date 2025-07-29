@@ -6,7 +6,9 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function floatchart() {
+  
   (function () {
+    
     var options = {
       chart: {
         height: 450,
@@ -34,8 +36,11 @@ function floatchart() {
         categories: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
       }
     };
+    
     var chart = new ApexCharts(document.querySelector('#visitor-chart'), options);
     chart.render();
+
+
     var options1 = {
       chart: {
         height: 450,
@@ -63,8 +68,10 @@ function floatchart() {
         categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
       }
     };
+    
     var chart = new ApexCharts(document.querySelector('#visitor-chart-1'), options1);
     chart.render();
+
   })();
 
   (function () {
@@ -166,9 +173,12 @@ function floatchart() {
         show: false
       },
     };
+
     var chart = new ApexCharts(document.querySelector('#analytics-report-chart'), options);
     chart.render();
+  
   })();
+
   (function () {
     var options = {
       chart: {

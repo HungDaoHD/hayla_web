@@ -92,7 +92,7 @@ async def update_drink(oid: str, obj_drink: DrinkUpdate, current_user: UserPubli
 async def retrieve_inventory(request: Request, current_user: UserPublic = Depends(require_role(role=lst_role))):
 
     opt = Operation()
-    lst_inv = await opt.retrieve_inventory()
+    lst_inv = await opt.retrieve_inventory(dict_filter_mongodb={'Location': {'$in': ['SGN', 'NTR']}})
     lst_rig = await opt.retrieve_raw_ingredient(current_user)
     lst_loc = ['SGN', 'NTR']
 
@@ -123,7 +123,7 @@ async def inventory_add_items(lst_inv_item: list[InventoryItemInsert], current_u
 async def retrieve_receipt_data(request: Request, current_user: UserPublic = Depends(require_role(role=lst_role))):
 
     opt = Operation()
-    lst_receipt = await opt.retrieve_receipt(dict_filter={'Location': ['SGN', 'NTR']}, current_user=current_user)
+    lst_receipt = await opt.retrieve_receipt(dict_filter_mongodb={'Location': {'$in': ['SGN', 'NTR']}}, is_convert_pig_to_rig=False, current_user=current_user)
     
     return templates.TemplateResponse('operation/receipt_data.html', {
         'request': request,
