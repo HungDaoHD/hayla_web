@@ -158,9 +158,50 @@
       </div>
     </div>
   </div>
+
+  <div class="col-md-12 col-xl-12">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h5 class="mb-0">Drinks Summary</h5>
+    </div>
+    
+    <div class="card">
+      <div class="card-body">
+        <div id="container-drk-summary" class="dt-responsive table-responsive"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- <div class="col-md-12 col-xl-6">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h5 class="mb-0">Drinks Margin</h5>
+    </div>
+    
+    <div class="card">
+      <div class="card-body">
+        <div id="container-drk-margin" class="dt-responsive table-responsive"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-12 col-xl-6">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h5 class="mb-0">Drinks Sales Quantity</h5>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <div id="container-drk-qty" class="dt-responsive table-responsive"></div>
+      </div>
+    </div>
+  </div> -->
   
 </div>
 <!-- [ Dashboard main content ] end -->
+
+
+
+
+
 
 <!-- DEMO----------------------------------------------------------------------------------------------------------------------------------------------- -->
 <div class="row">
@@ -584,6 +625,8 @@
                   
                   $('#container-rig-usage').html(response.HTML_RawIngredientUsage);
                   
+                  $('#container-drk-summary').html(response.HTML_DrinkSummary);
+                  
                   const $dt_rig_usage = $('#dt-rig-usage').DataTable({
                     dom:
                       "<'row g-2 p-2 mb-3'" +
@@ -595,7 +638,7 @@
                         "<'col-sm-8'i>" +   // table info here
                         "<'col-sm-4'p>" +   // pagination here
                       ">",
-                    order: [[5, 'desc']],
+                    order: [[3, 'desc']],
                     language: {
                       lengthMenu: 'Show _MENU_ entries',
                       search: '',
@@ -607,9 +650,36 @@
                         last:     '<i class="ti ti-chevrons-right"></i>'
                       }
                     },
-                    pageLength: 10
+                    pageLength: 10,
                   });
-                  
+
+                  const $dt_drk_summary = $('#dt-drk-summary').DataTable({
+                    dom:
+                      "<'row g-2 p-2 mb-3'" +
+                      "<'col-sm-8'l>" +   // length menu here
+                      "<'col-sm-4'f>" +   // filter input here
+                      ">" +
+                      "t" +                 // the table itself
+                      "<'row g-2 p-2 mt-3'" +
+                        "<'col-sm-8'i>" +   // table info here
+                        "<'col-sm-4'p>" +   // pagination here
+                      ">",
+                    order: [[3, 'desc']],
+                    language: {
+                      lengthMenu: 'Show _MENU_ entries',
+                      search: '',
+                      searchPlaceholder: 'Search…',
+                      paginate: {
+                        first:    '<i class="ti ti-chevrons-left"></i>',
+                        previous: '<i class="ti ti-chevron-left"></i>',
+                        next:     '<i class="ti ti-chevron-right"></i>',
+                        last:     '<i class="ti ti-chevrons-right"></i>'
+                      }
+                    },
+                    pageLength: 10,
+                  });
+
+
                   $('.dataTables_length select').addClass('form-select form-select-sm');
                   $('.dataTables_filter label').addClass('d-flex justify-content-end');
                   $('.dataTables_filter input').addClass('form-control form-control-sm');
@@ -651,12 +721,12 @@
           }
         });
         
-      
+        
       });
     });
 
 
-
+    
 
 
   </script>

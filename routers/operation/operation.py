@@ -64,7 +64,7 @@ async def retrieve_processed_ingredient(request: Request, current_user: UserPubl
 async def retrieve_drink(request: Request, current_user: UserPublic = Depends(require_role(role=lst_role))):
 
     opt = Operation()
-    dict_drink = await opt.retrieve_drink(groupby='group', current_user=current_user)
+    dict_drink = await opt.retrieve_drink(groupby='group', dict_filter_mongodb={}, current_user=current_user)
     lst_full_igr = await opt.get_full_ingredients(current_user)
 
     js_drinks = {k: [i.model_dump() for i in v] for k, v in dict_drink.items()}
@@ -85,6 +85,54 @@ async def update_drink(oid: str, obj_drink: DrinkUpdate, current_user: UserPubli
     opt = Operation()
     updated_drink: DrinkUpdate = await opt.update_drink(oid=oid, obj_drink=obj_drink)
     return JSONResponse(content=updated_drink.model_dump(mode='json'))
+
+
+
+
+
+
+
+# HERE
+@router.get('/drink_v2', response_class=HTMLResponse)
+async def page_drink_v2(request: Request, current_user: UserPublic = Depends(require_role(role=lst_role))):
+    
+    return templates.TemplateResponse('operation/drink_v2.html', {
+        'request': request,
+        'user': current_user.model_dump()
+    })
+    
+
+
+
+@router.get('/drink_v2/retrieve', response_class=JSONResponse)
+async def retrieve_drink_v2(current_user: UserPublic = Depends(require_role(role=lst_role))):
+    
+    opt = Operation()
+    dict_drink = await opt.retrieve_drink_v2(groupby='group', dict_filter_mongodb={}, current_user=current_user)
+    js_drinks = {k: [i.model_dump(mode='json') for i in v] for k, v in dict_drink.items()}
+    
+    return JSONResponse(content=js_drinks)
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

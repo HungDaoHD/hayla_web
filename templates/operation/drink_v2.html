@@ -1,0 +1,111 @@
+<!-- Load template html -->
+{% extends "./base.html" %}
+
+{% set str_title = 'Drink v2' %}
+
+<!-- Title -->
+{% block title %} {{ str_title ~ ' | Haylà' }} {% endblock %}
+
+
+<!-- [ breadcrumb ] start -->
+{% block breadcrumb %}
+<div class="col-md-12">
+  <ul class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/">Home</a></li>
+    <li class="breadcrumb-item"><a href="javascript: void(0)">Operation</a></li>
+    <li class="breadcrumb-item" aria-current="page">{{ str_title }}</li>
+  </ul>
+</div>
+
+<div class="col-md-12">
+  <div class="page-header-title">
+    <h2 class="mb-0">{{ str_title }}</h2>
+  </div>
+</div>
+
+{% endblock %}
+<!-- [ breadcrumb ] end -->
+
+
+<!-- [ Main Content ] start -->
+{% block main_content %}
+  
+  <div class="text-end p-2 pb-2">
+    <a href="javascript:void(0)" class="btn btn-primary d-inline-flex align-item-center" data-bs-toggle="modal" data-bs-target="#drink-edit_add-modal">
+      <i class="ti ti-plus f-18"></i>Add
+    </a>
+  </div>
+
+
+  <div>
+
+    <div id="drinks">
+      
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        
+        <table id="dt-drinks" class="table table-hover table-sm">
+
+          <thead>
+
+          </thead>
+
+          <tbody>
+
+          </tbody>
+          
+        </table>
+      
+      </div>
+    </div>
+  </div>
+
+
+
+{% endblock %}
+<!-- [ Main Content ] end -->
+
+
+
+{% block extra_scripts %}
+
+<script src="{{ request.url_for('static', path='js/plugins/choices.min.js') }}"></script>
+<script src="{{ request.url_for('static', path='js/plugins/bouncer.min.js') }}"></script>
+<script src="{{ request.url_for('static', path='js/pages/form-validation.js') }}"></script>
+
+<script src="{{ request.url_for('static', path='js/plugins/jquery.dataTables.min.js') }}"></script>
+<script src="{{ request.url_for('static', path='js/plugins/dataTables.bootstrap5.min.js') }}"></script>
+<script src="{{ request.url_for('static', path='js/plugins/dataTables.colReorder.min.js') }}"></script>
+<script src="{{ request.url_for('static', path='js/plugins/dataTables.fixedHeader.min.js') }}"></script>
+<script src="{{ request.url_for('static', path='js/plugins/sweetalert2.all.min.js') }}"></script>
+
+
+<script>
+
+
+  $.ajax({
+    url: `/operation/drink_v2/retrieve`,
+    method: 'GET',
+    contentType: 'application/json',
+    success: function(resp) {
+
+      console.log(resp);
+
+
+      $('#drinks').text(resp.values());
+
+    },
+    error: function(xhr, status, err) {
+      console.error(xhr);
+      console.error(status);
+      console.error(err);
+      Swal.fire(`Could not load drinks. Please try again.`, xhr.responseText || 'Error', 'error');
+    }
+  });
+
+
+</script>
+
+{% endblock %}

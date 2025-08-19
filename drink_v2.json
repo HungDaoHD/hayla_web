@@ -1,0 +1,2814 @@
+[
+    {
+        "Drink_ID": "DRK001",
+        "Group": "Cafe",
+        "Drink_Name": "Cafe đen",
+        "Location": "SGN",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG11",
+                            "Ingredient_Quanty": 50
+                        },
+                        {
+                            "Ingredient_ID": "PIG8",
+                            "Ingredient_Quanty": 20
+                        }
+                    ],
+                    "Price": 35000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK002",
+        "Group": "Cafe",
+        "Drink_Name": "Cafe sữa",
+        "Location": "SGN",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG11",
+                            "Ingredient_Quanty": 50
+                        },
+                        {
+                            "Ingredient_ID": "RIG3",
+                            "Ingredient_Quanty": 20
+                        }
+                    ],
+                    "Price": 35000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK003",
+        "Group": "Cafe",
+        "Drink_Name": "Cafe muối",
+        "Location": "SGN",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG11",
+                            "Ingredient_Quanty": 30
+                        },
+                        {
+                            "Ingredient_ID": "RIG3",
+                            "Ingredient_Quanty": 25
+                        },
+                        {
+                            "Ingredient_ID": "PIG6",
+                            "Ingredient_Quanty": 50
+                        }
+                    ],
+                    "Price": 45000
+                }
+            }
+        }    
+    },
+    {
+        "Drink_ID": "DRK004",
+        "Group": "Cafe",
+        "Drink_Name": "Hayla cafe",
+        "Location": "SGN",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "RIG3",
+                            "Ingredient_Quanty": 20
+                        },
+                        {
+                            "Ingredient_ID": "RIG2",
+                            "Ingredient_Quanty": 20
+                        },
+                        {
+                            "Ingredient_ID": "RIG4",
+                            "Ingredient_Quanty": 70
+                        },
+                        {
+                            "Ingredient_ID": "PIG11",
+                            "Ingredient_Quanty": 50
+                        }
+                    ],
+                    "Price": 48000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK005",
+        "Group": "Cafe",
+        "Drink_Name": "Hayla cafe 2",
+        "Location": "SGN",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG11",
+                            "Ingredient_Quanty": 40
+                        },
+                        {
+                            "Ingredient_ID": "RIG3",
+                            "Ingredient_Quanty": 20
+                        },
+                        {
+                            "Ingredient_ID": "RIG2",
+                            "Ingredient_Quanty": 30
+                        },
+                        {
+                            "Ingredient_ID": "RIG6",
+                            "Ingredient_Quanty": 10
+                        }
+                    ],
+                    "Price": 47000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK006",
+        "Group": "Cafe",
+        "Drink_Name": "Cafe Chocolate",
+        "Location": "SGN",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG11",
+                            "Ingredient_Quanty": 20
+                        },
+                        {
+                            "Ingredient_ID": "RIG3",
+                            "Ingredient_Quanty": 15
+                        },
+                        {
+                            "Ingredient_ID": "RIG2",
+                            "Ingredient_Quanty": 15
+                        },
+                        {
+                            "Ingredient_ID": "RIG8",
+                            "Ingredient_Quanty": 20
+                        },
+                        {
+                            "Ingredient_ID": "RIG42",
+                            "Ingredient_Quanty": 1
+                        },
+                        {
+                            "Ingredient_ID": "RIG4",
+                            "Ingredient_Quanty": 55
+                        }
+                    ],
+                    "Price": 45000
+                }
+            }
+        }    
+    },
+    {
+        "Drink_ID": "DRK007",
+        "Group": "Cafe",
+        "Drink_Name": "Cafe Caramel",
+        "Location": "SGN",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG11",
+                            "Ingredient_Quanty": 20
+                        },
+                        {
+                            "Ingredient_ID": "RIG3",
+                            "Ingredient_Quanty": 20
+                        },
+                        {
+                            "Ingredient_ID": "RIG2",
+                            "Ingredient_Quanty": 15
+                        },
+                        {
+                            "Ingredient_ID": "RIG9",
+                            "Ingredient_Quanty": 20
+                        },
+                        {
+                            "Ingredient_ID": "RIG4",
+                            "Ingredient_Quanty": 55
+                        }
+                    ],
+                    "Price": 45000
+                }   
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK008",
+        "Group": "Cafe",
+        "Drink_Name": "Cafe Kem sữa",
+        "Location": "SGN",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG11",
+                            "Ingredient_Quanty": 20
+                        },
+                        {
+                            "Ingredient_ID": "RIG3",
+                            "Ingredient_Quanty": 20
+                        },
+                        {
+                            "Ingredient_ID": "RIG2",
+                            "Ingredient_Quanty": 15
+                        },
+                        {
+                            "Ingredient_ID": "PIG1",
+                            "Ingredient_Quanty": 50
+                        },
+                        {
+                            "Ingredient_ID": "RIG42",
+                            "Ingredient_Quanty": 1
+                        },
+                        {
+                            "Ingredient_ID": "RIG4",
+                            "Ingredient_Quanty": 70
+                        }
+                    ],
+                    "Price": 47000
+                }
+            }
+        }   
+    },
+    {
+        "Drink_ID": "DRK010",
+        "Group": "Trà trái cây",
+        "Drink_Name": "Trà bưởi",
+        "Location": "SGN",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "RIG14",
+                            "Ingredient_Quanty": 0.5
+                        },
+                        {
+                            "Ingredient_ID": "RIG23",
+                            "Ingredient_Quanty": 20
+                        },
+                        {
+                            "Ingredient_ID": "RIG24",
+                            "Ingredient_Quanty": 20
+                        },
+                        {
+                            "Ingredient_ID": "RIG13",
+                            "Ingredient_Quanty": 50
+                        },
+                        {
+                            "Ingredient_ID": "RIG25",
+                            "Ingredient_Quanty": 10
+                        }
+                    ],
+                    "Price": 47000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK011",
+        "Group": "Trà trái cây",
+        "Drink_Name": "Trà vải lài",
+        "Location": "SGN",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG13",
+                            "Ingredient_Quanty": 5
+                        },
+                        {
+                            "Ingredient_ID": "RIG22",
+                            "Ingredient_Quanty": 20
+                        },
+                        {
+                            "Ingredient_ID": "RIG20",
+                            "Ingredient_Quanty": 20
+                        },
+                        {
+                            "Ingredient_ID": "RIG18",
+                            "Ingredient_Quanty": 2
+                        },
+                        {
+                            "Ingredient_ID": "RIG13",
+                            "Ingredient_Quanty": 50
+                        },
+                        {
+                            "Ingredient_ID": "RIG15",
+                            "Ingredient_Quanty": 5
+                        }
+                    ],
+                    "Price": 45000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK012a",
+        "Group": "Trà trái cây",
+        "Drink_Name": "Trà nhài đác thơm",
+        "Location": "SGN",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG13",
+                            "Ingredient_Quanty": 10
+                        },
+                        {
+                            "Ingredient_ID": "PIG5",
+                            "Ingredient_Quanty": 50
+                        },
+                        {
+                            "Ingredient_ID": "RIG45",
+                            "Ingredient_Quanty": 5
+                        },
+                        {
+                            "Ingredient_ID": "PIG8",
+                            "Ingredient_Quanty": 20
+                        },
+                        {
+                            "Ingredient_ID": "RIG15",
+                            "Ingredient_Quanty": 10
+                        }
+                    ],
+                    "Price": 45000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK012b",
+        "Group": "Trà trái cây",
+        "Drink_Name": "Trà nhài đác thơm",
+        "Location": "NTR",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG13",
+                            "Ingredient_Quanty": 10
+                        },
+                        {
+                            "Ingredient_ID": "PIG5",
+                            "Ingredient_Quanty": 50
+                        },
+                        {
+                            "Ingredient_ID": "RIG45",
+                            "Ingredient_Quanty": 5
+                        },
+                        {
+                            "Ingredient_ID": "PIG8",
+                            "Ingredient_Quanty": 20
+                        },
+                        {
+                            "Ingredient_ID": "RIG15",
+                            "Ingredient_Quanty": 10
+                        }
+                    ],
+                    "Price": 28000
+                },
+                "_L": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG13",
+                            "Ingredient_Quanty": 15
+                        },
+                        {
+                            "Ingredient_ID": "PIG5",
+                            "Ingredient_Quanty": 75
+                        },
+                        {
+                            "Ingredient_ID": "RIG45",
+                            "Ingredient_Quanty": 7.5
+                        },
+                        {
+                            "Ingredient_ID": "PIG8",
+                            "Ingredient_Quanty": 30
+                        },
+                        {
+                            "Ingredient_ID": "RIG15",
+                            "Ingredient_Quanty": 15
+                        }
+                    ],
+                    "Price": 32000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK013",
+        "Group": "Trà trái cây",
+        "Drink_Name": "Trà đào",
+        "Location": "SGN",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "RIG11",
+                            "Ingredient_Quanty": 1
+                        },
+                        {
+                            "Ingredient_ID": "RIG21",
+                            "Ingredient_Quanty": 10
+                        },
+                        {
+                            "Ingredient_ID": "RIG19",
+                            "Ingredient_Quanty": 10
+                        },
+                        {
+                            "Ingredient_ID": "RIG17",
+                            "Ingredient_Quanty": 100
+                        },
+                        {
+                            "Ingredient_ID": "RIG13",
+                            "Ingredient_Quanty": 50
+                        },
+                        {
+                            "Ingredient_ID": "RIG15",
+                            "Ingredient_Quanty": 5
+                        }
+                    ],
+                    "Price": 45000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK014",
+        "Group": "Trà trái cây",
+        "Drink_Name": "Trà tắc xí muội",
+        "Location": "SGN",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG16",
+                            "Ingredient_Quanty": 100
+                        },
+                        {
+                            "Ingredient_ID": "RIG16",
+                            "Ingredient_Quanty": 10
+                        },
+                        {
+                            "Ingredient_ID": "RIG15",
+                            "Ingredient_Quanty": 20
+                        },
+                        {
+                            "Ingredient_ID": "RIG13",
+                            "Ingredient_Quanty": 50
+                        },
+                        {
+                            "Ingredient_ID": "PIG8",
+                            "Ingredient_Quanty": 40
+                        }
+                    ],
+                    "Price": 47000
+                }
+            }
+        }    
+    },
+    {
+        "Drink_ID": "DRK015",
+        "Group": "Trà trái cây",
+        "Drink_Name": "Trà hoa hồng",
+        "Location": "SGN",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG16",
+                            "Ingredient_Quanty": 100
+                        },
+                        {
+                            "Ingredient_ID": "RIG14",
+                            "Ingredient_Quanty": 0.5
+                        },
+                        {
+                            "Ingredient_ID": "RIG15",
+                            "Ingredient_Quanty": 20
+                        },
+                        {
+                            "Ingredient_ID": "PIG8",
+                            "Ingredient_Quanty": 30
+                        },
+                        {
+                            "Ingredient_ID": "RIG13",
+                            "Ingredient_Quanty": 50
+                        },
+                        {
+                            "Ingredient_ID": "RIG40",
+                            "Ingredient_Quanty": 10
+                        }
+                    ],
+                    "Price": 42000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK016",
+        "Group": "Trà sữa",
+        "Drink_Name": "Trà sữa thái",
+        "Location": "SGN",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "RIG12",
+                            "Ingredient_Quanty": 8
+                        },
+                        {
+                            "Ingredient_ID": "RIG41",
+                            "Ingredient_Quanty": 70
+                        },
+                        {
+                            "Ingredient_ID": "RIG3",
+                            "Ingredient_Quanty": 20
+                        },
+                        {
+                            "Ingredient_ID": "RIG13",
+                            "Ingredient_Quanty": 50
+                        }
+                    ],
+                    "Price": 42000
+                }
+            }
+        }    
+    },
+    {
+        "Drink_ID": "DRK017",
+        "Group": "Trà sữa",
+        "Drink_Name": "Trà lài Machiato",
+        "Location": "SGN",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG13",
+                            "Ingredient_Quanty": 70
+                        },
+                        {
+                            "Ingredient_ID": "PIG1",
+                            "Ingredient_Quanty": 50
+                        },
+                        {
+                            "Ingredient_ID": "PIG8",
+                            "Ingredient_Quanty": 20
+                        }
+                    ],
+                    "Price": 42000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK018",
+        "Group": "Trà sữa",
+        "Drink_Name": "Trà sữa nguyên lá",
+        "Location": "SGN",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG2",
+                            "Ingredient_Quanty": 170
+                        },
+                        {
+                            "Ingredient_ID": "RIG42",
+                            "Ingredient_Quanty": 1
+                        },
+                        {
+                            "Ingredient_ID": "RIG3",
+                            "Ingredient_Quanty": 10
+                        }
+                    ],
+                    "Price": 39000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK019a",
+        "Group": "Trà sữa",
+        "Drink_Name": "Trà sữa kem muối",
+        "Location": "SGN",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+            "_M": {
+                "Ingredients": [
+                {
+                    "Ingredient_ID": "PIG2",
+                    "Ingredient_Quanty": 170
+                },
+                {
+                    "Ingredient_ID": "PIG6",
+                    "Ingredient_Quanty": 50
+                },
+                {
+                    "Ingredient_ID": "RIG3",
+                    "Ingredient_Quanty": 10
+                }
+                ],
+                "Price": 43000
+            }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK019b",
+        "Group": "Trà sữa",
+        "Drink_Name": "Trà sữa kem muối",
+        "Location": "NTR",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "PIG2",
+                        "Ingredient_Quanty": 170
+                        },
+                        {
+                        "Ingredient_ID": "PIG6",
+                        "Ingredient_Quanty": 50
+                        },
+                        {
+                        "Ingredient_ID": "RIG3",
+                        "Ingredient_Quanty": 10
+                        }
+                    ],
+                    "Price": 23000
+                },
+                "_L": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "PIG2",
+                        "Ingredient_Quanty": 255
+                        },
+                        {
+                        "Ingredient_ID": "PIG6",
+                        "Ingredient_Quanty": 75
+                        },
+                        {
+                        "Ingredient_ID": "RIG3",
+                        "Ingredient_Quanty": 15
+                        }
+                    ],
+                    "Price": 28000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK020",
+        "Group": "Trà sữa",
+        "Drink_Name": "Trà sữa blao lài",
+        "Location": "SGN",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG3",
+                            "Ingredient_Quanty": 170
+                        },
+                        {
+                            "Ingredient_ID": "RIG42",
+                            "Ingredient_Quanty": 1
+                        },
+                        {
+                            "Ingredient_ID": "RIG3",
+                            "Ingredient_Quanty": 25
+                        }
+                    ],
+                    "Price": 40000
+                }
+            }
+        }    
+    },
+    {
+        "Drink_ID": "DRK021a",
+        "Group": "Trà sữa",
+        "Drink_Name": "Trà sữa ô long sữa",
+        "Location": "SGN",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG4",
+                            "Ingredient_Quanty": 170
+                        },
+                        {
+                            "Ingredient_ID": "RIG42",
+                            "Ingredient_Quanty": 1
+                        },
+                        {
+                            "Ingredient_ID": "RIG3",
+                            "Ingredient_Quanty": 25
+                        }
+                    ],
+                    "Price": 40000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK021b",
+        "Group": "Trà sữa",
+        "Drink_Name": "Trà sữa ô long sữa",
+        "Location": "NTR",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "PIG4",
+                        "Ingredient_Quanty": 170
+                        },
+                        {
+                        "Ingredient_ID": "RIG42",
+                        "Ingredient_Quanty": 1
+                        },
+                        {
+                        "Ingredient_ID": "RIG3",
+                        "Ingredient_Quanty": 25
+                        }
+                    ],
+                    "Price": 22000
+                },
+                "_L": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "PIG4",
+                        "Ingredient_Quanty": 255
+                        },
+                        {
+                        "Ingredient_ID": "RIG42",
+                        "Ingredient_Quanty": 1.5
+                        },
+                        {
+                        "Ingredient_ID": "RIG3",
+                        "Ingredient_Quanty": 37.5
+                        }
+                    ],
+                    "Price": 28000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK022",
+        "Group": "Trà sữa",
+        "Drink_Name": "Trà sữa mây",
+        "Location": "SGN",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "PIG2",
+                        "Ingredient_Quanty": 170
+                        },
+                        {
+                        "Ingredient_ID": "RIG39",
+                        "Ingredient_Quanty": 10
+                        },
+                        {
+                        "Ingredient_ID": "RIG13",
+                        "Ingredient_Quanty": 50
+                        }
+                    ],
+                    "Price": 42000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK023",
+        "Group": "Cafe",
+        "Drink_Name": "Cafe sữa dừa",
+        "Location": "SGN",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                    {
+                        "Ingredient_ID": "PIG11",
+                        "Ingredient_Quanty": 20
+                    },
+                    {
+                        "Ingredient_ID": "RIG3",
+                        "Ingredient_Quanty": 20
+                    },
+                    {
+                        "Ingredient_ID": "RIG28",
+                        "Ingredient_Quanty": 30
+                    }
+                    ],
+                    "Price": 38000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK024a",
+        "Group": "Trà sữa",
+        "Drink_Name": "Socola sữa dừa",
+        "Location": "SGN",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "RIG8",
+                            "Ingredient_Quanty": 12
+                        },
+                        {
+                            "Ingredient_ID": "RIG28",
+                            "Ingredient_Quanty": 80
+                        },
+                        {
+                            "Ingredient_ID": "RIG3",
+                            "Ingredient_Quanty": 20
+                        },
+                        {
+                            "Ingredient_ID": "RIG42",
+                            "Ingredient_Quanty": 1
+                        },
+                        {
+                            "Ingredient_ID": "RIG2",
+                            "Ingredient_Quanty": 20
+                        }
+                    ],
+                    "Price": 47000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK024b",
+        "Group": "Trà sữa",
+        "Drink_Name": "Socola sữa dừa",
+        "Location": "NTR",
+        "Enable": true,
+        "Recipe": { 
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "RIG8",
+                            "Ingredient_Quanty": 12
+                        },
+                        {
+                            "Ingredient_ID": "RIG28",
+                            "Ingredient_Quanty": 80
+                        },
+                        {
+                            "Ingredient_ID": "RIG3",
+                            "Ingredient_Quanty": 20
+                        },
+                        {
+                            "Ingredient_ID": "RIG42",
+                            "Ingredient_Quanty": 1
+                        },
+                        {
+                            "Ingredient_ID": "RIG2",
+                            "Ingredient_Quanty": 20
+                        }
+                    ],
+                    "Price": 28000
+                },
+                "_L": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "RIG8",
+                            "Ingredient_Quanty": 18
+                        },
+                        {
+                            "Ingredient_ID": "RIG28",
+                            "Ingredient_Quanty": 120
+                        },
+                        {
+                            "Ingredient_ID": "RIG3",
+                            "Ingredient_Quanty": 30
+                        },
+                        {
+                            "Ingredient_ID": "RIG42",
+                            "Ingredient_Quanty": 1.5
+                        },
+                        {
+                            "Ingredient_ID": "RIG2",
+                            "Ingredient_Quanty": 30
+                        }
+                    ],
+                    "Price": 32000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK025a",
+        "Group": "Trà sữa",
+        "Drink_Name": "Matcha latte",
+        "Location": "SGN",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "RIG4",
+                            "Ingredient_Quanty": 120
+                        },
+                        {
+                            "Ingredient_ID": "PIG8",
+                            "Ingredient_Quanty": 20
+                        },
+                        {
+                            "Ingredient_ID": "RIG43",
+                            "Ingredient_Quanty": 5
+                        }
+                    ],
+                    "Price": 50000
+                }   
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK025b",
+        "Group": "Trà sữa",
+        "Drink_Name": "Matcha latte",
+        "Location": "NTR",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "RIG4",
+                        "Ingredient_Quanty": 120
+                        },
+                        {
+                        "Ingredient_ID": "PIG8",
+                        "Ingredient_Quanty": 20
+                        },
+                        {
+                        "Ingredient_ID": "RIG43",
+                        "Ingredient_Quanty": 5
+                        }
+                    ],
+                    "Price": 38000
+                },
+                "_L": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "RIG4",
+                        "Ingredient_Quanty": 180
+                        },
+                        {
+                        "Ingredient_ID": "PIG8",
+                        "Ingredient_Quanty": 30
+                        },
+                        {
+                        "Ingredient_ID": "RIG43",
+                        "Ingredient_Quanty": 7.5
+                        }
+                    ],
+                    "Price": 43000
+                }
+            }
+        }        
+    },
+    {
+        "Drink_ID": "DRK026",
+        "Group": "Trà sữa",
+        "Drink_Name": "Trà sen kem dứa",
+        "Location": "SGN",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {     
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG13",
+                            "Ingredient_Quanty": 100
+                        },
+                        {
+                            "Ingredient_ID": "PIG1",
+                            "Ingredient_Quanty": 50
+                        },
+                        {
+                            "Ingredient_ID": "PIG8",
+                            "Ingredient_Quanty": 5
+                        },
+                        {
+                            "Ingredient_ID": "RIG45",
+                            "Ingredient_Quanty": 10
+                        },
+                        {
+                            "Ingredient_ID": "RIG46",
+                            "Ingredient_Quanty": 1
+                        }
+                    ],
+                    "Price": 45000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK027a",
+        "Group": "Trà sữa",
+        "Drink_Name": "Coco Matcha",
+        "Location": "SGN",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "RIG48",
+                            "Ingredient_Quanty": 180
+                        },
+                        {
+                            "Ingredient_ID": "PIG7",
+                            "Ingredient_Quanty": 50
+                        }
+                    ],
+                    "Price": 50000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK027b",
+        "Group": "Trà sữa",
+        "Drink_Name": "Coco Matcha",
+        "Location": "NTR",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "RIG48",
+                        "Ingredient_Quanty": 180
+                        },
+                        {
+                        "Ingredient_ID": "PIG7",
+                        "Ingredient_Quanty": 50
+                        }
+                    ],
+                    "Price": 35000
+                },
+                "_L": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "RIG48",
+                        "Ingredient_Quanty": 270
+                        },
+                        {
+                        "Ingredient_ID": "PIG7",
+                        "Ingredient_Quanty": 75
+                        }
+                    ],
+                    "Price": 38000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK028a",
+        "Group": "Cafe",
+        "Drink_Name": "Cold Brew Mận",
+        "Location": "SGN",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG15",
+                            "Ingredient_Quanty": 100
+                        },
+                        {
+                            "Ingredient_ID": "PIG9",
+                            "Ingredient_Quanty": 50
+                        }
+                    ],
+                    "Price": 39000
+                }
+            }
+        }        
+    },
+    {
+        "Drink_ID": "DRK028b",
+        "Group": "Cafe",
+        "Drink_Name": "Cold Brew Mận",
+        "Location": "NTR",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "PIG15",
+                        "Ingredient_Quanty": 100
+                        },
+                        {
+                        "Ingredient_ID": "PIG9",
+                        "Ingredient_Quanty": 50
+                        }
+                    ],
+                    "Price": 28000
+                },
+                "_L": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "PIG15",
+                        "Ingredient_Quanty": 150
+                        },
+                        {
+                        "Ingredient_ID": "PIG9",
+                        "Ingredient_Quanty": 75
+                        }
+                    ],
+                    "Price": 33000
+            
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK029",
+        "Group": "Cafe",
+        "Drink_Name": "Bạc xỉu",
+        "Location": "SGN",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "RIG4",
+                            "Ingredient_Quanty": 100
+                        },
+                        {
+                            "Ingredient_ID": "PIG11",
+                            "Ingredient_Quanty": 25
+                        },
+                        {
+                            "Ingredient_ID": "RIG3",
+                            "Ingredient_Quanty": 20
+                        }
+                    ],
+                    "Price": 38000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK030",
+        "Group": "Cafe",
+        "Drink_Name": "Cafe sữa tươi",
+        "Location": "SGN",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "RIG4",
+                            "Ingredient_Quanty": 110
+                        },
+                        {
+                            "Ingredient_ID": "PIG11",
+                            "Ingredient_Quanty": 15
+                        },
+                        {
+                            "Ingredient_ID": "PIG8",
+                            "Ingredient_Quanty": 10
+                        },
+                        {
+                            "Ingredient_ID": "RIG42",
+                            "Ingredient_Quanty": 1
+                        },
+                        {
+                            "Ingredient_ID": "RIG2",
+                            "Ingredient_Quanty": 10
+                        }
+                    ],
+                    "Price":40000
+                }
+            }
+        }        
+    },
+    {
+        "Drink_ID": "DRK031",
+        "Group": "Cafe",
+        "Drink_Name": "Cafe đen",
+        "Location": "NTR",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_S": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG12",
+                            "Ingredient_Quanty": 50
+                        },
+                        {
+                            "Ingredient_ID": "PIG8",
+                            "Ingredient_Quanty": 20
+                        }
+                    ],
+                    "Price": 18000
+                },
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG12",
+                            "Ingredient_Quanty": 75
+                        },
+                        {
+                            "Ingredient_ID": "PIG8",
+                            "Ingredient_Quanty": 30
+                        }
+                    ],
+                    "Price": 21000
+                },
+                "_L": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG12",
+                            "Ingredient_Quanty": 112.5
+                        },
+                        {
+                            "Ingredient_ID": "PIG8",
+                            "Ingredient_Quanty": 45
+                        }
+                    ],
+                    "Price": 23000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK032",
+        "Group": "Cafe",
+        "Drink_Name": "Cafe sữa",
+        "Location": "NTR",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_S": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG12",
+                            "Ingredient_Quanty": 50
+                        },
+                        {
+                            "Ingredient_ID": "RIG3",
+                            "Ingredient_Quanty": 20
+                        }
+                    ],
+                    "Price": 22000
+                },
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG12",
+                            "Ingredient_Quanty": 75
+                        },
+                        {
+                            "Ingredient_ID": "RIG3",
+                            "Ingredient_Quanty": 30
+                        }
+                    ],
+                    "Price": 25000
+                },
+                "_L": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG12",
+                            "Ingredient_Quanty": 112.5
+                        },
+                        {
+                            "Ingredient_ID": "RIG3",
+                            "Ingredient_Quanty": 45
+                        }
+                    ],
+                    "Price": 27000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK033",
+        "Group": "Cafe",
+        "Drink_Name": "Cafe muối",
+        "Location": "NTR",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_S": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG12",
+                            "Ingredient_Quanty": 30
+                        },
+                        {
+                            "Ingredient_ID": "RIG3",
+                            "Ingredient_Quanty": 25
+                        },
+                        {
+                            "Ingredient_ID": "PIG6",
+                            "Ingredient_Quanty": 50
+                        }
+                    ],
+                    "Price": 25000
+                },
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG12",
+                            "Ingredient_Quanty": 45
+                        },
+                        {
+                            "Ingredient_ID": "RIG3",
+                            "Ingredient_Quanty": 37.5
+                        },
+                        {
+                            "Ingredient_ID": "PIG6",
+                            "Ingredient_Quanty": 75
+                        }
+                    ],
+                    "Price": 28000
+                },
+                "_L": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG12",
+                            "Ingredient_Quanty": 67.5
+                        },
+                        {
+                            "Ingredient_ID": "RIG3",
+                            "Ingredient_Quanty": 56.25
+                        },
+                        {
+                            "Ingredient_ID": "PIG6",
+                            "Ingredient_Quanty": 112.5
+                        }
+                    ],
+                    "Price": 31000
+                }
+            }
+        }        
+    },
+    {
+        "Drink_ID": "DRK034",
+        "Group": "Cafe",
+        "Drink_Name": "Hayla cafe",
+        "Location": "NTR",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_S": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "RIG3",
+                            "Ingredient_Quanty": 20
+                        },
+                        {
+                            "Ingredient_ID": "RIG2",
+                            "Ingredient_Quanty": 20
+                        },
+                        {
+                            "Ingredient_ID": "RIG4",
+                            "Ingredient_Quanty": 70
+                        },
+                        {
+                            "Ingredient_ID": "PIG12",
+                            "Ingredient_Quanty": 50
+                        }
+                    ],
+                    "Price": 25000
+                },
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "RIG3",
+                            "Ingredient_Quanty": 30
+                        },
+                        {
+                            "Ingredient_ID": "RIG2",
+                            "Ingredient_Quanty": 30
+                        },
+                        {
+                            "Ingredient_ID": "RIG4",
+                            "Ingredient_Quanty": 105
+                        },
+                        {
+                            "Ingredient_ID": "PIG12",
+                            "Ingredient_Quanty": 75
+                        }
+                    ],
+                    "Price": 28000
+                },
+                "_L": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "RIG3",
+                            "Ingredient_Quanty": 45
+                        },
+                        {
+                            "Ingredient_ID": "RIG2",
+                            "Ingredient_Quanty": 45
+                        },
+                        {
+                            "Ingredient_ID": "RIG4",
+                            "Ingredient_Quanty": 157.5
+                        },
+                        {
+                            "Ingredient_ID": "PIG12",
+                            "Ingredient_Quanty": 112.5
+                        }
+                    ],
+                    "Price": 31000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK035",
+        "Group": "Cafe",
+        "Drink_Name": "Cafe Chocolate",
+        "Location": "NTR",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "PIG12",
+                        "Ingredient_Quanty": 20
+                        },
+                        {
+                        "Ingredient_ID": "RIG3",
+                        "Ingredient_Quanty": 15
+                        },
+                        {
+                        "Ingredient_ID": "RIG2",
+                        "Ingredient_Quanty": 15
+                        },
+                        {
+                        "Ingredient_ID": "RIG8",
+                        "Ingredient_Quanty": 20
+                        },
+                        {
+                        "Ingredient_ID": "RIG42",
+                        "Ingredient_Quanty": 1
+                        },
+                        {
+                        "Ingredient_ID": "RIG4",
+                        "Ingredient_Quanty": 55
+                        }
+                    ],
+                    "Price": 26000
+                },
+                "_L": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "PIG12",
+                        "Ingredient_Quanty": 30
+                        },
+                        {
+                        "Ingredient_ID": "RIG3",
+                        "Ingredient_Quanty": 22.5
+                        },
+                        {
+                        "Ingredient_ID": "RIG2",
+                        "Ingredient_Quanty": 22.5
+                        },
+                        {
+                        "Ingredient_ID": "RIG8",
+                        "Ingredient_Quanty": 30
+                        },
+                        {
+                        "Ingredient_ID": "RIG42",
+                        "Ingredient_Quanty": 1.5
+                        },
+                        {
+                        "Ingredient_ID": "RIG4",
+                        "Ingredient_Quanty": 82.5
+                        }
+                    ],
+                    "Price": 29000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK036",
+        "Group": "Cafe",
+        "Drink_Name": "Cafe Caramel",
+        "Location": "NTR",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "PIG12",
+                        "Ingredient_Quanty": 20
+                        },
+                        {
+                        "Ingredient_ID": "RIG3",
+                        "Ingredient_Quanty": 20
+                        },
+                        {
+                        "Ingredient_ID": "RIG2",
+                        "Ingredient_Quanty": 15
+                        },
+                        {
+                        "Ingredient_ID": "RIG9",
+                        "Ingredient_Quanty": 20
+                        },
+                        {
+                        "Ingredient_ID": "RIG4",
+                        "Ingredient_Quanty": 55
+                        }
+                    ],
+                    "Price": 26000
+                },
+                "_L": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "PIG12",
+                        "Ingredient_Quanty": 30
+                        },
+                        {
+                        "Ingredient_ID": "RIG3",
+                        "Ingredient_Quanty": 30
+                        },
+                        {
+                        "Ingredient_ID": "RIG2",
+                        "Ingredient_Quanty": 22.5
+                        },
+                        {
+                        "Ingredient_ID": "RIG9",
+                        "Ingredient_Quanty": 30
+                        },
+                        {
+                        "Ingredient_ID": "RIG4",
+                        "Ingredient_Quanty": 82.5
+                        }
+                    ],
+                    "Price": 29000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK037",
+        "Group": "Cafe",
+        "Drink_Name": "Cafe sữa dừa",
+        "Location": "NTR",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_S": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "PIG12",
+                        "Ingredient_Quanty": 20
+                        },
+                        {
+                        "Ingredient_ID": "RIG3",
+                        "Ingredient_Quanty": 20
+                        },
+                        {
+                        "Ingredient_ID": "RIG28",
+                        "Ingredient_Quanty": 30
+                        }
+                    ],
+                    "Price": 24000
+                },
+                "_M": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "PIG12",
+                        "Ingredient_Quanty": 30
+                        },
+                        {
+                        "Ingredient_ID": "RIG3",
+                        "Ingredient_Quanty": 30
+                        },
+                        {
+                        "Ingredient_ID": "RIG28",
+                        "Ingredient_Quanty": 45
+                        }
+                    ],
+                    "Price": 27000
+                },
+                "_L": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "PIG12",
+                        "Ingredient_Quanty": 45
+                        },
+                        {
+                        "Ingredient_ID": "RIG3",
+                        "Ingredient_Quanty": 45
+                        },
+                        {
+                        "Ingredient_ID": "RIG28",
+                        "Ingredient_Quanty": 67.5
+                        }
+                    ],
+                    "Price": 30000
+                }
+            }
+        }        
+    },
+    {
+        "Drink_ID": "DRK038",
+        "Group": "Cafe",
+        "Drink_Name": "Bạc xỉu",
+        "Location": "NTR",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "RIG4",
+                            "Ingredient_Quanty": 100
+                        },
+                        {
+                            "Ingredient_ID": "PIG12",
+                            "Ingredient_Quanty": 25
+                        },
+                        {
+                            "Ingredient_ID": "RIG3",
+                            "Ingredient_Quanty": 20
+                        }
+                    ],
+                    "Price": 24000
+                },
+                "_L": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "RIG4",
+                            "Ingredient_Quanty": 150
+                        },
+                        {
+                            "Ingredient_ID": "PIG12",
+                            "Ingredient_Quanty": 37.5
+                        },
+                        {
+                            "Ingredient_ID": "RIG3",
+                            "Ingredient_Quanty": 30
+                        }
+                    ],
+                    "Price": 27000
+                }
+            }
+        }        
+    },
+    {   
+        "Drink_ID": "DRK039",
+        "Group": "Cafe",
+        "Drink_Name": "Cafe sữa tươi",
+        "Location": "NTR",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "RIG4",
+                            "Ingredient_Quanty": 110
+                        },
+                        {
+                            "Ingredient_ID": "PIG12",
+                            "Ingredient_Quanty": 15
+                        },
+                        {
+                            "Ingredient_ID": "PIG8",
+                            "Ingredient_Quanty": 5
+                        },
+                        {
+                            "Ingredient_ID": "RIG42",
+                            "Ingredient_Quanty": 1
+                        },
+                        {
+                            "Ingredient_ID": "RIG2",
+                            "Ingredient_Quanty": 10
+                        }
+                    ],
+                    "Price": 24000
+                },
+                "_L": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "RIG4",
+                            "Ingredient_Quanty": 165
+                        },
+                        {
+                            "Ingredient_ID": "PIG12",
+                            "Ingredient_Quanty": 22.5
+                        },
+                        {
+                            "Ingredient_ID": "PIG8",
+                            "Ingredient_Quanty": 7.5
+                        },
+                        {
+                            "Ingredient_ID": "RIG42",
+                            "Ingredient_Quanty": 1.5
+                        },
+                        {
+                            "Ingredient_ID": "RIG2",
+                            "Ingredient_Quanty": 15
+                        }
+                    ],
+                    "Price": 27000
+                }
+            }    
+        }
+    },
+    {
+        "Drink_ID": "DRK040",
+        "Group": "Cafe",
+        "Drink_Name": "Cafe sữa hạt",
+        "Location": "SGN",
+        "Enable": false,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "RIG47",
+                            "Ingredient_Quanty": 110
+                        },
+                        {
+                            "Ingredient_ID": "PIG11",
+                            "Ingredient_Quanty": 15
+                        },
+                        {
+                            "Ingredient_ID": "PIG8",
+                            "Ingredient_Quanty": 10
+                        },
+                        {
+                            "Ingredient_ID": "RIG42",
+                            "Ingredient_Quanty": 1
+                        },
+                        {
+                            "Ingredient_ID": "RIG2",
+                            "Ingredient_Quanty": 10
+                        }
+                    ],
+                    "Price": 99000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK041",
+        "Group": "Cafe",
+        "Drink_Name": "Cafe sữa oatside",
+        "Location": "NTR",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "RIG47",
+                            "Ingredient_Quanty": 110
+                        },
+                        {
+                            "Ingredient_ID": "PIG12",
+                            "Ingredient_Quanty": 15
+                        },
+                        {
+                            "Ingredient_ID": "PIG8",
+                            "Ingredient_Quanty": 10
+                        },
+                        {
+                            "Ingredient_ID": "RIG42",
+                            "Ingredient_Quanty": 1
+                        },
+                        {
+                            "Ingredient_ID": "RIG2",
+                            "Ingredient_Quanty": 10
+                        }
+                    ],
+                    "Price": 26000
+                },
+                "_L": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "RIG47",
+                            "Ingredient_Quanty": 165
+                        },
+                        {
+                            "Ingredient_ID": "PIG12",
+                            "Ingredient_Quanty": 22.5
+                        },
+                        {
+                            "Ingredient_ID": "PIG8",
+                            "Ingredient_Quanty": 15
+                        },
+                        {
+                            "Ingredient_ID": "RIG42",
+                            "Ingredient_Quanty": 1.5
+                        },
+                        {
+                            "Ingredient_ID": "RIG2",
+                            "Ingredient_Quanty": 15
+                        }
+                    ],
+                    "Price": 29000
+                }
+            }
+        }        
+    },
+    {
+        "Drink_ID": "DRK042",
+        "Group": "Trà trái cây",
+        "Drink_Name": "Trà tắc xí muội",
+        "Location": "NTR",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG14",
+                            "Ingredient_Quanty": 30
+                        },
+                        {
+                            "Ingredient_ID": "RIG16",
+                            "Ingredient_Quanty": 10
+                        },
+                        {
+                            "Ingredient_ID": "RIG15",
+                            "Ingredient_Quanty": 20
+                        },
+                        {
+                            "Ingredient_ID": "RIG55",
+                            "Ingredient_Quanty": 50
+                        },
+                        {
+                            "Ingredient_ID": "PIG8",
+                            "Ingredient_Quanty": 25
+                        }
+                    ],
+                    "Price": 25000
+                },
+                "_L": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG14",
+                            "Ingredient_Quanty": 45
+                        },
+                        {
+                            "Ingredient_ID": "RIG16",
+                            "Ingredient_Quanty": 15
+                        },
+                        {
+                            "Ingredient_ID": "RIG15",
+                            "Ingredient_Quanty": 30
+                        },
+                        {
+                            "Ingredient_ID": "RIG55",
+                            "Ingredient_Quanty": 75
+                        },
+                        {
+                            "Ingredient_ID": "PIG8",
+                            "Ingredient_Quanty": 37.5
+                        }
+                    ],
+                    "Price": 27000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK043a",
+        "Group": "Trà trái cây",
+        "Drink_Name": "Trà Mận Hà Nội",
+        "Location": "SGN",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG13",
+                            "Ingredient_Quanty": 70
+                        },
+                        {
+                            "Ingredient_ID": "PIG9",
+                            "Ingredient_Quanty": 50
+                        },
+                        {
+                            "Ingredient_ID": "PIG10",
+                            "Ingredient_Quanty": 20
+                        }
+                    ],
+                    "Price": 42000
+                }
+            }
+        }        
+    },
+    {
+        "Drink_ID": "DRK043b",
+        "Group": "Trà trái cây",
+        "Drink_Name": "Trà Mận Hà Nội",
+        "Location": "NTR",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG13",
+                            "Ingredient_Quanty": 70
+                        },
+                        {
+                            "Ingredient_ID": "PIG9",
+                            "Ingredient_Quanty": 50
+                        },
+                        {
+                            "Ingredient_ID": "PIG10",
+                            "Ingredient_Quanty": 20
+                        }
+                    ],
+                    "Price": 25000
+                },
+                "_L": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG13",
+                            "Ingredient_Quanty": 105
+                        },
+                        {
+                            "Ingredient_ID": "PIG9",
+                            "Ingredient_Quanty": 75
+                        },
+                        {
+                            "Ingredient_ID": "PIG10",
+                            "Ingredient_Quanty": 30
+                        }
+                    ],
+                    "Price": 28000
+                }
+            }
+        }        
+    },
+    {
+        "Drink_ID": "DRK044",
+        "Group": "Trà trái cây",
+        "Drink_Name": "Trà bưởi",
+        "Location": "NTR",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "RIG14",
+                            "Ingredient_Quanty": 0.5
+                        },
+                        {
+                            "Ingredient_ID": "RIG23",
+                            "Ingredient_Quanty": 20
+                        },
+                        {
+                            "Ingredient_ID": "RIG24",
+                            "Ingredient_Quanty": 20
+                        },
+                        {
+                            "Ingredient_ID": "RIG55",
+                            "Ingredient_Quanty": 50
+                        },
+                        {
+                            "Ingredient_ID": "RIG25",
+                            "Ingredient_Quanty": 10
+                        }
+                    ],
+                    "Price": 28000
+                },
+                "_L": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "RIG14",
+                            "Ingredient_Quanty": 0.75
+                        },
+                        {
+                            "Ingredient_ID": "RIG23",
+                            "Ingredient_Quanty": 30
+                        },
+                        {
+                            "Ingredient_ID": "RIG24",
+                            "Ingredient_Quanty": 30
+                        },
+                        {
+                            "Ingredient_ID": "RIG55",
+                            "Ingredient_Quanty": 75
+                        },
+                        {
+                            "Ingredient_ID": "RIG25",
+                            "Ingredient_Quanty": 15
+                        }
+                    ],
+                    "Price": 32000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK045",
+        "Group": "Trà trái cây",
+        "Drink_Name": "Trà vải lài",
+        "Location": "NTR",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG13",
+                            "Ingredient_Quanty": 5
+                        },
+                        {
+                            "Ingredient_ID": "RIG22",
+                            "Ingredient_Quanty": 20
+                        },
+                        {
+                            "Ingredient_ID": "RIG20",
+                            "Ingredient_Quanty": 20
+                        },
+                        {
+                            "Ingredient_ID": "RIG18",
+                            "Ingredient_Quanty": 2
+                        },
+                        {
+                            "Ingredient_ID": "RIG55",
+                            "Ingredient_Quanty": 50
+                        },
+                        {
+                            "Ingredient_ID": "RIG15",
+                            "Ingredient_Quanty": 5
+                        }
+                    ],
+                    "Price": 28000
+                },
+                "_L": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG13",
+                            "Ingredient_Quanty": 7.5
+                        },
+                        {
+                            "Ingredient_ID": "RIG22",
+                            "Ingredient_Quanty": 30
+                        },
+                        {
+                            "Ingredient_ID": "RIG20",
+                            "Ingredient_Quanty": 30
+                        },
+                        {
+                            "Ingredient_ID": "RIG18",
+                            "Ingredient_Quanty": 3
+                        },
+                        {
+                            "Ingredient_ID": "RIG55",
+                            "Ingredient_Quanty": 75
+                        },
+                        {
+                            "Ingredient_ID": "RIG15",
+                            "Ingredient_Quanty": 7.5
+                        }
+                    ],
+                    "Price": 32000
+                }
+
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK046",
+        "Group": "Trà trái cây",
+        "Drink_Name": "Trà đào",
+        "Location": "NTR",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "RIG11",
+                            "Ingredient_Quanty": 1
+                        },
+                        {
+                            "Ingredient_ID": "RIG53",
+                            "Ingredient_Quanty": 10
+                        },
+                        {
+                            "Ingredient_ID": "RIG19",
+                            "Ingredient_Quanty": 10
+                        },
+                        {
+                            "Ingredient_ID": "RIG17",
+                            "Ingredient_Quanty": 100
+                        },
+                        {
+                            "Ingredient_ID": "RIG55",
+                            "Ingredient_Quanty": 50
+                        },
+                        {
+                            "Ingredient_ID": "RIG15",
+                            "Ingredient_Quanty": 5
+                        }
+                    ],
+                    "Price": 28000
+                },
+                "_L": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "RIG11",
+                            "Ingredient_Quanty": 1.5
+                        },
+                        {
+                            "Ingredient_ID": "RIG53",
+                            "Ingredient_Quanty": 15
+                        },
+                        {
+                            "Ingredient_ID": "RIG19",
+                            "Ingredient_Quanty": 15
+                        },
+                        {
+                            "Ingredient_ID": "RIG17",
+                            "Ingredient_Quanty": 150
+                        },
+                        {
+                            "Ingredient_ID": "RIG55",
+                            "Ingredient_Quanty": 75
+                        },
+                        {
+                            "Ingredient_ID": "RIG15",
+                            "Ingredient_Quanty": 7.5
+                        }
+                    ],
+                    "Price": 32000
+                }
+            }
+
+        }        
+    },
+    {
+        "Drink_ID": "DRK047",
+        "Group": "Trà sữa",
+        "Drink_Name": "Trà sữa thái",
+        "Location": "NTR",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                            "Ingredient_ID": "PIG14",
+                            "Ingredient_Quanty": 90
+                        },
+                        {
+                            "Ingredient_ID": "RIG41",
+                            "Ingredient_Quanty": 30
+                        },
+                        {
+                            "Ingredient_ID": "RIG3",
+                            "Ingredient_Quanty": 45
+                        },
+                        {
+                            "Ingredient_ID": "RIG55",
+                            "Ingredient_Quanty": 50
+                        }
+                    ],
+                    "Price": 20000
+                },
+                "_L": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "PIG14",
+                        "Ingredient_Quanty": 135
+                        },
+                        {
+                        "Ingredient_ID": "RIG41",
+                        "Ingredient_Quanty": 45
+                        },
+                        {
+                        "Ingredient_ID": "RIG3",
+                        "Ingredient_Quanty": 67.5
+                        },
+                        {
+                        "Ingredient_ID": "RIG55",
+                        "Ingredient_Quanty": 75
+                        }
+                    ],
+                    "Price": 25000
+                }
+            }
+        }          
+    },
+    {
+        "Drink_ID": "DRK048",
+        "Group": "Trà sữa",
+        "Drink_Name": "Matcha latte cold whisk",
+        "Location": "NTR",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                     "Ingredients": [
+                        {
+                        "Ingredient_ID": "RIG4",
+                        "Ingredient_Quanty": 180
+                        },
+                        {
+                        "Ingredient_ID": "PIG8",
+                        "Ingredient_Quanty": 20
+                        },
+                        {
+                        "Ingredient_ID": "RIG43",
+                        "Ingredient_Quanty": 5
+                        }
+                    ],
+                    "Price": 40000
+                },
+                "_L": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "RIG4",
+                        "Ingredient_Quanty": 270
+                        },
+                        {
+                        "Ingredient_ID": "PIG8",
+                        "Ingredient_Quanty": 30
+                        },
+                        {
+                        "Ingredient_ID": "RIG43",
+                        "Ingredient_Quanty": 7.5
+                        }
+                    ],
+                    "Price": 45000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK049",
+        "Group": "Trà sữa",
+        "Drink_Name": "Trà sữa mây",
+        "Location": "NTR",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "PIG2",
+                        "Ingredient_Quanty": 170
+                        },
+                        {
+                        "Ingredient_ID": "RIG39",
+                        "Ingredient_Quanty": 10
+                        },
+                        {
+                        "Ingredient_ID": "RIG55",
+                        "Ingredient_Quanty": 50
+                        }
+                    ],
+                    "Price": 22000
+                },
+                "_L": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "PIG2",
+                        "Ingredient_Quanty": 255 
+                        },
+                        {
+                        "Ingredient_ID": "RIG39",
+                        "Ingredient_Quanty": 15
+                        },
+                        {
+                        "Ingredient_ID": "RIG55",
+                        "Ingredient_Quanty": 75
+                        }
+                    ],
+                    "Price": 28000
+                }
+            }
+        }        
+    },
+    {
+        "Drink_ID": "DRK050",
+        "Group": "Trà sữa",
+        "Drink_Name": "Houjicha latte",
+        "Location": "NTR",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "RIG51",
+                        "Ingredient_Quanty": 4
+                        },
+                        {
+                        "Ingredient_ID": "RIG49",
+                        "Ingredient_Quanty": 120
+                        },
+                        {
+                        "Ingredient_ID": "PIG8",
+                        "Ingredient_Quanty": 25
+                        }
+                    ],
+                    "Price": 35000
+                },
+                "_L": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "RIG51",
+                        "Ingredient_Quanty": 6
+                        },
+                        {
+                        "Ingredient_ID": "RIG49",
+                        "Ingredient_Quanty": 180
+                        },
+                        {
+                        "Ingredient_ID": "PIG8",
+                        "Ingredient_Quanty": 37.5
+                        }
+                    ],
+                    "Price": 40000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK051",
+        "Group": "Trà sữa",
+        "Drink_Name": "Matcha latte oatside",
+        "Location": "NTR",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "RIG47",
+                        "Ingredient_Quanty": 120
+                        },
+                        {
+                        "Ingredient_ID": "PIG8",
+                        "Ingredient_Quanty": 20
+                        },
+                        {
+                        "Ingredient_ID": "RIG43",
+                        "Ingredient_Quanty": 4
+                        }
+                    ],
+                    "Price": 40000
+                },
+                "_L": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "RIG47",
+                        "Ingredient_Quanty": 180
+                        },
+                        {
+                        "Ingredient_ID": "PIG8",
+                        "Ingredient_Quanty": 30
+                        },
+                        {
+                        "Ingredient_ID": "RIG43",
+                        "Ingredient_Quanty": 6
+                        }
+                    ],
+                    "Price": 45000
+                }
+            }
+        }  
+    },
+    {
+        "Drink_ID": "DRK052",
+        "Group": "Trà sữa",
+        "Drink_Name": "Matcha Latte Cold Whisk Oatside",
+        "Location": "NTR",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "RIG47",
+                        "Ingredient_Quanty": 180
+                        },
+                        {
+                        "Ingredient_ID": "PIG8",
+                        "Ingredient_Quanty": 40
+                        },
+                        {
+                        "Ingredient_ID": "RIG43",
+                        "Ingredient_Quanty": 4
+                        }
+                    ],
+                    "Price": 42000
+                },
+                "_L": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "RIG47",
+                        "Ingredient_Quanty": 270
+                        },
+                        {
+                        "Ingredient_ID": "PIG8",
+                        "Ingredient_Quanty": 60
+                        },
+                        {
+                        "Ingredient_ID": "RIG43",
+                        "Ingredient_Quanty": 6
+                        }
+                    ],
+                    "Price": 47000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK053",
+        "Group": "Trà sữa",
+        "Drink_Name": "Houjicha latte Cold whisk",
+        "Location": "NTR",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "RIG51",
+                        "Ingredient_Quanty": 4
+                        },
+                        {
+                        "Ingredient_ID": "RIG49",
+                        "Ingredient_Quanty": 150
+                        },
+                        {
+                        "Ingredient_ID": "PIG8",
+                        "Ingredient_Quanty": 20
+                        }
+                    ],
+                    "Price": 38000
+                },
+                "_L": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "RIG51",
+                        "Ingredient_Quanty": 6
+                        },
+                        {
+                        "Ingredient_ID": "RIG49",
+                        "Ingredient_Quanty": 255
+                        },
+                        {
+                        "Ingredient_ID": "PIG8",
+                        "Ingredient_Quanty": 30
+                        }
+                    ],
+                    "Price": 42000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK054",
+        "Group": "Trà sữa",
+        "Drink_Name": "Houjicha Coldwhisk Oatside",
+        "Location": "NTR",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "RIG47",
+                        "Ingredient_Quanty": 4
+                        },
+                        {
+                        "Ingredient_ID": "RIG49",
+                        "Ingredient_Quanty": 150
+                        },
+                        {
+                        "Ingredient_ID": "PIG8",
+                        "Ingredient_Quanty": 20
+                        }
+                    ],
+                    "Price": 42000
+                },
+                "_L": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "RIG47",
+                        "Ingredient_Quanty": 6
+                        },
+                        {
+                        "Ingredient_ID": "RIG49",
+                        "Ingredient_Quanty": 225
+                        },
+                        {
+                        "Ingredient_ID": "PIG8",
+                        "Ingredient_Quanty": 30
+                        }
+                    ],
+                    "Price": 47000
+                }
+            }
+        }
+    },
+    {
+        "Drink_ID": "DRK055",
+        "Group": "Trà sữa",
+        "Drink_Name": "Houjicha Latte Oatside",
+        "Location": "NTR",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "RIG47",
+                        "Ingredient_Quanty": 4
+                        },
+                        {
+                        "Ingredient_ID": "RIG49",
+                        "Ingredient_Quanty": 120
+                        },
+                        {
+                        "Ingredient_ID": "PIG8",
+                        "Ingredient_Quanty": 25
+                        }
+                    ],
+                    "Price": 40000
+                },
+                "_L": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "RIG47",
+                        "Ingredient_Quanty": 6
+                        },
+                        {
+                        "Ingredient_ID": "RIG49",
+                        "Ingredient_Quanty": 180
+                        },
+                        {
+                        "Ingredient_ID": "PIG8",
+                        "Ingredient_Quanty": 37.5
+                        }
+                    ],
+                    "Price": 45000
+                }
+            }
+        }            
+    },
+    {
+        "Drink_ID": "DRK056",
+        "Group": "Cafe",
+        "Drink_Name": "Cafe Kem sữa",
+        "Location": "NTR",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "PIG12",
+                        "Ingredient_Quanty": 20
+                        },
+                        {
+                        "Ingredient_ID": "RIG3",
+                        "Ingredient_Quanty": 20
+                        },
+                        {
+                        "Ingredient_ID": "RIG2",
+                        "Ingredient_Quanty": 15
+                        },
+                        {
+                        "Ingredient_ID": "PIG1",
+                        "Ingredient_Quanty": 50
+                        },
+                        {
+                        "Ingredient_ID": "RIG42",
+                        "Ingredient_Quanty": 1
+                        },
+                        {
+                        "Ingredient_ID": "RIG4",
+                        "Ingredient_Quanty": 70
+                        }
+                    ],
+                    "Price": 35000
+                },
+                "_L": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "PIG12",
+                        "Ingredient_Quanty": 30
+                        },
+                        {
+                        "Ingredient_ID": "RIG3",
+                        "Ingredient_Quanty": 30
+                        },
+                        {
+                        "Ingredient_ID": "RIG2",
+                        "Ingredient_Quanty": 22.5
+                        },
+                        {
+                        "Ingredient_ID": "PIG1",
+                        "Ingredient_Quanty": 75
+                        },
+                        {
+                        "Ingredient_ID": "RIG42",
+                        "Ingredient_Quanty": 1.5
+                        },
+                        {
+                        "Ingredient_ID": "RIG4",
+                        "Ingredient_Quanty": 105
+                        }
+                    ],
+                    "Price": 40000
+                }
+            }
+        }        
+    },
+    {
+        "Drink_ID": "DRK057",
+        "Group": "Trà sữa",
+        "Drink_Name": "Trà sữa hay là",
+        "Location": "NTR",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "PIG2",
+                        "Ingredient_Quanty": 170
+                        },
+                        {
+                        "Ingredient_ID": "RIG42",
+                        "Ingredient_Quanty": 1
+                        },
+                        {
+                        "Ingredient_ID": "RIG3",
+                        "Ingredient_Quanty": 10
+                        }
+                    ],
+                    "Price": 20000
+                },
+                "_L": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "PIG2",
+                        "Ingredient_Quanty": 255
+                        },
+                        {
+                        "Ingredient_ID": "RIG42",
+                        "Ingredient_Quanty": 1.5
+                        },
+                        {
+                        "Ingredient_ID": "RIG3",
+                        "Ingredient_Quanty": 15
+                        }
+                    ],
+                    "Price": 25000
+                }
+            }
+        }        
+    },
+    {
+        "Drink_ID": "DRK058",
+        "Group": "Trà sữa",
+        "Drink_Name": "Trà sữa thái kem muối",
+        "Location": "NTR",
+        "Enable": true,
+        "Recipe": {
+            "2025_07": {
+                "_M": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "PIG14",
+                        "Ingredient_Quanty": 90
+                        },
+                        {
+                        "Ingredient_ID": "RIG41",
+                        "Ingredient_Quanty": 30
+                        },
+                        {
+                        "Ingredient_ID": "RIG3",
+                        "Ingredient_Quanty": 45
+                        },
+                        {
+                        "Ingredient_ID": "RIG55",
+                        "Ingredient_Quanty": 50
+                        },
+                        {
+                        "Ingredient_ID": "PIG6",
+                        "Ingredient_Quanty": 50
+                        }
+                    ],
+                    "Price": 25000
+                },
+                "_L": {
+                    "Ingredients": [
+                        {
+                        "Ingredient_ID": "PIG14",
+                        "Ingredient_Quanty": 135
+                        },
+                        {
+                        "Ingredient_ID": "RIG41",
+                        "Ingredient_Quanty": 45
+                        },
+                        {
+                        "Ingredient_ID": "RIG3",
+                        "Ingredient_Quanty": 67.5
+                        },
+                        {
+                        "Ingredient_ID": "RIG55",
+                        "Ingredient_Quanty": 75
+                        },
+                        {
+                        "Ingredient_ID": "PIG6",
+                        "Ingredient_Quanty": 75
+                        }
+                    ],
+                    "Price": 28000
+                }
+            }
+        }
+    }
+]
+
+

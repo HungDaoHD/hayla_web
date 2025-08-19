@@ -82,10 +82,8 @@ class DashboardAnalyze(BaseModel):
     Current: DashboardResult
     ChartRevDcost: AreaChart = Field(default_factory=AreaChart)
     HTML_RawIngredientUsage: str = Field(default='')
+    HTML_DrinkSummary: str = Field(default='')
     
-        
-    
-
 
 
 
@@ -141,8 +139,8 @@ class Dashboard(Operation):
                     igr_data = {
                         'Location': rec.Location, 
                         'Payment_Time': rec.Payment_Time,
-                        # 'Product_Code': item.Product_Code,
                         'Quantity': item.Quantity,
+                        # 'Product_Code': item.Product_Code,
                         # 'Size': item.Size,
                         # 'Drink_Name': item.Drink_Name,
                         # 'Total_Cost_By_Size': item.Total_Cost_By_Size
@@ -157,11 +155,12 @@ class Dashboard(Operation):
         self.df_receipt['Payment_Period'] = self.df_receipt['Payment_Time'].apply(lambda x: 'Current' if x >= dboard_filter_output.StartDate else 'Previous')
         
         
-        
         self.df_drink = pd.DataFrame(raw_dink)
         self.df_drink['Payment_Date'] = pd.to_datetime(self.df_drink['Payment_Time'].dt.date)
         self.df_drink['Payment_Period'] = self.df_drink['Payment_Time'].apply(lambda x: 'Current' if x >= dboard_filter_output.StartDate else 'Previous')
         self.df_drink['Total_Cost_By_Size_Qty'] = self.df_drink['Total_Cost_By_Size'] * self.df_drink['Quantity']
+        self.df_drink['Size'] = self.df_drink['Size'].str.replace(r"^Size_", r"", regex=True)
+        self.df_drink['GP'] = (self.df_drink['Price_By_Size'] * self.df_drink['Quantity']) - self.df_drink['Total_Cost_By_Size_Qty']
         
         
         
@@ -178,7 +177,7 @@ class Dashboard(Operation):
         
         dict_filter_mongodb = {'Location': dboard_filter_output.to_mongodb_query().get('Location')}
         self.df_inventory = self.analyze_inventory(lst_inventory=await self.retrieve_inventory(dict_filter_mongodb=dict_filter_mongodb), is_export_df=True)
-    
+        
         print(f"Inventory to dataFrame completed")
         
         
@@ -240,7 +239,7 @@ class Dashboard(Operation):
             df_predict = pd.DataFrame({
                 'Payment_Date': pd.date_range(
                     start=df_cast_flow_curr['Payment_Date'].max() + timedelta(days=1),
-                    end='2025-08-05',
+                    end=dboard_filter_output.EndDate,
                     freq='D'
                 ),
                 'Amount': np.nan,
@@ -317,6 +316,7 @@ class Dashboard(Operation):
         
         dboard_analyze.HTML_RawIngredientUsage = df_rig_usage.to_html(
             table_id='dt-rig-usage', 
+            columns=df_rig_usage.columns.tolist()[2:],  # Exclude 'Ingredient_ID' and 'Location'
             index=False, 
             index_names=False, 
             float_format="{:,.0f}".format,
@@ -328,6 +328,44 @@ class Dashboard(Operation):
     
     
     
+    def dashboard_drk_margin(self, dboard_analyze: DashboardAnalyze) -> DashboardAnalyze:
+        
+        df_drk_summary = (
+            self.df_drink
+            .loc[self.df_drink['Payment_Period'].isin(['Current'])]
+            .groupby(['Product_Code','Location','Drink_Name','Size','Payment_Period'], as_index=False)
+            .agg(
+                Qty = ('Quantity', 'sum'),
+                GP = ('GP', 'sum'),
+                Avg_Margin = ('Margin_By_Size','mean'),
+            )
+            .pivot_table(
+                index = ['Product_Code','Location','Drink_Name','Size'],
+                values = ['Qty','GP', 'Avg_Margin'],
+                fill_value = 0,
+                observed= False,
+            )
+            .reset_index(drop=False)
+            .sort_values(by=['Qty'], ascending=False)
+        )
+        
+        dboard_analyze.HTML_DrinkSummary = df_drk_summary.to_html(
+            table_id='dt-drk-summary', 
+            columns=df_drk_summary.columns.tolist()[1:-3] + ['Qty', 'GP', 'Avg_Margin'],  # Exclude 'Product_Code'
+            index=False, 
+            index_names=False, 
+            float_format="{:,.0f}".format,
+            justify='left',
+            classes='table table-striped table-borderless table-sm',
+        )
+        
+        dboard_analyze.HTML_DrinkSummary = dboard_analyze.HTML_DrinkSummary.replace('<th>', '<th class="text-nowrap">')    
+        
+        return dboard_analyze
+    
+    
+    
+    
     async def dashboard_analyze(self, dboard_filter_input: DashboardFilterInput, current_user: UserPublic) -> DashboardAnalyze:
         
         try:
@@ -335,7 +373,7 @@ class Dashboard(Operation):
             dboard_filter_output = self.dashboard_filter_output(dboard_filter_input=dboard_filter_input)
             
             await self.analyze_fixed_cost()
-            await self.analyze_receipts_drinks_ingredients(dboard_filter_output=dboard_filter_output, current_user = current_user)
+            await self.analyze_receipts_drinks_ingredients(dboard_filter_output=dboard_filter_output, current_user=current_user)
             await self.analyze_inventories(dboard_filter_output=dboard_filter_output)
             
             if self.df_receipt.empty or self.df_drink.empty:
@@ -359,15 +397,20 @@ class Dashboard(Operation):
             # Cast Flow
             dboard_analyze = self.dashboard_cast_flow(dboard_analyze=DashboardAnalyze(**dboard_data), dboard_filter_output=dboard_filter_output)
             
-            
+        
             # Raw Ingredient Usage
             dboard_analyze = self.dashboard_rig_usage(dboard_analyze=dboard_analyze)
+            
+            
+            # Drink Margin
+            dboard_analyze = self.dashboard_drk_margin(dboard_analyze=dboard_analyze)
             
             
         except Exception as e:
             print(f"Error analyzing dashboard: {traceback.format_exc()}")
             raise HTTPException(status_code=400, detail=f"<b>Could not analyze dashboard</b>:\n{e}")
-
+        
+        
         
         return dboard_analyze
 

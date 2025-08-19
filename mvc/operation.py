@@ -116,7 +116,8 @@ class IngredientForFil(BaseModel):
     Name: str = Field(min_length=3)
     Unit: Literal["gram", "ml", "ly", "trái", "gói"]
     Type: Literal["Raw", "Processed"] = Field(default=None)
-
+    Cost_Per_Unit: Annotated[float, Field(ge=1, default=0)]
+    
 
     @model_validator(mode='after')
     @classmethod
@@ -214,6 +215,173 @@ class DrinkUpdate(BaseModel):
 
 
 
+
+# HERE
+class DrinkIngredientEntry(BaseModel):
+    Ingredient_ID: Annotated[str, Field(pattern=r'^(?:RIG|PIG)\d+$')]
+    Ingredient_Quanty: Annotated[int | float, Field(gt=.01, description='Lượng dùng để pha chế')]
+
+    # Reference fields
+    Ingredient_Name: Annotated[str, Field(min_length=2, default=None)]
+    Unit: Annotated[Literal['gram', 'ml', 'ly', 'trái', 'gói'], Field(description="Must be in ['gram', 'ml', 'ly', 'trái', 'gói']", default=None)]
+    Cost_Per_Unit: Annotated[float, Field(ge=1, default=None)]
+
+    # Calculated fields
+    Ingredient_Driect_Cost: Annotated[float, Field(ge=1, default=0)]
+
+
+    def add_data_ref_cal_fields(self, igr):
+        self.Ingredient_Name = igr.Name
+        self.Unit = igr.Unit
+        self.Cost_Per_Unit = igr.Cost_Per_Unit
+        self.Ingredient_Driect_Cost = self.Ingredient_Quanty * self.Cost_Per_Unit
+
+        
+
+
+
+class DrinkRecipeSize(BaseModel):
+    Ingredients: Dict[str, DrinkIngredientEntry]
+    Price: Annotated[int, Field(ge=0)]
+
+    # Calculated fields
+    Drink_Driect_Cost: Annotated[float, Field(ge=1, default=0)]
+    Drink_Margin: Annotated[float, Field(ge=-1, default=0)]
+    
+    
+    @field_validator("Ingredients", mode="before")
+    @classmethod
+    def ingridients_list_to_dict(cls, value: Union[list, dict]):
+        
+        if isinstance(value, dict):
+            return value
+        
+        dict_out = {}
+        
+        for item in value:
+            if isinstance(item, DrinkIngredientEntry):
+                key = item.Ingredient_ID
+                val = item
+            
+            else:
+                key = item["Ingredient_ID"]
+                val = item
+            dict_out[key] = val
+        
+        return dict_out
+    
+    
+    
+    def recipe_update(self, dict_full_igr: dict):
+        
+        for key, val in self.Ingredients.items():
+            val.add_data_ref_cal_fields(dict_full_igr[key])
+            self.Drink_Driect_Cost += val.Ingredient_Driect_Cost
+        
+        self.Drink_Margin = (self.Price - self.Drink_Driect_Cost) / self.Price 
+        
+        
+    
+    
+    
+    
+    
+    
+    
+
+class DrinkRecipeMonth(BaseModel):
+    S: Optional[DrinkRecipeSize] = Field(None, alias="_S")
+    M: DrinkRecipeSize = Field(..., alias="_M")
+    L: Optional[DrinkRecipeSize] = Field(None, alias="_L")
+    
+    model_config = {
+        "populate_by_name": True,
+        "arbitrary_types_allowed": True
+    }
+    
+     
+    def recipe_update(self, dict_full_igr: dict):
+        for fname in self.model_fields_set:
+            getattr(self, fname).recipe_update(dict_full_igr)
+
+        
+    
+    
+
+
+class DrinkV2(BaseModel):
+    
+    # Mandatory fields
+    id: str = Field(default_factory=ObjectId, alias='_id')
+    Drink_ID: str = Field(pattern=r"^DRK\d{3}[a-z]?+$")
+    Drink_Name: str = Field(min_length=3)
+    Group: str = Field(min_length=3)
+    Location: str = Literal['SGN', 'NTR']
+    Enable: bool = Field(...)
+    Recipe: Dict[Annotated[str, Field(pattern=r'^(?:2025_(?:0[7-9]|1[0-2])|20(?:2[6-9]|[3-9]\d)_(?:0[1-9]|1[0-2]))$')], DrinkRecipeMonth]
+    
+    # Calculated fields
+    Extra_Cost: Annotated[int | float, Field(description="Ly nhựa, ống hút, trà đá", default=0)]
+
+    model_config = {
+        'populate_by_name': True,
+        'arbitrary_types_allowed': True,
+        'json_encoders': {ObjectId: lambda oid: str(oid)},
+    }
+
+    
+    @model_validator(mode='after')
+    @classmethod
+    def compute_unit_cost(cls, values):
+        if values.Location in ['SGN']:
+            return values
+        
+        values.Extra_Cost = 2000
+        
+        if values.Drink_ID in ['DRK031', 'DRK032']:
+            values.Extra_Cost = 4000
+        
+        return values
+
+    
+    def recipe_update(self, dict_full_igr: dict):
+        for val in self.Recipe.values():
+            val.recipe_update(dict_full_igr)
+        
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class InventoryItem(BaseModel):
     id: str = Field(default_factory=ObjectId, alias='_id')
     Raw_Ingredient_ID: str = Field(pattern=r"^RIG\d+$")
@@ -292,7 +460,7 @@ class ReceiptItem(BaseModel):
     Price_By_Size: Annotated[Union[float, int], Field(ge=10000)] | Literal[0] = 0
     Total_Cost_By_Size: Annotated[float, Field(ge=1, default=0)]
     Ingredients_By_Size: Annotated[List[DrinkIngredientItem], Field(min_length=1, default=[])]
-
+    Margin_By_Size: Annotated[float, Field(ge=0, default=0)] = 0
 
 
 class Receipt(BaseModel):
@@ -326,6 +494,7 @@ class Operation:
         self.clt_raw_ingredient = mongo_db.hayladb['raw_ingredient']
         self.clt_processed_ingredient = mongo_db.hayladb['processed_ingredient']
         self.clt_drink = mongo_db.hayladb['drink']
+        self.clt_drink_v2 = mongo_db.hayladb['drink_v2']
         self.clt_fixed_cost = mongo_db.hayladb['fixed_cost']
         self.clt_inventory = mongo_db.hayladb['inventory']
         self.clt_receipt = mongo_db.hayladb['receipt']
@@ -334,8 +503,7 @@ class Operation:
 
     @staticmethod
     async def convert_raw_ingredient(rig: dict, current_user: UserPublic) -> RawIngredient:
-        rig_data = jsonable_encoder(rig, custom_encoder={ObjectId: str})
-        rig_data = RawIngredient(**rig_data)
+        rig_data = RawIngredient(**(jsonable_encoder(rig, custom_encoder={ObjectId: str})))
 
         if current_user.role.upper() not in ['ADMIN']:
             rig_data.Cost_Per_Unit = 0
@@ -361,14 +529,12 @@ class Operation:
 
 
     async def convert_processed_ingredient(self, pig: dict, current_user: UserPublic) -> ProcessedIngredient:
-
-        pig_data = jsonable_encoder(pig, custom_encoder={ObjectId: str})
-        pig_data = ProcessedIngredient(**pig_data)
+        
+        pig_data = ProcessedIngredient(**(jsonable_encoder(pig, custom_encoder={ObjectId: str})))
 
         for item in pig_data.Raw_Ingredients:
             rig = await self.clt_raw_ingredient.find_one({'Raw_Ingredient_ID': {'$exists': True, '$eq': item.Raw_Ingredient_ID}})
-            rig_data = jsonable_encoder(rig, custom_encoder={ObjectId: str})
-            rig_data = await self.convert_raw_ingredient(rig_data, current_user)
+            rig_data = await self.convert_raw_ingredient(jsonable_encoder(rig, custom_encoder={ObjectId: str}), current_user)
             item.add_data_ref_cal_fields(rig_data, pig_qty=pig_data.Quanty)  # item = RawIngredientItem
 
             # Calculated fields - pro igr
@@ -393,16 +559,14 @@ class Operation:
 
     async def convert_drink(self, drk: dict, current_user: UserPublic) -> Drink:
 
-        drk_data = jsonable_encoder(drk, custom_encoder={ObjectId: str})
-        drk_data = Drink(**drk_data)
+        drk_data = Drink(**(jsonable_encoder(drk, custom_encoder={ObjectId: str})))
         
         for item in drk_data.Ingredients:
 
             if str(item.Ingredient_ID)[:3].upper() == 'RIG':
 
                 drk_igr = await self.clt_raw_ingredient.find_one({'Raw_Ingredient_ID': {'$exists': True, '$eq': item.Ingredient_ID}})
-                drk_igr_data = jsonable_encoder(drk_igr, custom_encoder={ObjectId: str})
-                drk_igr_data = await self.convert_raw_ingredient(drk_igr_data, current_user)
+                drk_igr_data = await self.convert_raw_ingredient(jsonable_encoder(drk_igr, custom_encoder={ObjectId: str}), current_user)
 
                 item.add_data_ref_cal_fields(drk_igr_data)
 
@@ -415,7 +579,7 @@ class Operation:
 
 
             drk_data.Total_Cost += item.Total_Cost
-
+            
             for loc in drk_data.Location:
                 
                 if loc == 'SGN':
@@ -442,30 +606,33 @@ class Operation:
 
 
 
-    async def retrieve_drink(self, groupby: str, current_user: UserPublic) -> Dict[str, list[Drink] | Drink] | None:
+    async def retrieve_drink(self, groupby: Literal['GROUP', 'ID', None], dict_filter_mongodb: dict, current_user: UserPublic) -> Dict[str, list[Drink] | Drink] | list[Drink]:
 
-        dict_drink = dict()
+        if groupby is None:
+            drinks = list()
+        else:
+            drinks = dict()
 
         async for drk in self.clt_drink.find({
             'Drink_ID': {'$exists': True, '$ne': None},
-            'Enable': True,
-        }).sort({'Group': 1, 'Location': -1, 'Drink_Name': 1}):
+            'Enable': True
+        } | dict_filter_mongodb).sort({'Group': 1, 'Location': -1, 'Drink_Name': 1}):
 
             drk_data = await self.convert_drink(drk, current_user)
 
             if groupby.upper() == 'GROUP':
                 group_key = drk_data.Group
-                dict_drink.setdefault(group_key, []).append(drk_data)
+                drinks.setdefault(group_key, []).append(drk_data)
             
             elif groupby.upper() == 'ID':
                 group_key = drk_data.Drink_ID
-                dict_drink.update({group_key: drk_data})
+                drinks.update({group_key: drk_data})
             
             else:
-                return None
-            
+                drinks.append(drk_data)
+                
         
-        return dict_drink
+        return drinks
 
 
 
@@ -496,15 +663,86 @@ class Operation:
         return updated_drink
 
 
+    
+    # Here
+    async def retrieve_drink_v2(self, groupby: Literal['GROUP', 'ID', None], dict_filter_mongodb: dict, current_user: UserPublic) -> Dict[str, list[DrinkV2] | DrinkV2] | list[DrinkV2]:
 
+        if groupby is None:
+            drinks = list()
+        else:
+            drinks = dict()
+
+        dict_full_igr = await self.get_full_ingredients(output_type='DICT', current_user=current_user)
+        
+        
+        async for drk in self.clt_drink_v2.find({
+            'Drink_ID': {'$exists': True, '$ne': None},
+            'Enable': True
+        } | dict_filter_mongodb).sort({'Group': 1, 'Location': -1, 'Drink_ID': 1}):
+            
+            drk_data = DrinkV2(**(jsonable_encoder(drk, custom_encoder={ObjectId: str})))
+            drk_data.recipe_update(dict_full_igr)
+            
+            if groupby.upper() == 'GROUP':
+                group_key = drk_data.Group
+                drinks.setdefault(group_key, []).append(drk_data)
+            
+            elif groupby.upper() == 'ID':
+                group_key = drk_data.Drink_ID
+                drinks.update({group_key: drk_data})
+            
+            else:
+                drinks.append(drk_data)
+                
+        
+        return drinks
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
     async def retrieve_fixed_cost(self) -> list[FixedCost]:
 
         lst_fixed_cost = list()
 
         async for fix in self.clt_fixed_cost.find({'Fixed_Cost_ID': {'$exists': True, '$ne': None}}):
-            fix_data = jsonable_encoder(fix, custom_encoder={ObjectId: str})
-            lst_fixed_cost.append(FixedCost(**fix_data))
+            lst_fixed_cost.append(FixedCost(**(jsonable_encoder(fix, custom_encoder={ObjectId: str}))))
 
         return lst_fixed_cost
 
@@ -512,9 +750,7 @@ class Operation:
 
 
     async def convert_inventory(self, inv: dict) -> InventoryItem:
-
-        inv_data = jsonable_encoder(inv, custom_encoder={ObjectId: str})
-        inv_data = InventoryItem(**inv_data)
+        inv_data = InventoryItem(**(jsonable_encoder(inv, custom_encoder={ObjectId: str})))
 
         rig = await self.clt_raw_ingredient.find_one({'Raw_Ingredient_ID': {'$exists': True, '$eq': inv_data.Raw_Ingredient_ID}})
         rig_data = jsonable_encoder(rig, custom_encoder={ObjectId: str})
@@ -596,19 +832,35 @@ class Operation:
     
 
 
-    async def get_full_ingredients(self, current_user: UserPublic) -> list[IngredientForFil]:
+    async def get_full_ingredients(self, current_user: UserPublic, output_type: str = 'LST') -> list[IngredientForFil] | dict[str, IngredientForFil]:
         
-        lst_full_igr = list()
+        full_igrs = list() if output_type.upper() == 'LST' else dict()
+        
         lst_full_pig = await self.retrieve_processed_ingredient(current_user)
         lst_full_rig = await self.retrieve_raw_ingredient(current_user)
 
         for pig in lst_full_pig:
-            lst_full_igr.append(IngredientForFil(ID=pig.Processed_Ingredient_ID, Name=pig.Processed_Ingredient_Name, Unit=pig.Unit))
+            
+            obj_igr = IngredientForFil(ID=pig.Processed_Ingredient_ID, Name=pig.Processed_Ingredient_Name, Unit=pig.Unit, Cost_Per_Unit=pig.Cost_Per_Unit)
+            
+            if isinstance(full_igrs, list):
+                full_igrs.append(obj_igr)
 
+            else:
+                full_igrs.update({obj_igr.ID: obj_igr})
+            
+            
         for rig in lst_full_rig:
-            lst_full_igr.append(IngredientForFil(ID=rig.Raw_Ingredient_ID, Name=rig.Raw_Ingredient_Name, Unit=rig.Unit))
-
-        return lst_full_igr
+            
+            obj_igr = IngredientForFil(ID=rig.Raw_Ingredient_ID, Name=rig.Raw_Ingredient_Name, Unit=rig.Unit, Cost_Per_Unit=rig.Cost_Per_Unit)
+            
+            if isinstance(full_igrs, list):
+                full_igrs.append(obj_igr)
+            
+            else:
+                full_igrs.update({obj_igr.ID: obj_igr})
+        
+        return full_igrs
 
 
 
@@ -713,7 +965,7 @@ class Operation:
                 'upserted': result.upserted_count
             }
 
-
+            
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"Upload receipts error: {e}")
         
@@ -721,8 +973,7 @@ class Operation:
 
 
     async def convert_receipt(self, receipt: dict, dict_drink: Dict[str, Drink], is_convert_pig_to_rig: bool, dict_pig: dict, current_user: UserPublic) -> Receipt:
-        receipt_data = jsonable_encoder(receipt, custom_encoder={ObjectId: str})
-        receipt_data = Receipt(**receipt_data)
+        receipt_data = Receipt(**(jsonable_encoder(receipt, custom_encoder={ObjectId: str})))
         
         for item in receipt_data.Items:
             
@@ -737,6 +988,7 @@ class Operation:
             # Calculated fields based on Size
             item.Price_By_Size = getattr(getattr(obj_drink.Price, receipt_data.Location), item.Size)
             item.Total_Cost_By_Size = (obj_drink.Total_Cost * num_weight) + obj_drink.Extra_Cost.get(receipt_data.Location) 
+            item.Margin_By_Size = (item.Price_By_Size - item.Total_Cost_By_Size) * 100 / item.Price_By_Size if item.Price_By_Size > 0 else 0
             
             
             for igr in obj_drink.Ingredients:
@@ -786,7 +1038,7 @@ class Operation:
         lst_receipt = list()
         
         # Get all drink to add information to Receipt Items Object
-        dict_drink = await self.retrieve_drink(groupby='id', current_user=current_user)
+        dict_drink = await self.retrieve_drink(groupby='id', dict_filter_mongodb={}, current_user=current_user)
         dict_pig = dict()
         
         if is_convert_pig_to_rig:
