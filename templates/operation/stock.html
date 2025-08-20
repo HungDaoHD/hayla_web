@@ -1,0 +1,634 @@
+<!-- Load template html -->
+{% extends "./base.html" %}
+
+{% set str_title = 'Inventory' %}
+
+<!-- Title -->
+{% block title %} {{ str_title ~ ' | Haylà' }} {% endblock %}
+
+
+<!-- [ breadcrumb ] start -->
+{% block breadcrumb %}
+<div class="col-md-12">
+  <ul class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/">Home</a></li>
+    <li class="breadcrumb-item"><a href="javascript: void(0)">Operation</a></li>
+    <li class="breadcrumb-item" aria-current="page">{{ str_title }}</li>
+  </ul>
+</div>
+
+<div class="col-md-12">
+  <div class="page-header-title">
+    <h2 class="mb-0">{{ str_title }}</h2>
+  </div>
+</div>
+{% endblock %}
+<!-- [ breadcrumb ] end -->
+
+
+<!-- [ Main Content ] start -->
+{% block main_content %}
+
+{% set lst_tabname = ['summary', 'items'] %}
+
+<ul class="nav nav-pills p-2" id="pills-tab" role="tablist">
+
+  {% for tabname in lst_tabname %}
+
+    <li class="nav-item">
+      <a class="nav-link {{ 'active' if tabname == 'summary' else '' }}" id="pills-{{ tabname }}-tab"
+         data-bs-toggle="pill" href="#pills-{{ tabname }}" role="tab" aria-controls="pills-{{ tabname }}"
+         aria-selected="true">
+        
+        {{ tabname | capitalize }}
+        
+      </a>
+    </li>
+
+  {% endfor %}
+
+</ul>
+
+
+<div class="tab-content" id="pills-tabContent">
+
+  {% for tabname in lst_tabname %}
+
+    <div class="tab-pane fade show {{ 'active' if tabname == 'summary' else '' }}" id="pills-{{ tabname }}"
+         role="tabpanel" aria-labelledby="pills-{{ tabname }}-tab">
+
+        {% if loop.index0 == 0 %}
+        
+          <!-- Tab Summary -->
+          <div class="card">
+            
+            <div class="card-body">
+              <table class="table table-hover table-sm" id="dt-inventory-total-qty">
+
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>
+                      <span class="text-success">Add</span> / 
+                      <span class="text-warning">Get</span> / 
+                      <span class="text-primary">Remain</span>
+                    </th>
+                  </tr>
+                </thead>
+
+                <tbody>
+
+                  {% for item in dict_total_qty %}
+
+                    {% if item['remain'] == 0 %}
+                      {% set icon_remaining = 'ti ti-alert-triangle text-danger' %}
+                    
+                    {% elif item['remain'] <= 3 %}
+                      {% set icon_remaining = 'ti ti-alert-triangle text-warning' %}
+
+                    {% else %}
+                      {% set icon_remaining = '' %}
+
+                    {% endif %}
+
+                    <tr>
+                      <td>
+                        <div class="row">
+                          <div class="col">
+                            <h6 class="mb-0">
+                              <span class="badge {{ 'bg-blue-500' if item['Location'] == 'SGN' else 'bg-orange-500' }}">{{ item['Location'] }}</span>
+                              {{ item['Raw_Ingredient_Name'] }}
+                            </h6>
+                            <span class="text-muted f-12 mb-0">{{ item['Raw_Ingredient_ID'] }}</span>
+                          </div>
+                        </div>
+                      </td>
+                      
+                      <td>
+                        <span class="text-success">{{ "{:,.0f}".format(item['add']) }}</span> / 
+                        <span class="text-warning">{{ "{:,.0f}".format(item['get']) }}</span> / 
+                        <span class="text-primary">{{ "{:,.0f}".format(item['remain']) }} <i class="{{ icon_remaining }} f-18"></i></span>
+                        <p class="text-muted f-12 mb-0">x {{ item['Quanty'] }} {{ item['Unit'] }}</p>
+                      </td>
+                      
+                    </tr>
+                  {% endfor %}
+
+                </tbody>
+                
+              </table>
+
+            </div>
+          </div>
+        
+        {% else %}
+          <!-- Tab Items -->
+          <div class="card">
+
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <a id="btn-get-inventory-items" href="javascript:void(0)" class="btn btn-warning">
+                <i class="ti ti-transfer-out"></i> Get
+              </a>
+              <a id="btn-add-inventory-items" href="javascript:void(0)" class="btn btn-success">
+                <i class="ti ti-transfer-in"></i> Add
+              </a>
+            </div>
+            
+            <div class="card-body">
+              <table class="table table-hover table-sm" id="dt-inventory-items">
+
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Quanty</th>
+                    <th></th>
+                  </tr>
+                </thead>
+
+                <tbody>
+
+                  {% for item in lst_inv %}
+
+                    <tr data-id="{{ item.id }}">
+
+                      <td>
+                        <div class="row">
+                          <div class="col">
+                            <h6 class="mb-0">
+                              <span class="badge {{ 'bg-blue-500' if item.Location == 'SGN' else 'bg-orange-500' }}">{{ item.Location }}</span>
+                              {{ item.Raw_Ingredient_Name }}
+                            </h6>
+                            <span class="text-muted f-12 mb-0">{{ item.Raw_Ingredient_ID }}</span>
+                            <span class="text-muted f-12 mb-0">{{ item.DateTime.strftime("%d/%m/%y %H:%M") }}</span>
+                            <span class="text-muted f-12 mb-0">{{ item.email }}</span>
+                          </div>
+                        </div>
+                      </td>
+
+                      <td>
+                        {% if item.Action == 'add' %}
+                          <p class="text-success">+{{ "{:,.0f}".format(item.Qty) }}</p>
+                        {% else %}
+                          <p class="text-warning">-{{ "{:,.0f}".format(item.Qty) }}</p>
+                        {% endif %}
+                        
+                        <p class="text-muted f-12 mb-0">x {{ item.Quanty }} {{ item.Unit }}</p>
+                      </td>
+                      
+                      <td>
+                        <ul class="list-inline me-auto mb-0">
+                          <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Edit">
+                            <a href="#" class="avtar avtar-xs btn-link-primary">
+                              <i class="ti ti-edit-circle f-18"></i>
+                            </a>
+                          </li>
+                          <li class="list-inline-item align-bottom" data-bs-toggle="tooltip" title="Delete">
+                            <a href="#" class="avtar avtar-xs btn-link-danger">
+                              <i class="ti ti-trash f-18"></i>
+                            </a>
+                          </li>
+                        </ul>
+                      </td>
+
+                    </tr>
+
+                  {% endfor %}
+
+                </tbody>
+
+              </table>
+            </div>
+          </div>
+        
+        {% endif %}
+      
+      <!-- </div> -->
+
+    </div>
+
+  {% endfor %}
+
+</div>
+
+
+<div class="modal fade" id="inventory-items-modal" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h3 id="inventory-items-modal-title">[Add / Get] Items</h5>
+        <a href="#" class="avtar avtar-s btn-link-danger" data-bs-dismiss="modal">
+          <i class="ti ti-x f-20"></i>
+        </a>
+      </div>
+      
+      <hidden id="inventory-item-action"></hidden>
+      <div hidden id="modal-error-alert" class="alert alert-danger p-2 m-2" role="alert"></div>
+
+      <div class="row g-2 p-2 pb-0">
+
+        <div class="col-sm-4">
+          <select class="form-control" data-trigger name="inventory-item-location-choice" id="inventory-item-location-choice">
+            <option value="">Location</option>
+            {% for loc in lst_loc %}
+              <option value="{{ loc }}">{{ loc }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        
+        <div class="col-sm-4">
+          <select class="form-control" data-trigger name="inventory-item-name-choice" id="inventory-item-name-choice">
+            <option value="">Name</option>
+            {% for rig in dict_rig.values() %}
+              <option value="{{ rig.Raw_Ingredient_ID }}">{{ rig.Raw_Ingredient_Name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        
+        <div class="col-sm-4">
+            
+          <div class="row gx-2 gy-2">
+            
+            <div class="col">
+              <form class="validate-me" id="form-edit-drink" data-validate>
+                <div class="form-group">
+                  <input disabled type="number" class="form-control" min="1" max="50" name="inventory-item-qty" id="inventory-item-qty" placeholder="Qty" required>
+                </div>
+              </form>
+            </div>
+            
+            <div class="col-auto">
+              <button type="button" id="inventory-item-add-btn" class="btn btn-outline-primary mt-0">Submit</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-body p-2">
+        <div class="card">
+          <div class="card-body">
+            <table id="dt-modal-inventory-items" class="table table-hover table-sm">
+
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Location</th>
+                  <th>Quanty</th>
+                  <th></th>
+                </tr>
+              </thead>
+
+              <tbody></tbody>
+
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer justify-content-between">
+        <ul class="list-inline me-auto mb-0">
+          <li class="list-inline-item align-bottom">
+            <a href="#" class="avtar avtar-s btn-link-danger w-sm-auto" data-bs-toggle="tooltip" title="Delete">
+              <i class="ti ti-trash f-18"></i>
+            </a>
+          </li>
+        </ul>
+
+        <div class="flex-grow-1 text-end">
+          <button type="button" class="btn btn-link-danger" data-bs-dismiss="modal">Cancel</button>
+          <button id="save-all" type="button" class="btn btn-primary" data-bs-dismiss="modal">Save</button>
+        </div>
+
+      </div>
+
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+<!-- [ Main Content ] end -->
+
+
+
+{% block extra_scripts %}
+
+<script src="{{ request.url_for('static', path='js/plugins/choices.min.js') }}"></script>
+<script src="{{ request.url_for('static', path='js/plugins/bouncer.min.js') }}"></script>
+<script src="{{ request.url_for('static', path='js/pages/form-validation.js') }}"></script>
+<script src="{{ request.url_for('static', path='js/plugins/sweetalert2.all.min.js') }}"></script>
+
+<script>
+
+  const dict_total_qty = JSON.parse('{{ dict_total_qty | tojson | safe }}');
+
+  var dict_total_qty_nested = dict_total_qty.reduce((acc, item) => {
+    const loc = item.Location;
+    const id  = item.Raw_Ingredient_ID;
+
+    // ensure we have an object for this location
+    if (!acc[loc]) {
+      acc[loc] = {};
+    }
+
+    // set the second level key
+    acc[loc][id] = item;
+    return acc;
+  }, {});
+
+
+  const inventoryItemsModalEl = document.getElementById('inventory-items-modal');
+  const inventoryItemsModal   = new bootstrap.Modal(inventoryItemsModalEl);
+
+  function createNewChoice(id) {
+    return new Choices(id, {
+      placeholder: true,
+      placeholderValue: '',
+      searchPlaceholderValue: 'Search…',
+
+      allowHTML: true,
+      searchEnabled: true,
+      shouldSort: false,
+      shouldSortItems: false,
+    });
+  };
+  
+  var invItemNameChoice = createNewChoice('#inventory-item-name-choice');
+  var invItemLocChoice = createNewChoice('#inventory-item-location-choice');
+
+  invItemNameChoice.disable();
+
+  ['add', 'get'].forEach(action => {
+    
+    $(`#btn-${action}-inventory-items`).on('click', function() {
+      
+      if (action == 'add') {
+        var str_title = 'Add Items';
+        var str_remove_class = 'text-warning';
+        var str_add_class = 'text-success';
+      }
+      else {
+        var str_title = 'Get Items';
+        var str_remove_class = 'text-success';
+        var str_add_class = 'text-warning';
+      }
+
+      $('#inventory-items-modal-title')
+        .text(str_title)
+        .removeClass(str_remove_class)
+        .addClass(str_add_class);
+
+      $('#dt-modal-inventory-items tbody').empty();
+      invItemLocChoice.setChoiceByValue("");
+      invItemNameChoice.setChoiceByValue("");
+      $('#inventory-item-qty').val(null);
+      $('#inventory-item-action').val(action);
+      
+      inventoryItemsModal.show();
+    
+    });
+    
+  });
+
+
+  $('#inventory-item-location-choice').on('change', function(){
+
+    const location = $(this).val();
+
+    $('#inventory-item-qty').val(null);
+    invItemNameChoice.setChoiceByValue("");
+
+    if(!location) {
+      invItemNameChoice.disable();
+      return;
+    }
+    
+    invItemNameChoice.enable();
+
+    if($('#inventory-item-action').val() == 'get') {
+      filterInventoryItemsChoice();
+    }
+
+  });
+  
+  function filterInventoryItemsChoice() {
+    
+    const selected = invItemLocChoice.getValue(true);
+    const items = Object
+      .values(dict_total_qty_nested[selected] || {})
+      .filter(item => item.remain > 0);
+
+    let choiceList = [{
+        value: "",
+        label: "Name",
+        selected: true
+    }].concat(
+      items.map(item => ({
+        value: item.Raw_Ingredient_ID,
+        label: item.Raw_Ingredient_Name
+      }))
+    );
+    
+    invItemNameChoice.clearChoices();
+    invItemNameChoice.setChoices(choiceList, 'value', 'label', false);
+    
+  };
+  
+  $('#inventory-item-location-choice, #inventory-item-name-choice').on('change', function(){
+    const rig_id = $('#inventory-item-name-choice').val();
+    const location = $('#inventory-item-location-choice').val();
+    const action = $('#inventory-item-action').val();
+
+    $('#inventory-item-qty').attr('placeholder', 'Qty');
+    $('#inventory-item-qty').attr({
+      min: 1,
+      max: 0,
+    });
+    $('#inventory-item-qty').val(null);
+
+    if (!rig_id || !location)
+    {
+      $('#inventory-item-qty').prop('disabled', true);
+      return;
+    }
+
+    $('#inventory-item-qty').prop('disabled', false);
+
+    if (!rig_id || !location || action == 'add')
+    {
+      return;
+    }
+    
+    let selected_item = dict_total_qty_nested[location][rig_id];
+
+    if(!selected_item){
+      invItemNameChoice.setChoiceByValue("");
+      return;
+    }
+    
+    $('#inventory-item-qty').attr('placeholder', `Max ${selected_item.remain}`);
+    $('#inventory-item-qty').attr({
+      min: 1,
+      max: selected_item.remain
+    });
+
+  });
+  
+  // Submit added / got items
+  $('#inventory-item-add-btn').on('click', function() {
+    
+    const rig_id = $('#inventory-item-name-choice').val();
+    const location = $('#inventory-item-location-choice').val();
+    const qty = parseInt($('#inventory-item-qty').val(), 10);
+    const action = $('#inventory-item-action').val();
+
+    if (!rig_id || !location || isNaN(qty) || qty <= 0) {
+      $('#modal-error-alert')
+        .text('Please select item, location and enter a quantity > 0.')
+        .prop('hidden', false);
+      return;
+    }
+    
+    const tbody = document.querySelector('#dt-modal-inventory-items tbody');
+    
+    if (tbody.querySelector(`tr[data-id="${rig_id}"]`)) {
+      $('#modal-error-alert')
+        .text('This item is already in the table.')
+        .prop('hidden', false);
+      return;
+    }
+
+    if (action == 'get' && dict_total_qty_nested[location][rig_id].remain < qty) {
+      $('#modal-error-alert')
+        .text(`You only can get maximum ${dict_total_qty_nested[location][rig_id].remain}`)
+        .prop('hidden', false);
+      return;
+    }
+
+    $('#modal-error-alert').prop('hidden', true);
+    
+    const json_rig = JSON.parse('{{ dict_rig | tojson | safe }}');
+    const tr = document.createElement('tr');
+    tr.dataset.id = rig_id;
+    tr.dataset.loc = location;
+    tr.dataset.qty = qty;
+    tr.innerHTML = `
+      <td>
+        <div class="row">
+          <div class="col">
+            <h7 class="mb-0">${json_rig[rig_id].Raw_Ingredient_Name}</h7>
+            <p class="text-muted f-12 mb-0">${rig_id}</p>
+          </div>
+        </div>
+      </td>
+
+      <td>${location}</td>
+      <td>${qty} <p class="text-muted f-12 mb-0">x ${json_rig[rig_id].Quanty} ${json_rig[rig_id].Unit}</p></td>
+
+      <td>
+        <a onclick="deleteRowByDataId('${rig_id}');" href="javascript:void(0)" class="avtar avtar-s btn-link-danger w-sm-auto" data-bs-toggle="tooltip" title="Delete">
+          <i class="ti ti-trash f-18"></i>
+        </a>
+      </td>
+    `;
+    
+    tbody.appendChild(tr);
+    
+    if(action == 'get'){
+      dict_total_qty_nested[location][rig_id].remain -= qty;
+      filterInventoryItemsChoice();
+    }
+
+    
+    invItemNameChoice.setChoiceByValue("");
+    
+    $('#inventory-item-qty').val(null);
+    $('#inventory-item-qty').attr('placeholder', 'Qty');
+    $('#inventory-item-qty').prop('disabled', true);
+    
+  });
+
+  function deleteRowByDataId(dataId) {
+    
+    const row = document.querySelector(`tr[data-id="${dataId}"]`);
+    if (!row) {
+      console.warn(`No table row found with data-id="${dataId}"`);
+      return;
+    }
+    row.remove();
+  }
+
+  // Save all added/got items
+  $('#save-all').on('click', function() {
+
+    const docs = [];
+
+    $('#dt-modal-inventory-items tbody tr').each(function() {
+      const $tr = $(this);
+
+      docs.push({
+        Raw_Ingredient_ID: $tr.data('id'),
+        Location: $tr.data('loc'),
+        Qty: $tr.data('qty'),
+        Action: $('#inventory-item-action').val(),
+      });
+    });
+
+    console.log(docs);
+
+    Swal.fire({
+      title: `Do you want to save all items?`,
+      showDenyButton: true,
+      showCancelButton: false,
+      confirmButtonText: `Save`,
+      denyButtonText: `Don't save`
+    }).then((result) => {
+      
+      if (result.isDenied) 
+      {
+        Swal.fire('Changes are not saved', '', 'info');
+        return;
+      } 
+      else if (result.isConfirmed) {
+
+        $.ajax({
+          url: '/operation/inventory/add-items',
+          method: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify(docs),
+          success: function(resp) {
+
+            Swal.fire(`Items Saved!`, '', 'success').then(() => {
+              window.location.reload();
+            });
+            
+          },
+          error: function(xhr, status, err) {
+            console.error(xhr);
+            console.error(status);
+            console.error(err);
+            Swal.fire('Changes are not saved.', xhr.responseJSON.detail[0].msg, 'error');
+          }
+        });
+
+      }
+
+    });
+
+  });
+
+
+</script>
+
+
+{% endblock %}
+
+
+
+
+
+
+

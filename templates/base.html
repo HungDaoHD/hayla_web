@@ -76,38 +76,48 @@
 
           <ul class="pc-navbar">
 
-            <!-- [ Sidebar Menu - Dashboard ] start -->
-            <li class="pc-item">
-              <a href="/dashboard/index" class="pc-link">
-                <span class="pc-micon"><i class="ti ti-dashboard"></i></span>
-                <span class="pc-mtext">Dashboard</span>
-              </a>
-            </li>
-            <!-- [ Sidebar Menu - Dashboard ] end -->
+              {% if user.role in ['Admin', 'Staff'] %}
+                <li class="pc-item">
+                  <a href="/operation/stock" class="pc-link">
+                    <span class="pc-micon"><i class="ti ti-building-warehouse"></i></span>
+                    <span class="pc-mtext">Stock</span>
+                  </a>
+                </li>
+              {% endif %}
 
+            {% if user.role in ['Admin'] %}
+              <!-- [ Sidebar Menu - Dashboard ] start -->
+              <li class="pc-item">
+                <a href="/dashboard/index" class="pc-link">
+                  <span class="pc-micon"><i class="ti ti-dashboard"></i></span>
+                  <span class="pc-mtext">Dashboard</span>
+                </a>
+              </li>
+              <!-- [ Sidebar Menu - Dashboard ] end -->
+              
+              <!-- [ Sidebar Menu - Reservation ] start -->
+              <li class="pc-item pc-caption">
+                <label>Reservation</label>
+                <i class="ti ti-calendar-event"></i>
+              </li>
 
-            <!-- [ Sidebar Menu - Reservation ] start -->
-            <li class="pc-item pc-caption">
-              <label>Reservation</label>
-              <i class="ti ti-calendar-event"></i>
-            </li>
-
-            <li class="pc-item">
-              <a href="/calendar" class="pc-link">
-                <span class="pc-micon"><i class="ti ti-calendar-time"></i></span>
-                <span class="pc-mtext">Calendar</span>
-              </a>
-            </li>
-            <!-- [ Sidebar Menu - Reservation ] end -->
-
-
+              <li class="pc-item">
+                <a href="/calendar" class="pc-link">
+                  <span class="pc-micon"><i class="ti ti-calendar-time"></i></span>
+                  <span class="pc-mtext">Calendar</span>
+                </a>
+              </li>
+              <!-- [ Sidebar Menu - Reservation ] end -->
+            {% endif %}
+            
             <!-- [ Sidebar Menu - Operation ] start -->
-            {% if user.role in ['Admin', 'Staff'] %}
+            {% if user.role in ['Admin'] %}
+              
               <li class="pc-item pc-caption">
                 <label>Operation</label>
                 <i class="ti ti-table"></i>
               </li>
-              
+
               <li class="pc-item pc-hasmenu">
                 
                 <a href="javascript: void(0)" class="pc-link">

@@ -671,7 +671,7 @@ class Operation:
             drinks = list()
         else:
             drinks = dict()
-
+        
         dict_full_igr = await self.get_full_ingredients(output_type='DICT', current_user=current_user)
         
         
