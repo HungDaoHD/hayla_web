@@ -77,56 +77,55 @@
               
                 </div>
                 
+              
                 <!-- --------------------------------------->
-                <table class="table table-bordered align-middle">
+                <div class="dt-responsive table-responsive p-1">
 
-                  <thead>
-                    <tr>
-                      <th style="width: 10%;">#</th>
-                      <th>Item</th>
-                      <th>Trong kho</th>
-                      <th>Ngoài kho</th>
-                    </tr>
-                  </thead>
+                  <table id="dt-stock" class="table table-striped table-bordered table-sm align-middle">
+                    <thead>
+                      <tr>
+                        <th class="text-center">#</th>
+                        <th>Name</th>
+                        <th>Trong kho</th>
+                        <th>Ngoài kho</th>
+                      </tr>
+                    </thead>
 
-                  <tbody>
-                    <!-- Row A -->
-                    <tr>
-                      <td class="text-center">
-                        <input type="checkbox" class="toggle-row" data-target="#row-a-input">
-                      </td>
-                      <td>Option A</td>
-                      <td>
-                        <input type="number" id="row-a-input-1" class="form-control d-none" name="value_a1" placeholder="Value for A1" disabled required>
-                      </td>
-                      <td>
-                        <input type="number" id="row-a-input-2" class="form-control d-none" name="value_a2" placeholder="Value for A2" disabled required>
-                      </td>
-                    </tr>
+                    <tbody>
+                      {% set ns = namespace(count=0) %}
 
-                    <!-- Row B -->
-                    <tr>
-                      <td class="text-center">
-                        <input type="checkbox" class="toggle-row" data-target="#row-b-input">
-                      </td>
-                      <td>Option B</td>
-                      <td>
-                        <input type="number" id="row-b-input-1" class="form-control d-none"
-                              name="value_b1" placeholder="Value for B1" disabled required>
-                      </td>
-                      <td>
-                        <input type="number" id="row-b-input-2" class="form-control d-none"
-                              name="value_b2" placeholder="Value for B2" disabled required>
-                      </td>
-                    </tr>
+                      {% for grp, lst_rig in dict_raw_ingredient.items() %}
 
+                        {% for rig in lst_rig %}
+                          {% set ns.count = ns.count + 1 %}
+                          <tr data-id="{{ rig.Raw_Ingredient_ID }}" data-target="#{{ rig.Raw_Ingredient_ID }}-qty">
+                            
+                            <td class="text-center">
+                              <input type="checkbox" class="toggle-row" data-target="#{{ rig.Raw_Ingredient_ID }}-qty">
+                            </td>
 
+                            <td>{{ ns.count }}. {{ rig.Raw_Ingredient_Name }}</td>
+                            
+                            <td>
+                              <input type="number" id="{{ rig.Raw_Ingredient_ID }}-qty-instock" class="form-control d-none" name="{{ rig.Raw_Ingredient_ID }}-qty-instock" placeholder="Trong kho" disabled required>
+                            </td>
+                            
+                            <td>
+                              <input type="number" id="{{ rig.Raw_Ingredient_ID }}-qty-outstock" class="form-control d-none" name="{{ rig.Raw_Ingredient_ID }}-qty-outstock" placeholder="Ngoài kho" disabled required>
+                            </td>
+                          </tr>
+                        {% endfor %}
+                      
+                      {% endfor %}
 
-                    
-                  </tbody>
-                </table>
-
+                      
+                      
+                    </tbody>
+                  </table>
+                </div>
+              
               </form>
+              
 
             </div>
           </div>
@@ -163,21 +162,69 @@
 <script src="{{ request.url_for('static', path='js/plugins/dataTables.bootstrap5.min.js') }}"></script>
 
 <script>
-$(function () {
-  $('.toggle-row').on('change', function () {
-    const $target1 = $(`${$(this).data('target')}-1`);
-    const $target2 = $(`${$(this).data('target')}-2`);
+  $(function () {
+    const $dt_recept = $('#dt-stock').DataTable({
+      responsive: true,  // let DataTables auto‑shrink & wrap columns
+      scrollX:    false, // disable the horizontal scroll
+      autoWidth:  true,  // allows table to grow to 100%
+      ordering: false, // Prevent search columns
+
+      // 1) Custom DOM: length + filter row on top, info + paginate row on bottom
+      dom:
+        "<'row g-2 p-2 mb-3'" +
+        "<'col-sm-8'l>" +   // length menu here
+        "<'col-sm-4'f>" +   // filter input here
+        ">" +
+        "t" +                 // the table itself
+        "<'row g-2 p-2 mt-3'" +
+          "<'col-sm-8'i>" +   // table info here
+          "<'col-sm-4'p>" +   // pagination here
+        ">",
+      
+      // 2) Language tweaks
+      language: {
+        lengthMenu: 'Show _MENU_ entries',
+        search: '', // remove default “Search:” label
+        searchPlaceholder: 'Search…',
+        paginate: {
+          first:    '<i class="ti ti-chevrons-left"></i>',
+          previous: '<i class="ti ti-chevron-left"></i>',
+          next:     '<i class="ti ti-chevron-right"></i>',
+          last:     '<i class="ti ti-chevrons-right"></i>'
+        }
+      },
+
+      // 3) Optional: how many rows by default
+      pageLength: 100
+
+    });
+
+    $('.dataTables_length select').addClass('form-select form-select-sm');
+    $('.dataTables_filter label').addClass('d-flex justify-content-end');
+    $('.dataTables_filter input').addClass('form-control form-control-sm');
+
+    
+    $('.toggle-row').on('change', function () {
+      const $qty_instock = $(`${$(this).data('target')}-instock`);
+      const $qty_outstock = $(`${$(this).data('target')}-outstock`);
 
 
-    if (this.checked) {
-      $target1.removeClass('d-none').prop('disabled', false);
-      $target2.removeClass('d-none').prop('disabled', false);
-    } else {
-      $target1.addClass('d-none').prop('disabled', true);
-      $target2.addClass('d-none').prop('disabled', true);
-    }
+      if (this.checked) {
+        $qty_instock.removeClass('d-none').prop('disabled', false);
+        $qty_outstock.removeClass('d-none').prop('disabled', false);
+      } else {
+        $qty_instock.addClass('d-none').prop('disabled', true);
+        $qty_outstock.addClass('d-none').prop('disabled', true);
+      }
+    });
+
   });
-});
+
+  
+
+
+
+
 
 
 

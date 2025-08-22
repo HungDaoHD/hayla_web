@@ -207,13 +207,18 @@ async def upload_receipt(upload_file: UploadFile = File(...), current_user: User
     return dict_upload_status
 
 
-
+# STOCK HERE
 @router.get('/stock', response_class=HTMLResponse)
 async def page_stock(request: Request, current_user: UserPublic = Depends(require_role(role=lst_role))):
     
+    opt = Operation()
+    dict_raw_ingredient = await opt.retrieve_raw_ingredient(current_user, is_group=True)
+    
+    
     return templates.TemplateResponse('operation/stock.html', {
         'request': request,
-        'user': current_user.model_dump()
+        'user': current_user.model_dump(),
+        'dict_raw_ingredient': dict_raw_ingredient
     })
 
 

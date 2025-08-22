@@ -38,6 +38,8 @@ class RawIngredient(BaseModel):
     id: str = Field(default_factory=ObjectId, alias='_id')
     Raw_Ingredient_ID: str = Field(pattern=r"^RIG\d+$")
     Raw_Ingredient_Name: str = Field(min_length=2)
+    Group: Literal['Cà phê, Trà & Bột', 'Sữa, Kem & Nguyên liệu khác', 'Syrup, Sốt, Mứt & Topping', 'Bao bì & Phụ kiện', 'Vệ sinh & Hỗ trợ', 'Undefine'] = Field(min_length=3)
+    Location: List[Literal["SGN", "NTR"]] = Field(min_length=1)
     Cost: int = Field(ge=1000)
     Quanty: int = Field(ge=1)
     Unit: Literal["gram", "ml", "ly", "trái", "gói"]
@@ -484,9 +486,6 @@ class Receipt(BaseModel):
 
 
 
-
-
-
 class Operation:
 
     def __init__(self):
@@ -512,18 +511,30 @@ class Operation:
 
 
 
-    async def retrieve_raw_ingredient(self, current_user: UserPublic, is_show_disable: bool = False) -> list[RawIngredient]:
+    async def retrieve_raw_ingredient(self, current_user: UserPublic, is_group: bool = False, is_show_disable: bool = False) -> list[RawIngredient] | Dict[str, RawIngredient]:
+        
+        dict_db_filter = {'Raw_Ingredient_ID': {'$exists': True, '$ne': None}}
+        
+        if not is_show_disable:
+            dict_db_filter |= {'Enable': True}
+        
+        if current_user.role != 'admin':
+            dict_db_filter |= {'Location': {'$in': [current_user.location]}}
 
-        lst_raw_ingredient = list()
+        obj_raw_ingredient = list() if not is_group else dict()
 
-        async for rig in self.clt_raw_ingredient.find({
-            'Raw_Ingredient_ID': {'$exists': True, '$ne': None},
-        } | {'Enable': True} if not is_show_disable else {}).sort({'Enable': -1}):
-
+        async for rig in self.clt_raw_ingredient.find(dict_db_filter).sort({'Enable': -1}):
+            
             rig_data = await self.convert_raw_ingredient(rig, current_user)
-            lst_raw_ingredient.append(rig_data)
+                
+            if isinstance(obj_raw_ingredient, dict):
+                obj_raw_ingredient.setdefault(rig_data.Group, []).append(rig_data)
+            
+            else:
+                obj_raw_ingredient.append(rig_data)
+            
 
-        return lst_raw_ingredient
+        return obj_raw_ingredient
 
 
 
@@ -666,14 +677,10 @@ class Operation:
     
     # Here
     async def retrieve_drink_v2(self, groupby: Literal['GROUP', 'ID', None], dict_filter_mongodb: dict, current_user: UserPublic) -> Dict[str, list[DrinkV2] | DrinkV2] | list[DrinkV2]:
-
-        if groupby is None:
-            drinks = list()
-        else:
-            drinks = dict()
+        
+        drinks = list() if (groupby is None) else dict()
         
         dict_full_igr = await self.get_full_ingredients(output_type='DICT', current_user=current_user)
-        
         
         async for drk in self.clt_drink_v2.find({
             'Drink_ID': {'$exists': True, '$ne': None},
