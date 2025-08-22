@@ -354,14 +354,56 @@ class DrinkV2(BaseModel):
 
 
 
+# STOCK HERE START
+class StockItemInsert(BaseModel):
+    Raw_Ingredient_ID: str = Field(pattern=r"^RIG\d+$")
+    Location: Literal['SGN', 'NTR']
+    email: str = Field(default=None)
+    Method: Literal['add', 'get', 'check'] = Field(default=None)
+    DateTime: datetime = Field(default=None)
+    Qty_Instock: float = Field(ge=0, le=100)
+    Qty_Outstock: float = Field(ge=0, le=100)
+    
+
+
+class StockItem(BaseModel):
+    id: str = Field(default_factory=ObjectId, alias='_id')
+    Raw_Ingredient_ID: str = Field(pattern=r"^RIG\d+$")
+    Location: Literal['SGN', 'NTR']
+    email: EmailStr
+    Method: Literal['add', 'get', 'check']
+    DateTime: datetime
+    Qty_Instock: float = Field(ge=0, le=100)
+    Qty_Outstock: float = Field(ge=0, le=100)
+
+
+    # Reference fields
+    Raw_Ingredient_Name: Annotated[str, Field(min_length=2, default=None)]
+    Quanty: Annotated[int, Field(ge=1, default=None)]
+    Unit: Annotated[Literal["gram", "ml", "ly", "trái", "gói"], Field(description="Must be in ['gram', 'ml', 'ly', 'trái', 'gói']", default=None)]
+
+
+    model_config = {
+        'populate_by_name': True,
+        'arbitrary_types_allowed': True,
+        'json_encoders': {
+            ObjectId: lambda oid: str(oid),
+            datetime: lambda dt: dt.strftime("%d/%m/%Y %H:%M"),
+        },
+    }
+
+
+    # @field_validator('Qty')
+    # @classmethod
+    # def value_not_zero(cls, qty: float) -> float:
+    #     if qty == 0:
+    #         raise ValueError('value must not be zero')
+    #     return qty
 
 
 
 
-
-
-
-
+# STOCK HERE END
 
 
 
@@ -465,6 +507,7 @@ class ReceiptItem(BaseModel):
     Margin_By_Size: Annotated[float, Field(ge=0, default=0)] = 0
 
 
+
 class Receipt(BaseModel):
     id: str = Field(default_factory=ObjectId, alias='_id')
     Location: Literal["SGN", "NTR"]
@@ -496,6 +539,7 @@ class Operation:
         self.clt_drink_v2 = mongo_db.hayladb['drink_v2']
         self.clt_fixed_cost = mongo_db.hayladb['fixed_cost']
         self.clt_inventory = mongo_db.hayladb['inventory']
+        self.clt_stock = mongo_db.hayladb['stock']
         self.clt_receipt = mongo_db.hayladb['receipt']
 
 
@@ -1066,13 +1110,73 @@ class Operation:
     
     
     
+    # STOCK HERE START
+    async def convert_stock(self, stock_item: dict) -> StockItem:
+        
+        stock_item_data = StockItem(**(jsonable_encoder(stock_item, custom_encoder={ObjectId: str})))
+
+        rig = await self.clt_raw_ingredient.find_one({'Raw_Ingredient_ID': {'$exists': True, '$eq': stock_item_data.Raw_Ingredient_ID}})
+        rig_data = jsonable_encoder(rig, custom_encoder={ObjectId: str})
+
+        # Reference fields
+        stock_item_data.Raw_Ingredient_Name = rig_data['Raw_Ingredient_Name']
+        stock_item_data.Quanty = rig_data['Quanty']
+        stock_item_data.Unit = rig_data['Unit']
+
+        return stock_item_data
+
+
+
+    # async def retrieve_inventory(self, dict_filter_mongodb: dict) -> list[InventoryItem]:
+    #     lst_inventory = list()
+
+    #     async for inv in self.clt_inventory.find({
+    #             'Raw_Ingredient_ID': {'$exists': True, '$ne': None}
+    #         } | dict_filter_mongodb).sort({'DateTime': -1}):
+            
+    #         inv_data = await self.convert_inventory(inv)
+    #         lst_inventory.append(inv_data)
+
+    #     return lst_inventory
+    
+    
+    
+    async def insert_stock_items(self, lst_item: list[StockItemInsert], current_user: UserPublic) -> list[StockItem]:
+        
+        try:
+            lst_stock_item_dump = list()
+            
+            for i in lst_item:
+                i.email = current_user.email
+                i.DateTime = datetime.now()
+                lst_stock_item_dump.append(i.model_dump(by_alias=True, exclude_none=True))
+
+            result = await self.clt_stock.insert_many(lst_stock_item_dump)
+
+        
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Could not insert stock item(s): {e}")
+
+
+        lst_stock_item = list()
+        
+        async for item in self.clt_stock.find(
+                {
+                    "_id": {"$in": result.inserted_ids},
+                    "email": current_user.email
+                }, 
+            ).sort({'DateTime': -1}):
+            
+            item_data = await self.convert_stock(item)
+            lst_stock_item.append(item_data)
+            
+        
+        return lst_stock_item
     
     
     
     
-    
-    
-    
+    # STOCK HERE END
     
     
     

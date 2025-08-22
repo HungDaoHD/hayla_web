@@ -65,7 +65,7 @@
               <form class="was-validated" id="form-stock">  
                 <div class="form-group row">
                   
-                  <div class="col-lg-6">
+                  <div class="col-lg-10 mb-3">
                     <select id="stock-method" class="form-select" required aria-label="select example">
                       <option value="">Tác vụ</option>
                       <option value="add">Nhập hàng</option>
@@ -74,57 +74,66 @@
                     </select>
                     <div class="invalid-feedback">Vui lòng chọn tác vụ</div>
                   </div>
-              
-                </div>
-                
-                
-                <!-- --------------------------------------->
-                <div class="dt-responsive table-responsive p-1">
+                  
+                  <div class="col-lg-2">
+                    <button id="btn-stock-submit" type="button" class="btn btn-primary w-100">
+                      <span class="btn-text">Submit</span>
+                      <span class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
+                    </button>
+                  </div>
 
-                  <table id="dt-stock" class="table table-striped table-bordered table-sm align-middle">
-                    <thead>
-                      <tr>
-                        <th class="text-center">#</th>
-                        <th>Name</th>
-                        <th>Trong kho</th>
-                        <th>Ngoài kho</th>
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      {% set ns = namespace(count=0) %}
-
-                      {% for grp, lst_rig in dict_raw_ingredient.items() %}
-
-                        {% for rig in lst_rig %}
-                          {% set ns.count = ns.count + 1 %}
-                          <tr data-id="{{ rig.Raw_Ingredient_ID }}" data-target="#{{ rig.Raw_Ingredient_ID }}-qty">
-                            
-                            <td class="text-center">
-                              <input type="checkbox" class="toggle-row" data-target="#{{ rig.Raw_Ingredient_ID }}-qty">
-                            </td>
-
-                            <td>{{ ns.count }}. {{ rig.Raw_Ingredient_Name }}</td>
-                            
-                            <td>
-                              <input type="number" id="{{ rig.Raw_Ingredient_ID }}-qty-instock" class="form-control d-none" name="{{ rig.Raw_Ingredient_ID }}-qty-instock" placeholder="Trong kho" disabled required>
-                            </td>
-                            
-                            <td>
-                              <input type="number" id="{{ rig.Raw_Ingredient_ID }}-qty-outstock" class="form-control d-none" name="{{ rig.Raw_Ingredient_ID }}-qty-outstock" placeholder="Ngoài kho" disabled required>
-                            </td>
-                          </tr>
-                        {% endfor %}
-                      
-                      {% endfor %}
-
-                      
-                      
-                    </tbody>
-                  </table>
-                </div>
-              
+                </div>  
               </form>
+                
+              <!-- --------------------------------------->
+              <div id="stock-table-container" class="dt-responsive table-responsive p-1">
+
+                <table id="dt-stock" class="table table-striped table-bordered table-sm align-middle">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Name</th>
+                      <th>Trong kho</th>
+                      <th>Ngoài kho</th>
+                    </tr>
+                  </thead>
+                
+                  <tbody>
+                    {% set ns = namespace(count=0) %}
+
+                    {% for grp, lst_rig in dict_raw_ingredient.items() %}
+
+                      {% for rig in lst_rig %}
+                        {% set ns.count = ns.count + 1 %}
+                        <tr data-id="{{ rig.Raw_Ingredient_ID }}" data-loc="{{ user.location }}" data-target="#{{ rig.Raw_Ingredient_ID }}-qty">
+                          
+                          <td>
+                            <div class="form-check">
+                              <input class="form-check-input toggle-row" type="checkbox" data-target="#{{ rig.Raw_Ingredient_ID }}-qty">
+                            </div>
+                          </td>
+
+                          <td>{{ ns.count }}. {{ rig.Raw_Ingredient_Name }}</td>
+                          
+                          <td>
+                            <input type="number" id="{{ rig.Raw_Ingredient_ID }}-qty-instock" class="form-control d-none" name="{{ rig.Raw_Ingredient_ID }}-qty-instock" placeholder="Trong kho" disabled required>
+                          </td>
+                          
+                          <td>
+                            <input type="number" id="{{ rig.Raw_Ingredient_ID }}-qty-outstock" class="form-control d-none" name="{{ rig.Raw_Ingredient_ID }}-qty-outstock" placeholder="Ngoài kho" disabled required>
+                          </td>
+                        </tr>
+                      {% endfor %}
+                    
+                    {% endfor %}
+
+                    
+                    
+                  </tbody>
+                </table>
+              </div>
+              
+              
               
 
             </div>
@@ -163,7 +172,8 @@
 
 <script>
   $(function () {
-    const $dt_recept = $('#dt-stock').DataTable({
+
+    const $dt_stock = $('#dt-stock').DataTable({
       responsive: true,  // let DataTables auto‑shrink & wrap columns
       scrollX:    false, // disable the horizontal scroll
       autoWidth:  true,  // allows table to grow to 100%
@@ -202,27 +212,147 @@
     $('.dataTables_length select').addClass('form-select form-select-sm');
     $('.dataTables_filter label').addClass('d-flex justify-content-end');
     $('.dataTables_filter input').addClass('form-control form-control-sm');
-
     
+    // On init disable submit button
+    const $btn_stock_submit = $("#btn-stock-submit");
+    $btn_stock_submit.prop('disabled', true);
+    
+
+    // On init hide column ngoài kho
+    const $qty_outstock_col = $dt_stock.column(3);
+    $qty_outstock_col.visible(false); 
+
+    $('#stock-method').on('change', function () {
+      
+      // uncheck ALL checkboxes across pages
+      $dt_stock.$('input[type="checkbox"]').prop('checked', false).trigger('change');
+
+      // clear text/number/date inputs
+      $dt_stock.$('input[type="text"], input[type="number"], input[type="date"], input[type="time"]').val('').trigger('input');
+
+      // reset any selects inside the table
+      $dt_stock.$('select').prop('selectedIndex', 0).trigger('change');
+
+
+      if ($(this).val() == 'add' || $(this).val() == 'get') {
+        $qty_outstock_col.visible(false);
+        $btn_stock_submit.prop('disabled', false);
+
+      }
+      else if ($(this).val() == 'check') {
+        $qty_outstock_col.visible(true);
+        $btn_stock_submit.prop('disabled', false);
+
+      } else {
+        $qty_outstock_col.visible(false);
+        $btn_stock_submit.prop('disabled', true);
+        
+      }
+
+    });
+
     $('.toggle-row').on('change', function () {
       const $qty_instock = $(`${$(this).data('target')}-instock`);
       const $qty_outstock = $(`${$(this).data('target')}-outstock`);
 
+      $qty_instock.val(null);
+      $qty_outstock.val(null);
 
       if (this.checked) {
         $qty_instock.removeClass('d-none').prop('disabled', false);
         $qty_outstock.removeClass('d-none').prop('disabled', false);
+        
       } else {
         $qty_instock.addClass('d-none').prop('disabled', true);
         $qty_outstock.addClass('d-none').prop('disabled', true);
       }
     });
 
+
+    $btn_stock_submit.on('click', function () {
+      
+      var total_qty = 0;
+
+      const docs = [];
+
+      $('#dt-stock tbody tr').each(function() {
+        const $tr = $(this);
+        
+        const inVal  = parseFloat($tr.find(`input[id='${$tr.data('id')}-qty-instock']`).val()) || 0;
+        const outVal = parseFloat($tr.find(`input[id='${$tr.data('id')}-qty-outstock']`).val()) || 0;
+        
+        if (inVal + outVal > 0)
+        {
+          total_qty += (inVal + outVal);
+
+          docs.push({
+            Raw_Ingredient_ID: $tr.data('id'),
+            Location: $tr.data('loc'),
+            Method: $('#stock-method').val(),
+            Qty_Instock: inVal,
+            Qty_Outstock: outVal,
+          });
+        }
+
+      });
+
+      console.log(docs);
+
+      if (total_qty == 0)
+      {
+        Swal.fire('Bạn chưa nhập bất kỳ số lượng nào!!!', '', 'error');
+        return;
+      }
+      
+      $btn_stock_submit.prop('disabled', true).find('.btn-text').text('Plaese wait…');
+      $btn_stock_submit.find('.spinner-border').removeClass('d-none');
+
+      Swal.fire({
+        title: `Bạn có muốn lưu dữ liệu đã nhập?`,
+        showDenyButton: true,
+        showCancelButton: false,
+        confirmButtonText: `Lưu`,
+        denyButtonText: `Không`
+      }).then((result) => {
+        
+        if (result.isDenied) 
+        {
+          Swal.fire('Bạn không lưu dữ liệu.', '', 'info');
+          return;
+        } 
+        else if (result.isConfirmed) {
+
+          $.ajax({
+            url: '/operation/stock/insert-items',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(docs),
+            success: function(resp) {
+
+              Swal.fire(`Lưu dữ liệu thành công!`, '', 'success').then(() => {
+                window.location.reload();
+              });
+              
+            },
+            error: function(xhr, status, err) {
+              console.error(xhr);
+              console.error(status);
+              console.error(err);
+              Swal.fire('Phát sinh lỗi. Dữ liệu chưa được lưu.', xhr.responseJSON.detail[0].msg, 'error');
+            }
+          });
+
+        }
+
+      });
+      
+    
+    });
+  
+  
   });
 
   
-
-
 
 
 

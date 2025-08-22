@@ -5,7 +5,7 @@ from fastapi.templating import Jinja2Templates
 
 from routers.auth.oauth2 import require_role
 from mvc.users import UserPublic
-from mvc.operation import Operation, InventoryItemInsert, DrinkUpdate
+from mvc.operation import Operation, InventoryItemInsert, DrinkUpdate, StockItemInsert
 
 
 lst_role = ['Admin', 'Staff']
@@ -207,7 +207,9 @@ async def upload_receipt(upload_file: UploadFile = File(...), current_user: User
     return dict_upload_status
 
 
-# STOCK HERE
+
+
+# STOCK HERE ----------------------------------------------------------------------------------------------------------------------
 @router.get('/stock', response_class=HTMLResponse)
 async def page_stock(request: Request, current_user: UserPublic = Depends(require_role(role=lst_role))):
     
@@ -223,3 +225,10 @@ async def page_stock(request: Request, current_user: UserPublic = Depends(requir
 
 
 
+@router.post('/stock/insert-items', response_class=JSONResponse)
+async def inventory_add_items(lst_item: list[StockItemInsert], current_user: UserPublic = Depends(require_role(role=lst_role))):
+
+    opt = Operation()
+    lst_item = await opt.insert_stock_items(lst_item, current_user)
+    
+    return JSONResponse(content=[i.model_dump(mode='json') for i in lst_item])
