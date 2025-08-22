@@ -14,8 +14,8 @@
     <meta name="author" content="CodedThemes">
 
     <!-- [Favicon] icon -->
-    <link rel="icon" href="{{ request.url_for('static', path='images/favicon.svg') }}" type="image/x-icon"> 
-    <!--    <link rel="icon" href="{{ request.url_for('static', path='images/hayla_favicon.png') }}" type="image/x-icon"> -->
+    <!-- <link rel="icon" href="{{ request.url_for('static', path='images/favicon.svg') }}" type="image/x-icon">  -->
+    <link rel="icon" href="{{ request.url_for('static', path='images/hayla_favicon.png') }}" type="image/x-icon">
 
     <!-- [Google Font] Family -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" id="main-font-link">
@@ -68,7 +68,8 @@
         <div class="m-header">
           <a href="/" class="b-brand text-primary">
             <!-- ========   Change your logo from here   ============ -->
-            <img src="{{ request.url_for('static', path='images/logo-dark.svg') }}" class="img-fluid logo" alt="logo">
+            <!-- <img src="{{ request.url_for('static', path='images/logo-dark.svg') }}" class="img-fluid logo" alt="logo"> -->
+            <img src="{{ request.url_for('static', path='images/hayla_icon.png') }}" class="img-fluid logo" alt="logo">
           </a>
         </div>
 
