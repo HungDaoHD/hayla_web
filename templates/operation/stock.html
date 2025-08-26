@@ -414,7 +414,7 @@
         $dt_stock_items.DataTable().destroy();
       }
       $dt_stock_items.empty();
-      
+
       // define the columns you want
       const cols = [
         { title: '#'},
@@ -490,7 +490,7 @@
       $(wrap + ' .dataTables_filter input').addClass('form-control form-control-sm');
     }
 
-    $stock_items_container.addClass('d-none');
+    $dt_stock_items.addClass('d-none');
     $stt_loading.removeClass('d-none');
 
     function fnc_init_stock_items() {
@@ -522,14 +522,13 @@
       console.log('#pills-items-tab activated!');
 
       $stt_loading.removeClass('d-none');
-      $stock_items_container.addClass('d-none');
+      $dt_stock_items.addClass('d-none');
 
       fnc_init_stock_items?.();
 
       $stt_loading.addClass('d-none');
-      $stock_items_container.removeClass('d-none');
-
-    
+      $dt_stock_items.removeClass('d-none');
+			
     });
 
     // // also run on first load if it's already active
@@ -542,7 +541,7 @@
 
   });
 
-  
+
 
 
 
