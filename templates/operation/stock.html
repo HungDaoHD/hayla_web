@@ -141,15 +141,13 @@
           <div class="card">
             <div class="card-body">
               
-              <div id="stock-items-table-container" class="dt-responsive table-responsive p-1">
-                
-                <div class="stt-loading">
-                  <span class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true"></span>Loading, please wait...
-                </div>
+							<div class="stt-loading">
+								<span class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true"></span>Loading, please wait...
+							</div>
 
+              <div id="stock-items-table-container" class="dt-responsive table-responsive">
                 
-
-                <table id="dt-stock-items" class="table table-striped table-bordered table-sm align-middle">
+                <table id="dt-stock-items" class="table table-striped table-bordered table-sm align-middle mobile-cards">
                   
                 </table>
 
@@ -399,8 +397,8 @@
   // Tab ITEMS
   $(function () {
     
+		const $stt_loading = $('#pills-items').find('.stt-loading');
     const $stock_items_container = $('#stock-items-table-container');
-    const $stt_loading = $stock_items_container.find('.stt-loading');
     const $dt_stock_items = $('#dt-stock-items');
 
     // small helpers
@@ -491,13 +489,13 @@
     }
 
 		$stt_loading.removeClass('d-none');
-    $dt_stock_items.addClass('d-none');
+    $stock_items_container.addClass('d-none');
     
     function fnc_init_stock_items() {
       
       $stt_loading.removeClass('d-none');
-			$dt_stock_items.addClass('d-none');
-
+			$stock_items_container.addClass('d-none');
+			
       $.ajax({
         url: '/operation/stock/retrieve-items',
         method: 'GET',
@@ -505,8 +503,10 @@
 					
           renderStockItemsTable(resp);
           
-					$stt_loading.addClass('d-none');
-      		$dt_stock_items.removeClass('d-none');
+					setInterval(() => {
+						$stt_loading.addClass('d-none');
+      			$stock_items_container.removeClass('d-none');
+					}, 1000);
 
         },
         error: function(xhr, status, err) {
