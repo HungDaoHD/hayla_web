@@ -62,3 +62,65 @@
 
 
 
+/* mobile card layout */
+@media (max-width: 576px) {
+  .mobile-cards thead { display:none; }
+
+  .mobile-cards tbody { display:block; }
+  .mobile-cards tr {
+    display: grid;
+    grid-template-columns: 1fr auto; /* left content | right numbers */
+    gap: .25rem .75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: .5rem;
+    background: #fff;
+    padding: .5rem .75rem;
+    margin-bottom: .75rem;
+    box-sizing: border-box;
+  }
+
+  .mobile-cards td {
+    border: 0 !important;
+    padding: .25rem 0 !important;
+  }
+
+  /* show column labels */
+  .mobile-cards td::before {
+    content: attr(data-label) ": ";
+    display: inline;
+    font-size: .72rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: .02em;
+    margin-bottom: .1rem;
+  }
+
+
+
+  /* checkbox row spans full width at the very top */
+  .mobile-cards td:first-child {
+    grid-column: 1 / -1;
+    padding-bottom: .35rem !important;
+    border-bottom: 1px solid #eceff3 !important;
+  }
+  .mobile-cards td:first-child::before { content: '' !important; }
+
+
+  /* put stock numbers on the right column */
+  .mobile-cards td[data-label="TRONG KHO"],
+  .mobile-cards td[data-label="NGOÀI KHO"] {
+    grid-column: 2;
+    text-align: right;
+  }
+
+  /* everything else stays in the left column */
+  .mobile-cards td:not([data-label="TRONG KHO"]):not([data-label="NGOÀI KHO"]) {
+    grid-column: 1;
+  }
+}
+
+
+
+
+
+

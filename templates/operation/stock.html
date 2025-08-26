@@ -92,7 +92,7 @@
                   <thead>
                     <tr>
                       <th>#</th>
-                      <th>Name</th>
+                      <th>Nguyên liệu</th>
                       <th>Trong kho</th>
                       <th>Ngoài kho</th>
                     </tr>
@@ -140,14 +140,22 @@
           
           <div class="card">
             <div class="card-body">
-              
+							
+							<div class="text-end p-2 pb-2">
+								<button id="btn-delete-items" class="btn btn-danger" disabled>
+									<i class="ti ti-trash"></i> Xóa <span class="count"></span>
+								</button>
+							</div>
+
+							
+
 							<div class="stt-loading">
 								<span class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true"></span>Loading, please wait...
 							</div>
 
               <div id="stock-items-table-container" class="dt-responsive table-responsive">
                 
-                <table id="dt-stock-items" class="table table-striped table-bordered table-sm align-middle mobile-cards">
+                <table id="dt-stock-items" class="table table-hover table-bordered table-sm align-middle mobile-cards">
                   
                 </table>
 
@@ -416,14 +424,10 @@
       // define the columns you want
       const cols = [
         { title: '#'},
-        { title: 'DateTime'},
-        { title: 'By'},
-        
-        {% if user.role.lower() == 'admin' %}
-          { title: 'Name'},
-        {% endif %}
-        
-        { title: 'Method'},
+				{ title: 'Nguyên liệu'},
+        { title: 'Ngày Giờ'},
+        { title: 'Tài khoản'},
+        { title: 'Tác vụ'},
         { title: 'Trong kho'},
         { title: 'Ngoài kho'},
       ];
@@ -436,32 +440,30 @@
         ${rows.map((r, i) => `
           <tr data-id="${esc(r.id)}">
 
-            <td>
+            <td data-label="">
               <div class="form-check">
-                <input class="form-check-input toggle-row" type="checkbox">
+                <input class="form-check-input select-row" type="checkbox">
               </div>
             </td>
 
-            <td>${esc(r.DateTime)}</td>
+						<td data-label="Nguyên liệu">${esc(r.Raw_Ingredient_Name)}</td>
+            <td data-label="Ngày giờ">${esc(r.DateTime)}</td>
+            <td data-label="Tài khoản">${esc(r.email)}</td>
             
-            {% if user.role.lower() == 'admin' %}
-              <td>${esc(r.email)}</td>
-            {% endif %}
-
-            <td>${esc(r.Raw_Ingredient_Name)}</td>
-            <td>
-              <span class="badge bg-light-${methodColor(r.Method)} border border-${methodColor(r.Method)}">
+            <td data-label="Tác vụ">
+              <span class="badge bg-light-${methodColor(r.Method)} border border-${methodColor(r.Method)} f-14">
                 ${esc(r.Method)}
               </span>
             </td>
-            <td class="text-end">${num(r.Qty_Instock)}</td>
-            <td class="text-end">${num(r.Qty_Outstock)}</td>
+            <td data-label="Trong kho" class="text-end">${num(r.Qty_Instock)}</td>
+            <td data-label="Ngoài kho" class="text-end">${num(r.Qty_Outstock)}</td>
           </tr>
         `).join('')}
       </tbody>`;
 
       // insert and (re)initialize DataTables
       $dt_stock_items.html(thead + tbody).DataTable({
+				responsive: false, // we’ll do our own card layout
         dom:
           "<'row g-2 p-2 mb-3'<'col-sm-8'l><'col-sm-4'f>>" +
           "t" +
@@ -493,44 +495,132 @@
     
     function fnc_init_stock_items() {
       
-      $stt_loading.removeClass('d-none');
+			$stt_loading.removeClass('d-none');
 			$stock_items_container.addClass('d-none');
-			
-      $.ajax({
-        url: '/operation/stock/retrieve-items',
-        method: 'GET',
-        success: function(resp) {
+
+			$.ajax({
+				url: '/operation/stock/retrieve-items',
+				method: 'GET',
+				success: function(resp) {
 					
-          renderStockItemsTable(resp);
-          
+					renderStockItemsTable(resp);
+					
 					setInterval(() => {
 						$stt_loading.addClass('d-none');
-      			$stock_items_container.removeClass('d-none');
+						$stock_items_container.removeClass('d-none');
 					}, 1000);
-
-        },
-        error: function(xhr, status, err) {
-          console.error(xhr);
-          console.error(status);
-          console.error(err);
-          Swal.fire('Phát sinh lỗi.', xhr.responseJSON.detail[0].msg, 'error');
-        }
-      });
+					
+				},
+				error: function(xhr, status, err) {
+					console.error(xhr);
+					console.error(status);
+					console.error(err);
+					Swal.fire('Phát sinh lỗi.', xhr.responseJSON.detail[0].msg, 'error');
+				}
+			});
 
     }
     
     // fires when the Items pill becomes active
     $('#pills-items-tab').on('shown.bs.tab', function (e) {
       // e.target is the newly activated <a>
-      console.log('#pills-items-tab activated!');
+			console.log('#pills-items-tab showed!');
       fnc_init_stock_items?.();
-    });
+		});
+		
+		// fires AFTER the Items tab is deactivated
+		$('#pills-items-tab').on('hidden.bs.tab', function (e) {
+			console.log('Items tab is now inactive');
+			$stt_loading.removeClass('d-none');
+			$stock_items_container.addClass('d-none');
+		});
 
     // also run on first load if it's already active
     if ($('#pills-items').hasClass('active')) {
       console.log('#pills-items activated!');
       fnc_init_stock_items?.();
     }
+
+
+		// DELETE STOCK ITEMS
+		const dt = $.fn.DataTable.isDataTable($dt_stock_items) ? $dt_stock_items.DataTable() : null;
+
+		// helper: get all checked rows (works across pages if DataTables is used)
+		function getSelected() {
+			const $checks = dt ? dt.$('input.select-row:checked') : $dt_stock_items.find('input.select-row:checked');
+
+			const ids  = [];
+			const rows = [];
+
+			$checks.each(function () {
+				const $tr = $(this).closest('tr');
+				const id  = $tr.data('id');
+				if (id) { ids.push(id); rows.push($tr); }
+			});
+			return { ids, rows };
+		}
+
+		// enable/disable delete button when selection changes
+		$(document).on('change', '#dt-stock-items input.select-row', function () {
+			const n = getSelected().ids.length;
+			$('#btn-delete-items').prop('disabled', n === 0).find('.count').text(n ? `(${n})` : '');
+		});
+
+		
+		// delete click
+		$('#btn-delete-items').on('click', function () {
+			const { ids, rows } = getSelected();
+			if (!ids.length) return;
+
+			console.log(ids);
+			
+
+			Swal.fire({
+				title: `Xóa ${ids.length} mục?`,
+				text: 'Thao tác không thể hoàn tác.',
+				icon: 'warning',
+				showCancelButton: true,
+				confirmButtonText: 'Xóa',
+				cancelButtonText: 'Hủy',
+				confirmButtonColor: '#dc3545'
+			}).then(res => {
+
+				if (!res.isConfirmed) return;
+
+				const $btn = $('#btn-delete-items').prop('disabled', true).addClass('disabled');
+				
+				$.ajax({
+					url: '/operation/stock/delete-items',
+					method: 'POST',
+					contentType: 'application/json',
+					data: JSON.stringify({ ids }),
+
+					success: function (resp) {
+						
+						if (dt) {
+							rows.forEach($tr => dt.row($tr).remove());
+							dt.draw(false);
+						} else {
+							rows.forEach($tr => $tr.remove());
+						}
+
+						$('#btn-delete-items').prop('disabled', true).removeClass('disabled').find('.count').text('');
+						Swal.fire('Đã xóa!', '', 'success');
+					
+					},
+
+					error: function (xhr) {
+						const msg = xhr.responseJSON?.detail || xhr.statusText || 'Error';
+						Swal.fire('Xóa thất bại', msg, 'error');
+					},
+					
+					complete: function () {
+						$btn.prop('disabled', false).removeClass('disabled');
+					}
+				});
+			
+			});
+		});
 
 
 

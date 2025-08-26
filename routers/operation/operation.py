@@ -5,7 +5,7 @@ from fastapi.templating import Jinja2Templates
 
 from routers.auth.oauth2 import require_role
 from mvc.users import UserPublic
-from mvc.operation import Operation, InventoryItemInsert, DrinkUpdate, StockItemInsert
+from mvc.operation import Operation, InventoryItemInsert, DrinkUpdate, StockItemInsert, DeleteStockItems
 
 
 lst_role = ['Admin', 'Staff']
@@ -240,8 +240,18 @@ async def add_stock_items(lst_item: list[StockItemInsert], current_user: UserPub
 async def retrieve_stock_items(current_user: UserPublic = Depends(require_role(role=lst_role))):
 
     opt = Operation()
-    lst_item = await opt.retrieve_stock(dict_filter_mongodb={}, current_user=current_user)
+    lst_item = await opt.retrieve_stock_items(dict_filter_mongodb={}, current_user=current_user)
     
     
     return JSONResponse(content=[i.model_dump(mode='json') for i in lst_item])
+
+
+
+@router.post('/stock/delete-items', response_class=JSONResponse)
+async def delete_stock_items(lst_id: DeleteStockItems, current_user: UserPublic = Depends(require_role(role=lst_role))):
+
+    opt = Operation()
+    lst_item = await opt.delete_stock_items(lst_id=lst_id, current_user=current_user)
     
+    
+    return JSONResponse(content=[i.model_dump(mode='json') for i in lst_item])

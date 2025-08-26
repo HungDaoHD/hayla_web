@@ -4,7 +4,8 @@ from pydantic import BaseModel, Field, field_validator, model_validator, compute
 from typing import Optional, Literal, Union, Dict, List, Annotated
 from bson import ObjectId
 from pymongo import ReturnDocument, UpdateOne
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 from fastapi import HTTPException, UploadFile
 from fastapi.encoders import jsonable_encoder
 
@@ -393,12 +394,8 @@ class StockItem(BaseModel):
     }
 
 
-    # @field_validator('Qty')
-    # @classmethod
-    # def value_not_zero(cls, qty: float) -> float:
-    #     if qty == 0:
-    #         raise ValueError('value must not be zero')
-    #     return qty
+class DeleteStockItems(BaseModel):
+    ids: list[str]
 
 
 
@@ -541,7 +538,7 @@ class Operation:
         self.clt_inventory = mongo_db.hayladb['inventory']
         self.clt_stock = mongo_db.hayladb['stock']
         self.clt_receipt = mongo_db.hayladb['receipt']
-
+        self.local_tz = ZoneInfo("Asia/Ho_Chi_Minh")
 
 
     @staticmethod
@@ -1127,7 +1124,7 @@ class Operation:
 
 
 
-    async def retrieve_stock(self, dict_filter_mongodb: dict, current_user: UserPublic) -> list[StockItem]:
+    async def retrieve_stock_items(self, dict_filter_mongodb: dict, current_user: UserPublic) -> list[StockItem]:
         lst_stock = list()
 
         dict_filter = dict_filter_mongodb.copy() if dict_filter_mongodb else dict()
@@ -1136,7 +1133,7 @@ class Operation:
         
         if current_user.role.lower() not in ['admin']:
             
-            since = datetime.now(timezone.utc) - timedelta(days=7)
+            since = datetime.now(self.local_tz) - timedelta(days=7)
             dict_filter.update({
                 'DateTime': {'$gte': since},
                 'email': current_user.email
@@ -1158,7 +1155,7 @@ class Operation:
             
             for i in lst_item:
                 i.email = current_user.email
-                i.DateTime = datetime.now(timezone.utc)
+                i.DateTime = datetime.now(self.local_tz)
                 lst_stock_item_dump.append(i.model_dump(by_alias=True, exclude_none=True))
 
             result = await self.clt_stock.insert_many(lst_stock_item_dump)
@@ -1184,6 +1181,33 @@ class Operation:
         return lst_stock_item
     
     
+    
+    async def delete_stock_items(self, lst_id: DeleteStockItems, current_user: UserPublic) -> list[StockItem]:
+        
+        try:
+            
+            obj_ids = [ObjectId(x) for x in lst_id.ids]
+            
+            dict_del_query = {"_id": {"$in": obj_ids}}
+            
+            
+            if current_user.role.lower() not in ['admin']:
+                dict_del_query.update({'email': current_user.email})
+            
+            result = await self.clt_stock.delete_many(dict_del_query)
+            
+            if result.deleted_count == 0:
+                raise HTTPException(status_code=400, detail=f"Could not find item(s) to delete.")
+            
+        
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Could not delete stock item(s): {e}")
+
+
+        
+        lst_stock_item = await self.retrieve_stock_items(dict_filter_mongodb={}, current_user=current_user)
+        
+        return lst_stock_item
     
     
     # STOCK HERE END
