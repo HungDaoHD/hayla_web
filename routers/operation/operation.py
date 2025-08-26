@@ -226,9 +226,22 @@ async def page_stock(request: Request, current_user: UserPublic = Depends(requir
 
 
 @router.post('/stock/insert-items', response_class=JSONResponse)
-async def inventory_add_items(lst_item: list[StockItemInsert], current_user: UserPublic = Depends(require_role(role=lst_role))):
+async def add_stock_items(lst_item: list[StockItemInsert], current_user: UserPublic = Depends(require_role(role=lst_role))):
 
     opt = Operation()
     lst_item = await opt.insert_stock_items(lst_item, current_user)
     
     return JSONResponse(content=[i.model_dump(mode='json') for i in lst_item])
+
+
+
+
+@router.get('/stock/retrieve-items', response_class=JSONResponse)
+async def retrieve_stock_items(current_user: UserPublic = Depends(require_role(role=lst_role))):
+
+    opt = Operation()
+    lst_item = await opt.retrieve_stock(dict_filter_mongodb={}, current_user=current_user)
+    
+    
+    return JSONResponse(content=[i.model_dump(mode='json') for i in lst_item])
+    

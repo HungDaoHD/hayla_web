@@ -30,7 +30,7 @@
 {% block main_content %}
 
 <!-- TAB NAME -->
-{% set lst_tabname = ['input', 'summary', 'items'] %}
+{% set lst_tabname = ['input', 'items', 'summary'] %}
 
 <ul class="nav nav-pills p-2" id="pills-tab" role="tablist">
 
@@ -76,7 +76,7 @@
                   </div>
                   
                   <div class="col-lg-2">
-                    <button id="btn-stock-submit" type="button" class="btn btn-primary w-100">
+                    <button id="btn-stock-submit" type="button" class="btn btn-primary w-100" disabled>
                       <span class="btn-text">Submit</span>
                       <span class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
                     </button>
@@ -85,7 +85,7 @@
                 </div>  
               </form>
                 
-              <!-- --------------------------------------->
+              <!-- INPUT TABLE--------------------------------------->
               <div id="stock-table-container" class="dt-responsive table-responsive p-1">
 
                 <table id="dt-stock" class="table table-striped table-bordered table-sm align-middle">
@@ -133,21 +133,43 @@
                 </table>
               </div>
               
-              
-              
-
             </div>
           </div>
         
-        {% elif tabname == 'summary' %}
+        {% elif tabname == 'items' %}
+          
+          <div class="card">
+            <div class="card-body">
+              
+              <div id="stock-items-table-container" class="dt-responsive table-responsive p-1">
+                
+                <div class="stt-loading">
+                  <span class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true"></span>Loading, please wait...
+                </div>
 
-          {{ 'Here is '  ~ tabname }}
+                
 
-        
+                <table id="dt-stock-items" class="table table-striped table-bordered table-sm align-middle">
+                  
+                </table>
+
+              </div>
+              
+            </div>
+
+          </div>
+          
         {% else %}
           
-          {{ 'Here is ' ~ tabname }}
-        
+          <div class="card">
+            <div class="card-body">
+              
+              {{ 'here is ' ~ tabname }}
+
+              
+            </div>
+          </div>
+          
         {% endif %}
       
     </div>
@@ -171,8 +193,10 @@
 <script src="{{ request.url_for('static', path='js/plugins/dataTables.bootstrap5.min.js') }}"></script>
 
 <script>
+  // Tab INPUT
   $(function () {
 
+    // Define input table
     const $dt_stock = $('#dt-stock').DataTable({
       responsive: true,  // let DataTables auto‑shrink & wrap columns
       scrollX:    false, // disable the horizontal scroll
@@ -213,27 +237,49 @@
     $('.dataTables_filter label').addClass('d-flex justify-content-end');
     $('.dataTables_filter input').addClass('form-control form-control-sm');
     
-    // On init disable submit button
+
+    // Define elements
     const $btn_stock_submit = $("#btn-stock-submit");
-    $btn_stock_submit.prop('disabled', true);
-    
-
-    // On init hide column ngoài kho
     const $qty_outstock_col = $dt_stock.column(3);
-    $qty_outstock_col.visible(false); 
 
-    $('#stock-method').on('change', function () {
-      
+
+    // Clear all dt-stock input
+    function fnc_clear_dtstock_input() {
       // uncheck ALL checkboxes across pages
       $dt_stock.$('input[type="checkbox"]').prop('checked', false).trigger('change');
 
       // clear text/number/date inputs
       $dt_stock.$('input[type="text"], input[type="number"], input[type="date"], input[type="time"]').val('').trigger('input');
+    };
 
-      // reset any selects inside the table
-      $dt_stock.$('select').prop('selectedIndex', 0).trigger('change');
+    // Create "on init items" function
+    function fnc_init_input() {
+      
+      // On init disable submit button
+      $btn_stock_submit.prop('disabled', true).find('.btn-text').text('Submit');
+      $btn_stock_submit.find('.spinner-border').addClass('d-none');
+      
+      
+      // On init hide column ngoài kho
+      $qty_outstock_col.visible(false);
+
+      // Clear all dt-stock input
+      fnc_clear_dtstock_input();
+
+      // clear method input
+      $('#stock-method').val('');
+      
+    };
 
 
+    // call initialize function
+    fnc_init_input();
+
+
+    $('#stock-method').on('change', function () {
+      
+      fnc_clear_dtstock_input();
+      
       if ($(this).val() == 'add' || $(this).val() == 'get') {
         $qty_outstock_col.visible(false);
         $btn_stock_submit.prop('disabled', false);
@@ -272,7 +318,6 @@
     $btn_stock_submit.on('click', function () {
       
       var total_qty = 0;
-
       const docs = [];
 
       $('#dt-stock tbody tr').each(function() {
@@ -296,15 +341,13 @@
 
       });
 
-      console.log(docs);
-
       if (total_qty == 0)
       {
         Swal.fire('Bạn chưa nhập bất kỳ số lượng nào!!!', '', 'error');
         return;
       }
       
-      $btn_stock_submit.prop('disabled', true).find('.btn-text').text('Plaese wait…');
+      $btn_stock_submit.prop('disabled', true).find('.btn-text').text('Pleaese wait…');
       $btn_stock_submit.find('.spinner-border').removeClass('d-none');
 
       Swal.fire({
@@ -317,9 +360,10 @@
         
         if (result.isDenied) 
         {
-          Swal.fire('Bạn không lưu dữ liệu.', '', 'info');
+          $btn_stock_submit.prop('disabled', false).find('.btn-text').text('Submit');
+          $btn_stock_submit.find('.spinner-border').addClass('d-none');
           return;
-        } 
+        }
         else if (result.isConfirmed) {
 
           $.ajax({
@@ -329,8 +373,8 @@
             data: JSON.stringify(docs),
             success: function(resp) {
 
-              Swal.fire(`Lưu dữ liệu thành công!`, '', 'success').then(() => {
-                window.location.reload();
+              Swal.fire('Lưu dữ liệu thành công!', '', 'success').then(() => {
+                fnc_init_input();
               });
               
             },
@@ -350,6 +394,150 @@
     });
   
   
+  });
+
+  // Tab ITEMS
+  $(function () {
+    
+    const $stock_items_container = $('#stock-items-table-container');
+    const $stt_loading = $stock_items_container.find('.stt-loading');
+    const $dt_stock_items = $('#dt-stock-items');
+
+    // small helpers
+    const esc = s => $('<div>').text(s ?? '').html();
+    const num = v => (v ?? 0).toLocaleString('en-US', { maximumFractionDigits: 2 });
+    const methodColor = m => ({ add: 'primary', get: 'warning', check: 'info' }[m] || 'info');
+
+    function renderStockItemsTable(rows) {
+      // destroy any existing DataTable instance
+      if ($.fn.DataTable.isDataTable($dt_stock_items)) {
+        $dt_stock_items.DataTable().destroy();
+      }
+      $dt_stock_items.empty();
+
+      // define the columns you want
+      const cols = [
+        { title: '#'},
+        { title: 'DateTime'},
+        { title: 'By'},
+        
+        {% if user.role.lower() == 'admin' %}
+          { title: 'Name'},
+        {% endif %}
+        
+        { title: 'Method'},
+        { title: 'Trong kho'},
+        { title: 'Ngoài kho'},
+      ];
+      
+      // build thead
+      const thead = `<thead><tr>${cols.map(c => `<th>${c.title}</th>`).join('')}</tr></thead>`;
+      
+      // build tbody
+      const tbody = `<tbody>
+        ${rows.map((r, i) => `
+          <tr data-id="${esc(r.id)}">
+
+            <td>
+              <div class="form-check">
+                <input class="form-check-input toggle-row" type="checkbox">
+              </div>
+            </td>
+
+            <td>${esc(r.DateTime)}</td>
+            
+            {% if user.role.lower() == 'admin' %}
+              <td>${esc(r.email)}</td>
+            {% endif %}
+
+            <td>${esc(r.Raw_Ingredient_Name)}</td>
+            <td>
+              <span class="badge bg-light-${methodColor(r.Method)} border border-${methodColor(r.Method)}">
+                ${esc(r.Method)}
+              </span>
+            </td>
+            <td class="text-end">${num(r.Qty_Instock)}</td>
+            <td class="text-end">${num(r.Qty_Outstock)}</td>
+          </tr>
+        `).join('')}
+      </tbody>`;
+
+      // insert and (re)initialize DataTables
+      $dt_stock_items.html(thead + tbody).DataTable({
+        dom:
+          "<'row g-2 p-2 mb-3'<'col-sm-8'l><'col-sm-4'f>>" +
+          "t" +
+          "<'row g-2 p-2 mt-3'<'col-sm-8'i><'col-sm-4'p>>",
+        pageLength: 10,
+        order: [[0, 'desc']], // default sort by #; change if you prefer
+        language: {
+          lengthMenu: 'Show _MENU_ entries',
+          search: '',
+          searchPlaceholder: 'Search…',
+          paginate: {
+            first:    '<i class="ti ti-chevrons-left"></i>',
+            previous: '<i class="ti ti-chevron-left"></i>',
+            next:     '<i class="ti ti-chevron-right"></i>',
+            last:     '<i class="ti ti-chevrons-right"></i>'
+          }
+        }
+      });
+
+      // style the controls for this table only
+      const wrap = '#dt-stock-items_wrapper';
+      $(wrap + ' .dataTables_length select').addClass('form-select form-select-sm');
+      $(wrap + ' .dataTables_filter label').addClass('d-flex justify-content-end');
+      $(wrap + ' .dataTables_filter input').addClass('form-control form-control-sm');
+    }
+
+
+
+
+
+    $stt_loading.removeClass('d-none');
+
+    function fnc_init_stock_items() {
+      
+      $stt_loading.removeClass('d-none');
+
+      $.ajax({
+        url: '/operation/stock/retrieve-items',
+        method: 'GET',
+        success: function(resp) {
+
+          $stt_loading.addClass('d-none');
+          renderStockItemsTable(resp);
+          
+        },
+        error: function(xhr, status, err) {
+          console.error(xhr);
+          console.error(status);
+          console.error(err);
+          Swal.fire('Phát sinh lỗi.', xhr.responseJSON.detail[0].msg, 'error');
+        }
+      });
+
+    }
+    
+    // fires when the Items pill becomes active
+    $('#pills-items-tab').on('shown.bs.tab', function (e) {
+
+      // e.target is the newly activated <a>
+      console.log('#pills-items-tab activated!');
+      fnc_init_stock_items?.();
+    
+    
+    
+    });
+
+    // also run on first load if it's already active
+    if ($('#pills-items').hasClass('active')) {
+      console.log('#pills-items activated!');
+      fnc_init_stock_items?.();
+    }
+
+
+
   });
 
   

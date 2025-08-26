@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field, field_validator, model_validator, compute
 from typing import Optional, Literal, Union, Dict, List, Annotated
 from bson import ObjectId
 from pymongo import ReturnDocument, UpdateOne
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from fastapi import HTTPException, UploadFile
 from fastapi.encoders import jsonable_encoder
 
@@ -388,7 +388,7 @@ class StockItem(BaseModel):
         'arbitrary_types_allowed': True,
         'json_encoders': {
             ObjectId: lambda oid: str(oid),
-            datetime: lambda dt: dt.strftime("%d/%m/%Y %H:%M"),
+            datetime: lambda dt: dt.strftime("%d/%m/%y %H:%M"),
         },
     }
 
@@ -1127,17 +1127,27 @@ class Operation:
 
 
 
-    # async def retrieve_inventory(self, dict_filter_mongodb: dict) -> list[InventoryItem]:
-    #     lst_inventory = list()
+    async def retrieve_stock(self, dict_filter_mongodb: dict, current_user: UserPublic) -> list[StockItem]:
+        lst_stock = list()
 
-    #     async for inv in self.clt_inventory.find({
-    #             'Raw_Ingredient_ID': {'$exists': True, '$ne': None}
-    #         } | dict_filter_mongodb).sort({'DateTime': -1}):
+        dict_filter = dict_filter_mongodb.copy() if dict_filter_mongodb else dict()
+        
+        dict_filter.update({'Raw_Ingredient_ID': {'$exists': True, '$ne': None}})
+        
+        if current_user.role.lower() not in ['admin']:
             
-    #         inv_data = await self.convert_inventory(inv)
-    #         lst_inventory.append(inv_data)
+            since = datetime.now(timezone.utc) - timedelta(days=7)
+            dict_filter.update({
+                'DateTime': {'$gte': since},
+                'email': current_user.email
+            })
+            
+        async for item in self.clt_stock.find(dict_filter).sort({'DateTime': -1}):
+            
+            item_data = await self.convert_stock(item)
+            lst_stock.append(item_data)
 
-    #     return lst_inventory
+        return lst_stock
     
     
     
@@ -1148,7 +1158,7 @@ class Operation:
             
             for i in lst_item:
                 i.email = current_user.email
-                i.DateTime = datetime.now()
+                i.DateTime = datetime.now(timezone.utc)
                 lst_stock_item_dump.append(i.model_dump(by_alias=True, exclude_none=True))
 
             result = await self.clt_stock.insert_many(lst_stock_item_dump)
