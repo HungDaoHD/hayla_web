@@ -100,7 +100,7 @@ class ProcessedIngredient(BaseModel):
     Quanty: int = Field(ge=1)
     Unit: Literal["ml", "gram"]
 
-
+    
     # Calculated fields
     Total_Cost: Annotated[float, Field(ge=1000, default=0)]
     Cost_Per_Unit: Annotated[float, Field(ge=1, default=None)]

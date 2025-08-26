@@ -413,6 +413,7 @@
     const esc = s => $('<div>').text(s ?? '').html();
     const num = v => (v ?? 0).toLocaleString('en-US', { maximumFractionDigits: 2 });
     const methodColor = m => ({ add: 'primary', get: 'warning', check: 'info' }[m] || 'info');
+		const methodLabel = m => ({ add: 'Nhập hàng', get: 'Lấy hàng', check: 'Kiểm kho' }[m] || 'info');
 
     function renderStockItemsTable(rows) {
       // destroy any existing DataTable instance
@@ -452,7 +453,7 @@
             
             <td data-label="Tác vụ">
               <span class="badge bg-light-${methodColor(r.Method)} border border-${methodColor(r.Method)} f-14">
-                ${esc(r.Method)}
+                ${esc(methodLabel(r.Method))}
               </span>
             </td>
             <td data-label="Trong kho" class="text-end">${num(r.Qty_Instock)}</td>
