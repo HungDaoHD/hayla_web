@@ -490,20 +490,24 @@
       $(wrap + ' .dataTables_filter input').addClass('form-control form-control-sm');
     }
 
+		$stt_loading.removeClass('d-none');
     $dt_stock_items.addClass('d-none');
-    $stt_loading.removeClass('d-none');
-
+    
     function fnc_init_stock_items() {
       
       $stt_loading.removeClass('d-none');
+			$dt_stock_items.addClass('d-none');
 
       $.ajax({
         url: '/operation/stock/retrieve-items',
         method: 'GET',
         success: function(resp) {
-
+					
           renderStockItemsTable(resp);
           
+					$stt_loading.addClass('d-none');
+      		$dt_stock_items.removeClass('d-none');
+
         },
         error: function(xhr, status, err) {
           console.error(xhr);
@@ -517,25 +521,16 @@
     
     // fires when the Items pill becomes active
     $('#pills-items-tab').on('shown.bs.tab', function (e) {
-
       // e.target is the newly activated <a>
       console.log('#pills-items-tab activated!');
-
-      $stt_loading.removeClass('d-none');
-      $dt_stock_items.addClass('d-none');
-
       fnc_init_stock_items?.();
-
-      $stt_loading.addClass('d-none');
-      $dt_stock_items.removeClass('d-none');
-			
     });
 
-    // // also run on first load if it's already active
-    // if ($('#pills-items').hasClass('active')) {
-    //   console.log('#pills-items activated!');
-    //   fnc_init_stock_items?.();
-    // }
+    // also run on first load if it's already active
+    if ($('#pills-items').hasClass('active')) {
+      console.log('#pills-items activated!');
+      fnc_init_stock_items?.();
+    }
 
 
 
