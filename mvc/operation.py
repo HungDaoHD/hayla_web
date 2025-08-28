@@ -5,12 +5,14 @@ from typing import Optional, Literal, Union, Dict, List, Annotated
 from bson import ObjectId
 from pymongo import ReturnDocument, UpdateOne
 from datetime import datetime, timedelta
-from zoneinfo import ZoneInfo
 from fastapi import HTTPException, UploadFile
 from fastapi.encoders import jsonable_encoder
 
 from mvc.database import mongo_db
 from mvc.users import UserPublic
+
+
+
 
 
 
@@ -538,9 +540,9 @@ class Operation:
         self.clt_inventory = mongo_db.hayladb['inventory']
         self.clt_stock = mongo_db.hayladb['stock']
         self.clt_receipt = mongo_db.hayladb['receipt']
-        self.local_tz = ZoneInfo("Asia/Ho_Chi_Minh")
 
 
+    
     @staticmethod
     async def convert_raw_ingredient(rig: dict, current_user: UserPublic) -> RawIngredient:
         rig_data = RawIngredient(**(jsonable_encoder(rig, custom_encoder={ObjectId: str})))
@@ -559,9 +561,9 @@ class Operation:
         if not is_show_disable:
             dict_db_filter |= {'Enable': True}
         
-        if current_user.role != 'admin':
+        if current_user.role.lower() not in ['admin']:
             dict_db_filter |= {'Location': {'$in': [current_user.location]}}
-
+        
         obj_raw_ingredient = list() if not is_group else dict()
 
         async for rig in self.clt_raw_ingredient.find(dict_db_filter).sort({'Enable': -1}):
@@ -1133,7 +1135,7 @@ class Operation:
         
         if current_user.role.lower() not in ['admin']:
             
-            since = datetime.now(self.local_tz) - timedelta(days=7)
+            since = datetime.now() - timedelta(days=7)
             dict_filter.update({
                 'DateTime': {'$gte': since},
                 'email': current_user.email
@@ -1155,7 +1157,7 @@ class Operation:
             
             for i in lst_item:
                 i.email = current_user.email
-                i.DateTime = datetime.now(self.local_tz)
+                i.DateTime = datetime.now()
                 lst_stock_item_dump.append(i.model_dump(by_alias=True, exclude_none=True))
 
             result = await self.clt_stock.insert_many(lst_stock_item_dump)

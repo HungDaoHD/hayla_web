@@ -58,80 +58,95 @@
     <div class="tab-pane fade show {{ 'active' if tabname == 'input' else '' }}" id="pills-{{ tabname }}" role="tabpanel" aria-labelledby="pills-{{ tabname }}-tab">
 
         {% if tabname == 'input' %}
-          <div class="card">
-            
+          <div class="card">            
             <div class="card-body">
-              
-              <form class="was-validated" id="form-stock">  
-                <div class="form-group row">
-                  
-                  <div class="col-lg-10 mb-3">
-                    <select id="stock-method" class="form-select" required aria-label="select example">
-                      <option value="">Tác vụ</option>
+              <div class="row">
+
+                <!-- Select METHOD -->
+                <div class="col-lg-10 col-md-9 col-8 p-1">
+                  <form class="was-validated">
+                    <label for="stock-method-select" class="form-label d-none">Tác vụ</label>
+                    <select id="stock-method-select" class="form-select" required>
+                      <option value="">--Tác vụ--</option>
                       <option value="add">Nhập hàng</option>
                       <option value="get">Lấy hàng</option>
                       <option value="check">Kiểm kho</option>
                     </select>
                     <div class="invalid-feedback">Vui lòng chọn tác vụ</div>
-                  </div>
+                  </form>
+                </div>
+
+                <!-- Button SUMIT -->
+                <div class="col-lg-2 col-md-3 col-4 text-end p-1">
+                  <button id="btn-stock-submit" type="button" class="btn btn-primary w-100 w-md-auto" disabled>
+                    <span class="btn-text">Submit</span>
+                    <span class="count-items"></span>
+                    <span class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
+                  </button>
+                </div>
+                
+                <!-- STOCK ITEMS TABLE--------------------------------------->
+                <div class="col-lg-12 col-md-12 col-12 p-1">
                   
-                  <div class="col-lg-2">
-                    <button id="btn-stock-submit" type="button" class="btn btn-primary w-100" disabled>
-                      <span class="btn-text">Submit</span>
-                      <span class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
-                    </button>
+                  <div id="stock-table-container" class="dt-responsive table-responsive d-none">
+                    
+                    <table id="dt-stock" class="table table-hover table-bordered table-sm align-middle">
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Nguyên liệu</th>
+                          <th>Trong kho</th>
+                          <th>Ngoài kho</th>
+                        </tr>
+                      </thead>
+                    
+                      <tbody>
+                        {% set ns = namespace(count=0) %}
+
+                        {% for grp, lst_rig in dict_raw_ingredient.items() %}
+
+                          {% for rig in lst_rig %}
+                            {% set ns.count = ns.count + 1 %}
+                            <tr data-id="{{ rig.Raw_Ingredient_ID }}" data-name="{{ rig.Raw_Ingredient_Name }}" data-loc="{{ user.location }}" data-target="#{{ rig.Raw_Ingredient_ID }}-qty">
+                              
+                              <td>
+                                <div class="form-check">
+                                  <input class="form-check-input select-row" type="checkbox" data-target="#{{ rig.Raw_Ingredient_ID }}-qty">
+                                </div>
+                              </td>
+
+                              <td>{{ ns.count }}. {{ rig.Raw_Ingredient_Name }}</td>
+                              
+                              <td>
+                                <form class="was-validated">
+                                  <input type="number" id="{{ rig.Raw_Ingredient_ID }}-qty-instock" class="form-control d-none" name="{{ rig.Raw_Ingredient_ID }}-qty-instock" placeholder="Trong kho" disabled required>
+                                  <div class="invalid-feedback">Vui lòng nhập số</div>
+                                </form>
+                              </td>
+                              
+                              <td>
+                                <form class="was-validated">
+                                  <input type="number" id="{{ rig.Raw_Ingredient_ID }}-qty-outstock" class="form-control d-none" name="{{ rig.Raw_Ingredient_ID }}-qty-outstock" placeholder="Ngoài kho" disabled required>
+                                  <div class="invalid-feedback">Vui lòng nhập số</div>
+                                </form>
+                              </td>
+                            </tr>
+                          {% endfor %}
+                        
+                        {% endfor %}
+
+                        
+                        
+                      </tbody>
+                    </table>
+
                   </div>
 
-                </div>  
-              </form>
-                
-              <!-- INPUT TABLE--------------------------------------->
-              <div id="stock-table-container" class="dt-responsive table-responsive p-1">
+                </div>
 
-                <table id="dt-stock" class="table table-striped table-bordered table-sm align-middle">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Nguyên liệu</th>
-                      <th>Trong kho</th>
-                      <th>Ngoài kho</th>
-                    </tr>
-                  </thead>
-                
-                  <tbody>
-                    {% set ns = namespace(count=0) %}
-
-                    {% for grp, lst_rig in dict_raw_ingredient.items() %}
-
-                      {% for rig in lst_rig %}
-                        {% set ns.count = ns.count + 1 %}
-                        <tr data-id="{{ rig.Raw_Ingredient_ID }}" data-loc="{{ user.location }}" data-target="#{{ rig.Raw_Ingredient_ID }}-qty">
-                          
-                          <td>
-                            <div class="form-check">
-                              <input class="form-check-input toggle-row" type="checkbox" data-target="#{{ rig.Raw_Ingredient_ID }}-qty">
-                            </div>
-                          </td>
-
-                          <td>{{ ns.count }}. {{ rig.Raw_Ingredient_Name }}</td>
-                          
-                          <td>
-                            <input type="number" id="{{ rig.Raw_Ingredient_ID }}-qty-instock" class="form-control d-none" name="{{ rig.Raw_Ingredient_ID }}-qty-instock" placeholder="Trong kho" disabled required>
-                          </td>
-                          
-                          <td>
-                            <input type="number" id="{{ rig.Raw_Ingredient_ID }}-qty-outstock" class="form-control d-none" name="{{ rig.Raw_Ingredient_ID }}-qty-outstock" placeholder="Ngoài kho" disabled required>
-                          </td>
-                        </tr>
-                      {% endfor %}
-                    
-                    {% endfor %}
-
-                    
-                    
-                  </tbody>
-                </table>
               </div>
+              
+              
               
             </div>
           </div>
@@ -143,12 +158,10 @@
 							
 							<div class="text-end p-2 pb-2">
 								<button id="btn-delete-items" class="btn btn-danger" disabled>
-									<i class="ti ti-trash"></i> Xóa <span class="count"></span>
+									<i class="ti ti-trash"></i> Xóa <span class="count-items"></span>
 								</button>
 							</div>
-
-							
-
+              
 							<div class="stt-loading">
 								<span class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true"></span>Loading, please wait...
 							</div>
@@ -171,7 +184,7 @@
             <div class="card-body">
               
               {{ 'here is ' ~ tabname }}
-
+              
               
             </div>
           </div>
@@ -199,118 +212,112 @@
 <script src="{{ request.url_for('static', path='js/plugins/dataTables.bootstrap5.min.js') }}"></script>
 
 <script>
-  // Tab INPUT
+  // Tab INPUT -----------------------------------------------------------------------------------------------------------------------------------------------------
   $(function () {
-
-    // Define input table
-    const $dt_stock = $('#dt-stock').DataTable({
-      responsive: true,  // let DataTables auto‑shrink & wrap columns
-      scrollX:    false, // disable the horizontal scroll
-      autoWidth:  true,  // allows table to grow to 100%
-      ordering: false, // Prevent search columns
-
-      // 1) Custom DOM: length + filter row on top, info + paginate row on bottom
-      dom:
-        "<'row g-2 p-2 mb-3'" +
-        "<'col-sm-8'l>" +   // length menu here
-        "<'col-sm-4'f>" +   // filter input here
-        ">" +
-        "t" +                 // the table itself
-        "<'row g-2 p-2 mt-3'" +
-          "<'col-sm-8'i>" +   // table info here
-          "<'col-sm-4'p>" +   // pagination here
-        ">",
-      
-      // 2) Language tweaks
-      language: {
-        lengthMenu: 'Show _MENU_ entries',
-        search: '', // remove default “Search:” label
-        searchPlaceholder: 'Search…',
-        paginate: {
-          first:    '<i class="ti ti-chevrons-left"></i>',
-          previous: '<i class="ti ti-chevron-left"></i>',
-          next:     '<i class="ti ti-chevron-right"></i>',
-          last:     '<i class="ti ti-chevrons-right"></i>'
-        }
-      },
-
-      // 3) Optional: how many rows by default
-      pageLength: 100
-
-    });
-
-    $('.dataTables_length select').addClass('form-select form-select-sm');
-    $('.dataTables_filter label').addClass('d-flex justify-content-end');
-    $('.dataTables_filter input').addClass('form-control form-control-sm');
-    
 
     // Define elements
     const $btn_stock_submit = $("#btn-stock-submit");
-    const $qty_outstock_col = $dt_stock.column(3);
+    const $stock_table_container = $('#stock-table-container');
+    const $dt_stock = $('#dt-stock');
+    
 
+    // Initialize input table
+    function fnc_init_dt_stock() {
 
-    // Clear all dt-stock input
-    function fnc_clear_dtstock_input() {
-      // uncheck ALL checkboxes across pages
-      $dt_stock.$('input[type="checkbox"]').prop('checked', false).trigger('change');
-
-      // clear text/number/date inputs
-      $dt_stock.$('input[type="text"], input[type="number"], input[type="date"], input[type="time"]').val('').trigger('input');
-    };
-
-    // Create "on init items" function
-    function fnc_init_input() {
-      
-      // On init disable submit button
-      $btn_stock_submit.prop('disabled', true).find('.btn-text').text('Submit');
-      $btn_stock_submit.find('.spinner-border').addClass('d-none');
-      
-      
-      // On init hide column ngoài kho
-      $qty_outstock_col.visible(false);
-
-      // Clear all dt-stock input
-      fnc_clear_dtstock_input();
-
-      // clear method input
-      $('#stock-method').val('');
-      
-    };
-
-
-    // call initialize function
-    fnc_init_input();
-
-
-    $('#stock-method').on('change', function () {
-      
-      fnc_clear_dtstock_input();
-      
-      if ($(this).val() == 'add' || $(this).val() == 'get') {
-        $qty_outstock_col.visible(false);
-        $btn_stock_submit.prop('disabled', false);
-
+      // destroy any existing DataTable instance
+      if ($.fn.DataTable.isDataTable($dt_stock)) {
+        $dt_stock.DataTable().destroy();
       }
-      else if ($(this).val() == 'check') {
-        $qty_outstock_col.visible(true);
-        $btn_stock_submit.prop('disabled', false);
+      
+      $dt_stock.DataTable({
+        responsive: false,
+        scrollX: false,
+        autoWidth: false,
+        ordering: false,
 
-      } else {
-        $qty_outstock_col.visible(false);
-        $btn_stock_submit.prop('disabled', true);
+        // 1) Custom DOM: length + filter row on top, info + paginate row on bottom
+        dom:
+          "<'row g-2 p-2 mb-3'" +
+          "<'col-sm-8'l>" +   // length menu here
+          "<'col-sm-4'f>" +   // filter input here
+          ">" +
+          "t" +                 // the table itself
+          "<'row g-2 p-2 mt-3'" +
+            "<'col-sm-8'i>" +   // table info here
+            "<'col-sm-4'p>" +   // pagination here
+          ">",
         
+        // 2) Language tweaks
+        language: {
+          lengthMenu: 'Show _MENU_ entries',
+          search: '', // remove default “Search:” label
+          searchPlaceholder: 'Search…',
+          paginate: {
+            first:    '<i class="ti ti-chevrons-left"></i>',
+            previous: '<i class="ti ti-chevron-left"></i>',
+            next:     '<i class="ti ti-chevron-right"></i>',
+            last:     '<i class="ti ti-chevrons-right"></i>'
+          }
+        },
+
+        // 3) Optional: how many rows by default
+        pageLength: 100
+
+      });
+
+      const wrap = '#dt-stock_wrapper';
+      $(wrap + ' .dataTables_length select').addClass('form-select form-select-sm');
+      $(wrap + ' .dataTables_filter label').addClass('d-flex justify-content-end');
+      $(wrap + ' .dataTables_filter input').addClass('form-control form-control-sm');
+
+    }
+    
+
+    // helper: get all checked rows (works across pages if DataTables is used)
+    function getSelectedItems() {
+      
+      const $items_checked = $dt_stock.find('input.select-row:checked');
+      var lst_stock_items = []; 
+      var total_qty = 0;
+      if (!$items_checked.length) {
+        return {lst_stock_items, total_qty};
       }
 
-    });
+			$items_checked.each(function () {
+				
+        const $tr = $(this).closest('tr');  
+        const inVal  = parseFloat($tr.find(`input[id='${$tr.data('id')}-qty-instock']`).val()) || 0;
+        const outVal = parseFloat($tr.find(`input[id='${$tr.data('id')}-qty-outstock']`).val()) || 0;
 
-    $('.toggle-row').on('change', function () {
-      const $qty_instock = $(`${$(this).data('target')}-instock`);
-      const $qty_outstock = $(`${$(this).data('target')}-outstock`);
+        lst_stock_items.push({
+          Raw_Ingredient_ID: $tr.data('id'),
+          Raw_Ingredient_Name: $tr.data('name'),
+          Location: $tr.data('loc'),
+          Method: $('#stock-method-select').val(),
+          Qty_Instock: inVal,
+          Qty_Outstock: outVal,
+        });
+        
+        total_qty += (inVal + outVal);
+
+      });
+
+      console.log(lst_stock_items);
+      
+			return {lst_stock_items, total_qty};
+		}
+
+
+    // Clear Input Qty
+    function fnc_clear_input_qty(row) {
+
+      const $qty_instock = $(`${$(row).data('target')}-instock`);
+      const $qty_outstock = $(`${$(row).data('target')}-outstock`);
 
       $qty_instock.val(null);
       $qty_outstock.val(null);
 
-      if (this.checked) {
+      if (row.checked) {
         $qty_instock.removeClass('d-none').prop('disabled', false);
         $qty_outstock.removeClass('d-none').prop('disabled', false);
         
@@ -318,38 +325,83 @@
         $qty_instock.addClass('d-none').prop('disabled', true);
         $qty_outstock.addClass('d-none').prop('disabled', true);
       }
+
+    }
+    
+    
+
+    $('#stock-method-select').on('change', function () {
+      
+      // CALL FUNCTION
+      fnc_init_dt_stock();
+
+      if ($.fn.DataTable.isDataTable($dt_stock)) {
+        
+        $dt = $dt_stock.DataTable();
+        $qty_outstock_col = $dt.column(3);
+
+      }
+      
+      $qty_outstock_col.visible(false);
+            
+      if ($(this).val() == '') {
+        $btn_stock_submit.prop('disabled', true);
+        $stock_table_container.addClass('d-none'); 
+      }
+      else {
+        $stock_table_container.removeClass('d-none');
+      
+        if ($(this).val() == 'check') {
+          $qty_outstock_col.visible(true);
+        }
+
+      }
+      
+      // uncheck ALL checkboxes across pages
+      $dt.$('input[type="checkbox"]').prop('checked', false).trigger('change');
+
+      // clear text/number/date inputs
+      $dt.$('input[type="text"], input[type="number"], input[type="date"], input[type="time"]').val('').trigger('input');
+
     });
+    
 
+		// enable/disable delete button when selection changes
+		$(document).on('change', '#dt-stock input.select-row', function () {
+      const obj = getSelectedItems();
+      const n = obj.lst_stock_items.length;
+      
+      $btn_stock_submit.prop('disabled', n === 0).find('.count-items').text(n ? `(${n})` : '');
+      // $btn_stock_submit.prop('disabled', true).find('.count-items').text(n ? `(${n})` : '');
+      fnc_clear_input_qty(this);
+    });
+    
 
+    // SUBMITING
     $btn_stock_submit.on('click', function () {
       
-      var total_qty = 0;
-      const docs = [];
+      const obj_items = getSelectedItems();
 
-      $('#dt-stock tbody tr').each(function() {
-        const $tr = $(this);
-        
-        const inVal  = parseFloat($tr.find(`input[id='${$tr.data('id')}-qty-instock']`).val()) || 0;
-        const outVal = parseFloat($tr.find(`input[id='${$tr.data('id')}-qty-outstock']`).val()) || 0;
-        
-        if (inVal + outVal > 0)
-        {
-          total_qty += (inVal + outVal);
+      if (obj_items.total_qty === 0)
+      {
+        Swal.fire('Bạn chưa nhập bất kỳ số lượng nào!!!', '', 'error');
+        return;
+      }
 
-          docs.push({
-            Raw_Ingredient_ID: $tr.data('id'),
-            Location: $tr.data('loc'),
-            Method: $('#stock-method').val(),
-            Qty_Instock: inVal,
-            Qty_Outstock: outVal,
-          });
+      lst_mising = [];
+
+      obj_items.lst_stock_items.forEach((item, idx) => {
+        
+        if (item.Method === 'get' || item.Method === 'add') {
+          if (item.Qty_Instock + item.Qty_Outstock === 0) {
+            lst_mising.push(item.Raw_Ingredient_Name);
+          }          
         }
 
       });
 
-      if (total_qty == 0)
-      {
-        Swal.fire('Bạn chưa nhập bất kỳ số lượng nào!!!', '', 'error');
+      if (lst_mising.length) {
+        Swal.fire(`Bạn chưa nhập các nguyên liệu:`, lst_mising.join('<br/>'), 'error');
         return;
       }
       
@@ -357,7 +409,7 @@
       $btn_stock_submit.find('.spinner-border').removeClass('d-none');
 
       Swal.fire({
-        title: `Bạn có muốn lưu dữ liệu đã nhập?`,
+        title: `Bạn có muốn lưu (${obj_items.lst_stock_items.length}) dữ liệu đã nhập?`,
         showDenyButton: true,
         showCancelButton: false,
         confirmButtonText: `Lưu`,
@@ -376,15 +428,19 @@
             url: '/operation/stock/insert-items',
             method: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify(docs),
+            data: JSON.stringify(obj_items.lst_stock_items),
             success: function(resp) {
 
               Swal.fire('Lưu dữ liệu thành công!', '', 'success').then(() => {
-                fnc_init_input();
+                $('#stock-method-select').val('').trigger('change');
               });
               
             },
             error: function(xhr, status, err) {
+              
+              $btn_stock_submit.prop('disabled', false).find('.btn-text').text('Submit');
+              $btn_stock_submit.find('.spinner-border').addClass('d-none');
+
               console.error(xhr);
               console.error(status);
               console.error(err);
@@ -402,7 +458,9 @@
   
   });
 
-  // Tab ITEMS
+
+
+  // Tab ITEMS -----------------------------------------------------------------------------------------------------------------------------------------------------
   $(function () {
     
 		const $stt_loading = $('#pills-items').find('.stt-loading');
@@ -525,20 +583,20 @@
     // fires when the Items pill becomes active
     $('#pills-items-tab').on('shown.bs.tab', function (e) {
       // e.target is the newly activated <a>
-			console.log('#pills-items-tab showed!');
+			// console.log('#pills-items-tab showed!');
       fnc_init_stock_items?.();
 		});
 		
 		// fires AFTER the Items tab is deactivated
 		$('#pills-items-tab').on('hidden.bs.tab', function (e) {
-			console.log('Items tab is now inactive');
+			// console.log('Items tab is now inactive');
 			$stt_loading.removeClass('d-none');
 			$stock_items_container.addClass('d-none');
 		});
 
     // also run on first load if it's already active
     if ($('#pills-items').hasClass('active')) {
-      console.log('#pills-items activated!');
+      // console.log('#pills-items activated!');
       fnc_init_stock_items?.();
     }
 
@@ -564,7 +622,7 @@
 		// enable/disable delete button when selection changes
 		$(document).on('change', '#dt-stock-items input.select-row', function () {
 			const n = getSelected().ids.length;
-			$('#btn-delete-items').prop('disabled', n === 0).find('.count').text(n ? `(${n})` : '');
+			$('#btn-delete-items').prop('disabled', n === 0).find('.count-items').text(n ? `(${n})` : '');
 		});
 
 		
@@ -573,8 +631,8 @@
 			const { ids, rows } = getSelected();
 			if (!ids.length) return;
 
-			console.log(ids);
-			
+			// console.log(ids);
+      
 
 			Swal.fire({
 				title: `Xóa ${ids.length} mục?`,
@@ -605,7 +663,7 @@
 							rows.forEach($tr => $tr.remove());
 						}
 
-						$('#btn-delete-items').prop('disabled', true).removeClass('disabled').find('.count').text('');
+						$('#btn-delete-items').prop('disabled', true).removeClass('disabled').find('.count-items').text('');
 						Swal.fire('Đã xóa!', '', 'success');
 					
 					},
@@ -626,11 +684,6 @@
 
 
   });
-
-
-
-
-
 
 
 </script>

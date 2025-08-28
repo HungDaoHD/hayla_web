@@ -9,10 +9,10 @@ from datetime import datetime, timedelta
 from fastapi import HTTPException, UploadFile
 from fastapi.encoders import jsonable_encoder
 
-
-
 from mvc.users import UserPublic
 from mvc.operation import Operation
+
+
 
 
 
@@ -27,8 +27,10 @@ class DashboardFilterOutput(BaseModel):
     StartDate: Annotated[datetime, Field(default=None)]
     EndDate: Annotated[datetime, Field(default=None)]
     PrevStartDate: Annotated[datetime, Field(default=None)]
-    PrevEndtDate: Annotated[datetime, Field(default=None)]
+    PrevEndDate: Annotated[datetime, Field(default=None)]
     DeltaDay: Annotated[timedelta, Field(default=None)]
+    
+    
     
     def to_mongodb_query(self) -> dict:
         dict_filter_mongodb = {"Location": {"$in": self.Location}}
@@ -39,7 +41,7 @@ class DashboardFilterOutput(BaseModel):
                     {
                         "Payment_Time": {
                             "$gte": self.PrevStartDate,
-                            "$lte": self.PrevEndtDate,
+                            "$lte": self.PrevEndDate,
                         }
                     },
                     {
@@ -97,7 +99,7 @@ class Dashboard(Operation):
         self.df_ingredient = pd.DataFrame()
         self.df_fixed_cost = pd.DataFrame()
         self.df_inventory = pd.DataFrame()
-    
+        self.str_tz = 'Asia/Ho_Chi_Minh'
     
     
     async def analyze_fixed_cost(self):
@@ -203,7 +205,7 @@ class Dashboard(Operation):
             StartDate=start_dt,
             EndDate=end_dt,
             PrevStartDate=prev_start_dt,
-            PrevEndtDate=prev_end_dt,
+            PrevEndDate=prev_end_dt,
             DeltaDay=delta,
         )
     
@@ -219,7 +221,7 @@ class Dashboard(Operation):
         df_cast_flow['Fixed_Cost'] = monthly_fixed_cost / df_cast_flow['Payment_Date'].dt.days_in_month
         df_cast_flow['Net_Profit'] = df_cast_flow['Amount'] - (df_cast_flow['Total_Cost_By_Size_Qty'] + df_cast_flow['Fixed_Cost'])
 
-        df_cast_flow_prev = df_cast_flow.query("Payment_Date.between(@dboard_filter_output.PrevStartDate, @dboard_filter_output.PrevEndtDate)")
+        df_cast_flow_prev = df_cast_flow.query("Payment_Date.between(@dboard_filter_output.PrevStartDate, @dboard_filter_output.PrevEndDate)")
         df_cast_flow_curr = df_cast_flow.query("Payment_Date.between(@dboard_filter_output.StartDate, @dboard_filter_output.EndDate)")
         
         dboard_analyze.Previous.Revenue = df_cast_flow_prev['Amount'].sum()
@@ -236,17 +238,22 @@ class Dashboard(Operation):
 
         if not (df_cast_flow_curr['Payment_Date'] == dboard_filter_output.EndDate.replace(hour=0, minute=0, second=0, microsecond=0)).any():
             
+            a1 = df_cast_flow_curr['Payment_Date'].max() + timedelta(days=1)
+            a2 = dboard_filter_output.EndDate
+            
             df_predict = pd.DataFrame({
                 'Payment_Date': pd.date_range(
                     start=df_cast_flow_curr['Payment_Date'].max() + timedelta(days=1),
                     end=dboard_filter_output.EndDate,
-                    freq='D'
+                    freq='D',
                 ),
                 'Amount': np.nan,
                 'Total_Cost_By_Size_Qty': np.nan,
                 'Fixed_Cost': df_cast_flow_curr.iloc[-1,:]['Fixed_Cost'],
                 'Net_Profit': 0,
             })
+            
+            df_predict['Payment_Date'] = df_predict['Payment_Date']
             
             pred_fixed_cost = df_predict['Fixed_Cost'].sum() - dboard_analyze.Current.NetProfit
             
@@ -383,7 +390,7 @@ class Dashboard(Operation):
             
             dboard_data = {
                 'Previous': {
-                    'Period': f"{dboard_filter_output.PrevStartDate.strftime(str_date_format)} to {dboard_filter_output.PrevEndtDate.strftime(str_date_format)}",
+                    'Period': f"{dboard_filter_output.PrevStartDate.strftime(str_date_format)} to {dboard_filter_output.PrevEndDate.strftime(str_date_format)}",
                     'Revenue': 0,
                     'DirectCost': 0,
                 },

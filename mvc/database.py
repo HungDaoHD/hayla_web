@@ -1,11 +1,6 @@
 import os
-from zoneinfo import ZoneInfo
 from motor.motor_asyncio import AsyncIOMotorClient
 from dotenv import load_dotenv
-
-
-
-TZ = ZoneInfo("Asia/Ho_Chi_Minh")
 
 
 
@@ -19,11 +14,7 @@ class Database:
             if not MONGO_URI:
                 raise RuntimeError('MONGO_URI must be set')
 
-            self.client = AsyncIOMotorClient(
-                MONGO_URI,
-                tz_aware=True,
-                tzinfo=TZ
-            )
+            self.client = AsyncIOMotorClient(MONGO_URI)
             self.hayladb = self.client['hayladb']
             self.clt_user = self.hayladb['user']
 
