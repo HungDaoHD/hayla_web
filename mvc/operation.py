@@ -4,7 +4,8 @@ from pydantic import BaseModel, Field, field_validator, model_validator, compute
 from typing import Optional, Literal, Union, Dict, List, Annotated
 from bson import ObjectId
 from pymongo import ReturnDocument, UpdateOne
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 from fastapi import HTTPException, UploadFile
 from fastapi.encoders import jsonable_encoder
 
@@ -41,7 +42,14 @@ class RawIngredient(BaseModel):
     id: str = Field(default_factory=ObjectId, alias='_id')
     Raw_Ingredient_ID: str = Field(pattern=r"^RIG\d+$")
     Raw_Ingredient_Name: str = Field(min_length=2)
-    Group: Literal['Cà phê, Trà & Bột', 'Sữa, Kem & Nguyên liệu khác', 'Syrup, Sốt, Mứt & Topping', 'Bao bì & Phụ kiện', 'Vệ sinh & Hỗ trợ', 'Undefine'] = Field(min_length=3)
+    Group: Literal[
+        '1. Cà phê, Trà & Bột', 
+        '2. Sữa, Kem & Nguyên liệu khác', 
+        '3. Syrup, Sốt, Mứt & Topping', 
+        '4. Bao bì & Phụ kiện', 
+        '5. Vệ sinh & Hỗ trợ', 
+        '99. Undefine'
+    ] = Field(min_length=3)
     Location: List[Literal["SGN", "NTR"]] = Field(min_length=1)
     Cost: int = Field(ge=1000)
     Quanty: int = Field(ge=1)
@@ -566,7 +574,7 @@ class Operation:
         
         obj_raw_ingredient = list() if not is_group else dict()
 
-        async for rig in self.clt_raw_ingredient.find(dict_db_filter).sort({'Enable': -1}):
+        async for rig in self.clt_raw_ingredient.find(dict_db_filter).sort({'Enable': -1, 'Group': 1, 'Raw_Ingredient_Name': 1}):
             
             rig_data = await self.convert_raw_ingredient(rig, current_user)
                 
@@ -1127,6 +1135,19 @@ class Operation:
 
 
     async def retrieve_stock_items(self, dict_filter_mongodb: dict, current_user: UserPublic) -> list[StockItem]:
+        
+        LOCAL_TZ = ZoneInfo("Asia/Ho_Chi_Minh")
+        
+        def utc_to_local(dt_utc: datetime) -> datetime:
+            # if it's naive but represents UTC, attach UTC first
+            if dt_utc.tzinfo is None:
+                dt_utc = dt_utc.replace(tzinfo=timezone.utc)
+                
+            # convert to local zone
+            return dt_utc.astimezone(LOCAL_TZ)
+        
+        
+        
         lst_stock = list()
 
         dict_filter = dict_filter_mongodb.copy() if dict_filter_mongodb else dict()
@@ -1144,6 +1165,8 @@ class Operation:
         async for item in self.clt_stock.find(dict_filter).sort({'DateTime': -1}):
             
             item_data = await self.convert_stock(item)
+            item_data.DateTime = utc_to_local(item_data.DateTime)
+            
             lst_stock.append(item_data)
 
         return lst_stock
@@ -1162,6 +1185,8 @@ class Operation:
 
             result = await self.clt_stock.insert_many(lst_stock_item_dump)
 
+            
+            
         
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"Could not insert stock item(s): {e}")
