@@ -93,7 +93,12 @@
                     <table id="dt-stock" class="table table-hover table-bordered table-sm align-middle">
                       <thead>
                         <tr>
-                          <th>#</th>
+                          <th style="width:10%; text-align:center; vertical-align:middle;">
+                            <div class="form-check d-inline-block">
+                              <input class="form-check-input" type="checkbox" id="select-all">
+                              Select all
+                            </div>
+                          </th>
                           <th>Nguyên liệu</th>
                           <th>Trong kho</th>
                           <th>Ngoài kho</th>
@@ -109,8 +114,8 @@
                             {% set ns.count = ns.count + 1 %}
                             <tr data-id="{{ rig.Raw_Ingredient_ID }}" data-name="{{ rig.Raw_Ingredient_Name }}" data-loc="{{ user.location }}" data-target="#{{ rig.Raw_Ingredient_ID }}-qty">
                               
-                              <td>
-                                <div class="form-check">
+                              <td style="text-align:center; vertical-align:middle;">
+                                <div class="form-check d-inline-block">
                                   <input class="form-check-input select-row" type="checkbox" data-target="#{{ rig.Raw_Ingredient_ID }}-qty">
                                 </div>
                               </td>
@@ -119,14 +124,16 @@
                               
                               <td>
                                 <form class="was-validated">
-                                  <input type="number" id="{{ rig.Raw_Ingredient_ID }}-qty-instock" class="form-control d-none" step="any" name="{{ rig.Raw_Ingredient_ID }}-qty-instock" placeholder="Trong kho" disabled required>
+                                  <input type="number" id="{{ rig.Raw_Ingredient_ID }}-qty-instock" class="form-control d-none" step="any" 
+                                  name="{{ rig.Raw_Ingredient_ID }}-qty-instock" placeholder="Trong kho" disabled required>
                                   <div class="invalid-feedback">Vui lòng nhập số</div>
                                 </form>
                               </td>
                               
                               <td>
                                 <form class="was-validated">
-                                  <input type="number" id="{{ rig.Raw_Ingredient_ID }}-qty-outstock" class="form-control d-none" step="any" name="{{ rig.Raw_Ingredient_ID }}-qty-outstock" placeholder="Ngoài kho" disabled required>
+                                  <input type="number" id="{{ rig.Raw_Ingredient_ID }}-qty-outstock" class="form-control d-none" step="any" 
+                                  name="{{ rig.Raw_Ingredient_ID }}-qty-outstock" placeholder="Ngoài kho" disabled required>
                                   <div class="invalid-feedback">Vui lòng nhập số</div>
                                 </form>
                               </td>
@@ -143,7 +150,7 @@
                   </div>
 
                 </div>
-
+                
               </div>
               
               
@@ -219,6 +226,7 @@
     const $btn_stock_submit = $("#btn-stock-submit");
     const $stock_table_container = $('#stock-table-container');
     const $dt_stock = $('#dt-stock');
+    const $sel_stock_method = $('#stock-method-select');
     
 
     // Initialize input table
@@ -293,7 +301,7 @@
           Raw_Ingredient_ID: $tr.data('id'),
           Raw_Ingredient_Name: $tr.data('name'),
           Location: $tr.data('loc'),
-          Method: $('#stock-method-select').val(),
+          Method: $sel_stock_method.val(),
           Qty_Instock: inVal,
           Qty_Outstock: outVal,
         });
@@ -302,7 +310,7 @@
 
       });
 
-      console.log(lst_stock_items);
+      // console.log(lst_stock_items);
       
 			return {lst_stock_items, total_qty};
 		}
@@ -328,9 +336,21 @@
 
     }
     
+    // When "select all" is clicked
+    $('#select-all').on('change', function () {
+      const checked = this.checked;
+      $('#dt-stock .select-row').prop('checked', checked).trigger('change');
+    });
+
+    // If any single row is unchecked -> uncheck master
+    $('#dt-stock').on('change', '.select-row', function () {
+      const allRows = $('#dt-stock .select-row').length;
+      const checkedRows = $('#dt-stock .select-row:checked').length;
+      $('#select-all').prop('checked', allRows === checkedRows);
+    });
     
 
-    $('#stock-method-select').on('change', function () {
+    $sel_stock_method.on('change', function () {
       
       // CALL FUNCTION
       fnc_init_dt_stock();
@@ -384,9 +404,28 @@
 
       if (obj_items.total_qty === 0)
       {
-        Swal.fire('Bạn chưa nhập bất kỳ số lượng nào!!!', '', 'error');
+        Swal.fire('Bạn chưa nhập bất kỳ số lượng nào!', '', 'error');
         return;
       }
+
+
+      if ($sel_stock_method.val() === 'check') {
+        // all number inputs must be filled
+        const $nums = $dt_stock.find('tbody input[type=number]');
+        const allFilled = $nums.toArray().every(el => el.value.trim() !== '');
+
+        if (!allFilled) {
+          Swal.fire('Tác vụ kiểm kho cần nhập tất cả nguyên liệu!', '', 'error');
+          return;
+        }
+
+      }
+
+      
+
+
+
+
 
       lst_mising = [];
 
@@ -397,7 +436,6 @@
             lst_mising.push(item.Raw_Ingredient_Name);
           }          
         }
-
       });
 
       if (lst_mising.length) {
@@ -405,6 +443,13 @@
         return;
       }
       
+
+      
+
+
+
+
+
       $btn_stock_submit.prop('disabled', true).find('.btn-text').text('Pleaese wait…');
       $btn_stock_submit.find('.spinner-border').removeClass('d-none');
 
@@ -432,7 +477,7 @@
             success: function(resp) {
 
               Swal.fire('Lưu dữ liệu thành công!', '', 'success').then(() => {
-                $('#stock-method-select').val('').trigger('change');
+                $sel_stock_method.val('').trigger('change');
                 $btn_stock_submit.prop('disabled', false).find('.btn-text').text('Submit');
                 $btn_stock_submit.find('.spinner-border').addClass('d-none');
 
@@ -495,15 +540,15 @@
       ];
       
       // build thead
-      const thead = `<thead><tr>${cols.map(c => `<th>${c.title}</th>`).join('')}</tr></thead>`;
+      const thead = `<thead><tr>${cols.map(c => `<th style="width:10%; text-align:center; vertical-align:middle;">${c.title}</th>`).join('')}</tr></thead>`;
       
       // build tbody
       const tbody = `<tbody>
         ${rows.map((r, i) => `
           <tr data-id="${esc(r.id)}">
 
-            <td data-label="">
-              <div class="form-check">
+            <td style="text-align:center; vertical-align:middle;" data-label="">
+              <div class="form-check d-inline-block">
                 <input class="form-check-input select-row" type="checkbox">
               </div>
             </td>

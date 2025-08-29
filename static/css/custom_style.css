@@ -100,6 +100,7 @@
   /* checkbox row spans full width at the very top */
   .mobile-cards td:first-child {
     grid-column: 1 / -1;
+    justify-self: start; /* align left */
     padding-bottom: .35rem !important;
     border-bottom: 1px solid #eceff3 !important;
   }
@@ -117,6 +118,7 @@
   .mobile-cards td:not([data-label="TRONG KHO"]):not([data-label="NGOÀI KHO"]) {
     grid-column: 1;
   }
+  
 }
 
 
