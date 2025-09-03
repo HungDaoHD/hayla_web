@@ -85,9 +85,7 @@
                   </button>
                 </div>
                 
-                <div>
-                  
-                </div>
+                
 
                 <!-- STOCK ITEMS TABLE--------------------------------------->
                 <div class="col-lg-12 col-md-12 col-12 p-1">
@@ -193,8 +191,36 @@
           <div class="card">
             <div class="card-body">
               
-              {{ 'here is ' ~ tabname }}
-              
+              <div class="row">
+                
+                <div class="col-lg-10 col-md-9 col-8 p-1">
+                  <form class="was-validated">
+                    <label for="stock-summary-select" class="form-label d-none">Quán</label>
+
+                    <select id="stock-summary-select" class="form-select" required>
+                      <option value="">--Quán--</option>
+                      <option value="SGN">SGN</option>
+                      <option value="NTR">NTR</option>
+                    </select>
+
+                    <div class="invalid-feedback">Vui lòng chọn quán</div>
+                  </form>
+                </div>
+
+                <!-- Button SUMIT -->
+                <div class="col-lg-2 col-md-3 col-4 text-end p-1">
+                  <button id="btn-summary-submit" type="button" class="btn btn-primary w-100 w-md-auto" disabled>
+                    <span class="btn-text">Submit</span>
+                    <span class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
+                  </button>
+                </div>
+                
+                <div id="stock-summary-table-container" class="dt-responsive table-responsive">
+                  
+
+                </div>
+
+              </div>
               
             </div>
           </div>
@@ -453,7 +479,7 @@
 
 
 
-      $btn_stock_submit.prop('disabled', true).find('.btn-text').text('Pleaese wait…');
+      $btn_stock_submit.prop('disabled', true).find('.btn-text').text('Please wait…');
       $btn_stock_submit.find('.spinner-border').removeClass('d-none');
 
       Swal.fire({
@@ -537,6 +563,7 @@
 				{ title: 'Nguyên liệu'},
         { title: 'Ngày Giờ'},
         { title: 'Tài khoản'},
+        { title: 'Quán'},
         { title: 'Tác vụ'},
         { title: 'Trong kho'},
         { title: 'Ngoài kho'},
@@ -559,6 +586,7 @@
 						<td data-label="Nguyên liệu">${esc(r.Raw_Ingredient_Name)}</td>
             <td data-label="Ngày giờ">${esc(r.DateTime)}</td>
             <td data-label="Tài khoản">${esc(r.email)}</td>
+            <td data-label="Quán">${esc(r.Location)}</td>
             
             <td data-label="Tác vụ">
               <span class="badge bg-light-${methodColor(r.Method)} border border-${methodColor(r.Method)} f-14">
@@ -697,7 +725,8 @@
 
 				if (!res.isConfirmed) return;
 
-				const $btn = $('#btn-delete-items').prop('disabled', true).addClass('disabled');
+				const $btn = $('#btn-delete-items'); 
+        $btn.prop('disabled', true).addClass('disabled');
 				
 				$.ajax({
 					url: '/operation/stock/delete-items',
@@ -714,7 +743,7 @@
 							rows.forEach($tr => $tr.remove());
 						}
 
-						$('#btn-delete-items').prop('disabled', true).removeClass('disabled').find('.count-items').text('');
+						$btn.prop('disabled', true).addClass('disabled').find('.count-items').text('');
 						Swal.fire('Đã xóa!', '', 'success');
 					
 					},
@@ -725,11 +754,114 @@
 					},
 					
 					complete: function () {
-						$btn.prop('disabled', false).removeClass('disabled');
+						$btn.prop('disabled', true).addClass('disabled').find('.count-items').text('');
 					}
 				});
 			
 			});
+		});
+
+
+
+  });
+
+
+  // Tab SUMMARY -----------------------------------------------------------------------------------------------------------------------------------------------------
+  $(function () {
+    
+    const $sel_summary_location = $('#stock-summary-select'); 
+    const $btn_summary_submit = $('#btn-summary-submit');
+    const $stock_summary_container = $('#stock-summary-table-container');
+    const $dt_stock_summary = $('#dt-stock-summary');
+
+    $sel_summary_location.on('change', function () {
+
+      if ($(this).val() == '') {
+        $btn_summary_submit.prop('disabled', true);
+      }
+      else {
+        $btn_summary_submit.prop('disabled', false);
+      }
+
+    });
+
+    $btn_summary_submit.on('click', function () {
+      
+      $(this).prop('disabled', true).find('.btn-text').text('Please wait…');
+      $(this).find('.spinner-border').removeClass('d-none');
+      
+      
+      obj_fil = {
+        Location: $sel_summary_location.val(),
+      }
+
+      console.log(obj_fil);
+
+      $.ajax({
+        url: '/operation/stock/summary',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(obj_fil),
+
+        success: function (resp) {
+          
+          $stock_summary_container.html(resp.dt_summary_stock);
+          
+          const $dt_stock_summary = $('#dt-stock-summary').DataTable({
+            dom:
+              "<'row g-2 p-2 mb-3'" +
+              "<'col-sm-8'l>" +   // length menu here
+              "<'col-sm-4'f>" +   // filter input here
+              ">" +
+              "t" +                 // the table itself
+              "<'row g-2 p-2 mt-3'" +
+                "<'col-sm-8'i>" +   // table info here
+                "<'col-sm-4'p>" +   // pagination here
+              ">",
+            // order: [[6, 'asc']],
+            language: {
+              lengthMenu: 'Show _MENU_ entries',
+              search: '',
+              searchPlaceholder: 'Search…',
+              paginate: {
+                first:    '<i class="ti ti-chevrons-left"></i>',
+                previous: '<i class="ti ti-chevron-left"></i>',
+                next:     '<i class="ti ti-chevron-right"></i>',
+                last:     '<i class="ti ti-chevrons-right"></i>'
+              }
+            },
+            pageLength: 10,
+          });
+
+
+          $('.dataTables_length select').addClass('form-select form-select-sm');
+          $('.dataTables_filter label').addClass('d-flex justify-content-end');
+          $('.dataTables_filter input').addClass('form-control form-control-sm');
+
+
+          Swal.fire('Summary thành công!', '', 'success');
+          
+          
+          
+
+        },
+
+        error: function (xhr) {
+          
+          const msg = xhr.responseJSON?.detail || xhr.statusText || 'Error';
+          Swal.fire('Summary thất bại', msg, 'error');
+        
+          
+        },
+        
+        complete: function () {
+          $sel_summary_location.val('');
+          $btn_summary_submit.prop('disabled', true).find('.btn-text').text('Submit');
+          $btn_summary_submit.find('.spinner-border').addClass('d-none');
+        }
+      });
+
+
 		});
 
 

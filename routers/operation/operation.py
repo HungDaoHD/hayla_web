@@ -5,7 +5,7 @@ from fastapi.templating import Jinja2Templates
 
 from routers.auth.oauth2 import require_role
 from mvc.users import UserPublic
-from mvc.operation import Operation, InventoryItemInsert, DrinkUpdate, StockItemInsert, DeleteStockItems
+from mvc.operation import Operation, InventoryItemInsert, DrinkUpdate, StockItemInsert, DeleteStockItems, SummaryStockFilter
 
 
 lst_role = ['Admin', 'Staff']
@@ -255,3 +255,15 @@ async def delete_stock_items(lst_id: DeleteStockItems, current_user: UserPublic 
     
     
     return JSONResponse(content=[i.model_dump(mode='json') for i in lst_item])
+
+
+
+
+@router.post('/stock/summary', response_class=JSONResponse)
+async def summary_stock(obj_stock_summary_filter: SummaryStockFilter, current_user: UserPublic = Depends(require_role(role=lst_role))):
+
+    opt = Operation()
+    dict_summary = await opt.summary_stock(obj_stock_summary_filter=obj_stock_summary_filter, current_user=current_user)
+    
+    
+    return JSONResponse(content=dict_summary)
