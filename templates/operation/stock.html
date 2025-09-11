@@ -560,6 +560,7 @@
       // define the columns you want
       const cols = [
         { title: '#'},
+				{ title: 'ID'},
 				{ title: 'Nguyên liệu'},
         { title: 'Ngày Giờ'},
         { title: 'Tài khoản'},
@@ -583,6 +584,7 @@
               </div>
             </td>
 
+						<td data-label="ID">${esc(r.Raw_Ingredient_ID)}</td>
 						<td data-label="Nguyên liệu">${esc(r.Raw_Ingredient_Name)}</td>
             <td data-label="Ngày giờ">${esc(r.DateTime)}</td>
             <td data-label="Tài khoản">${esc(r.email)}</td>
@@ -613,10 +615,10 @@
           search: '',
           searchPlaceholder: 'Search…',
           paginate: {
-            first:    '<i class="ti ti-chevrons-left"></i>',
+            first: '<i class="ti ti-chevrons-left"></i>',
             previous: '<i class="ti ti-chevron-left"></i>',
-            next:     '<i class="ti ti-chevron-right"></i>',
-            last:     '<i class="ti ti-chevrons-right"></i>'
+            next: '<i class="ti ti-chevron-right"></i>',
+            last: '<i class="ti ti-chevrons-right"></i>'
           }
         }
       });
@@ -789,7 +791,7 @@
       
       $(this).prop('disabled', true).find('.btn-text').text('Please wait…');
       $(this).find('.spinner-border').removeClass('d-none');
-      
+      $sel_summary_location.prop('disabled', true);
       
       obj_fil = {
         Location: $sel_summary_location.val(),
@@ -856,6 +858,7 @@
         
         complete: function () {
           $sel_summary_location.val('');
+          $sel_summary_location.prop('disabled', false);
           $btn_summary_submit.prop('disabled', true).find('.btn-text').text('Submit');
           $btn_summary_submit.find('.spinner-border').addClass('d-none');
         }

@@ -1338,7 +1338,7 @@ class Operation:
             index_names=False, 
             float_format="{:,.1f}".format,
             justify='left',
-            classes='table table-hover table-bordered table-sm align-middle',  # mobile-cards
+            classes='table table-hover table-bordered table-sm align-middle mobile-cards', 
         )
         
         return {
