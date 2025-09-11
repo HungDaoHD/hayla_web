@@ -645,10 +645,11 @@
 					
 					renderStockItemsTable(resp);
 					
-					setInterval(() => {
-						$stt_loading.addClass('d-none');
-						$stock_items_container.removeClass('d-none');
-					}, 300);
+          $stt_loading.addClass('d-none');
+					$stock_items_container.removeClass('d-none');
+
+					// setInterval(() => {
+					// }, 300);
 					
 				},
 				error: function(xhr, status, err) {
