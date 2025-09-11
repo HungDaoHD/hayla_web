@@ -1328,7 +1328,7 @@ class Operation:
         df_pivot = pd.concat([df_1st_pivot, df_2nd_pivot], axis=1)
         df_pivot = df_pivot.reset_index(drop=False)
         df_pivot = df_pivot.sort_values(by=['remain'], ascending=[True])
-        df_pivot['gap'] = df_pivot[lst_str_latest2_dates[0]] - df_pivot[lst_str_latest2_dates[-1]]
+        df_pivot['gap'] = df_pivot['remain'] - df_pivot[lst_str_latest2_dates[-1]]
         df_pivot['note'] = df_pivot['gap'].apply(lambda x: 'Ok' if -.5 <= x <= .5 else 'Error')
         
         tbl_html = df_pivot.to_html(
