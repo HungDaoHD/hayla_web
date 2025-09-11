@@ -1281,6 +1281,8 @@ class Operation:
             .tolist()
         )
         
+        lst_str_latest2_dates = [f'{'From' if i == 0 else 'To'} {d.strftime('%d/%m/%y')}' for i, d in enumerate(lst_latest2_dates)]
+        
         df_data = df_data.query("DateTime.isin(@lst_latest2_dates)")
         df_data['Qty_Total'] = df_data[['Qty_Instock', 'Qty_Outstock']].sum(axis=1)
         
@@ -1297,7 +1299,7 @@ class Operation:
         
         flat_index = df_1st_pivot.columns.to_flat_index()
         df_1st_pivot.columns = flat_index.map(lambda t: t[-1])
-        df_1st_pivot = df_1st_pivot.rename(columns={'check': lst_latest2_dates[0].strftime("%d/%m/%y")})
+        df_1st_pivot = df_1st_pivot.rename(columns={'check': lst_str_latest2_dates[0]})
         
         
         if 'add' not in df_1st_pivot.columns:
@@ -1308,7 +1310,7 @@ class Operation:
         
         
         df_1st_pivot['get'] = df_1st_pivot['get'].apply(lambda x: x * -1)
-        
+        df_1st_pivot['remain'] = df_1st_pivot.sum(axis=1, numeric_only=True)
         
         df_2nd_pivot = df_2nd.pivot_table(
             columns=['Method'],
@@ -1320,36 +1322,28 @@ class Operation:
         
         flat_index = df_2nd_pivot.columns.to_flat_index()
         df_2nd_pivot.columns = flat_index.map(lambda t: t[-1])
-        df_1st_pivot = df_1st_pivot.rename(columns={'check': lst_latest2_dates[-1]})
-        
-        a = 1
+        df_2nd_pivot = df_2nd_pivot.rename(columns={'check': lst_str_latest2_dates[-1]})
         
         
+        df_pivot = pd.concat([df_1st_pivot, df_2nd_pivot], axis=1)
+        df_pivot = df_pivot.reset_index(drop=False)
+        df_pivot = df_pivot.sort_values(by=['remain'], ascending=[True])
+        df_pivot['gap'] = df_pivot[lst_str_latest2_dates[0]] - df_pivot[lst_str_latest2_dates[-1]]
+        df_pivot['note'] = df_pivot['gap'].apply(lambda x: 'Ok' if -.5 <= x <= .5 else 'Error')
         
-        
-        
-        
-        
-        # df_pivot = df_pivot.reset_index(drop=False)
-        # df_pivot['remain'] = df_pivot['add'] - df_pivot['get']
-        
-        
-        # df_pivot = df_pivot.sort_values(by=['remain'], ascending=[True])
-        
-        
-        # tbl_html = df_pivot.to_html(
-        #     table_id='dt-stock-summary', 
-        #     columns=df_pivot.columns.tolist(),
-        #     index=False, 
-        #     index_names=False, 
-        #     float_format="{:,.1f}".format,
-        #     justify='left',
-        #     classes='table table-hover table-bordered table-sm align-middle',  # mobile-cards
-        # )
+        tbl_html = df_pivot.to_html(
+            table_id='dt-stock-summary', 
+            columns=df_pivot.columns.tolist(),
+            index=False, 
+            index_names=False, 
+            float_format="{:,.1f}".format,
+            justify='left',
+            classes='table table-hover table-bordered table-sm align-middle',  # mobile-cards
+        )
         
         return {
-            'lst_latest2_dates': lst_latest2_dates,
-            # 'dt_summary_stock': tbl_html
+            # 'lst_latest2_dates': lst_latest2_dates,
+            'dt_summary_stock': tbl_html
         }
         
 
