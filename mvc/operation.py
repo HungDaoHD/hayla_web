@@ -11,7 +11,7 @@ from fastapi.encoders import jsonable_encoder
 
 from mvc.database import mongo_db
 from mvc.users import UserPublic
-from mvc.mailer import mailer
+# from mvc.mailer import mailer
 
 
 
