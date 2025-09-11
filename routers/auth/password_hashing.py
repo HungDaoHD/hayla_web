@@ -26,6 +26,8 @@ class PasswordHashing:
 #     'cat.bear.turtle2025',
 #     'falcon.leopard.seal2025',
 #     'monkey.whale.deer2025',
+#     'Giraffe.Wolf.Dolphin2025',
+
 # ]
 
 

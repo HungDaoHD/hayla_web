@@ -227,7 +227,7 @@ async def page_stock(request: Request, current_user: UserPublic = Depends(requir
 
 @router.post('/stock/insert-items', response_class=JSONResponse)
 async def add_stock_items(lst_item: list[StockItemInsert], current_user: UserPublic = Depends(require_role(role=lst_role))):
-
+    
     opt = Operation()
     lst_item = await opt.insert_stock_items(lst_item, current_user)
     

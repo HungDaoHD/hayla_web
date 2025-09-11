@@ -11,7 +11,7 @@ from fastapi.encoders import jsonable_encoder
 
 from mvc.database import mongo_db
 from mvc.users import UserPublic
-
+from mvc.mailer import mailer
 
 
 
@@ -413,6 +413,23 @@ class SummaryStockFilter(BaseModel):
     Location: Literal['SGN', 'NTR']
 
 
+
+# class SummaryStockResult:
+#     check_date_start: datetime
+#     check_date_end: datetime
+    
+
+#     model_config = {
+#         'populate_by_name': True,
+#         'arbitrary_types_allowed': True,
+#         'json_encoders': {
+#             ObjectId: lambda oid: str(oid),
+#             datetime: lambda dt: dt.strftime("%d/%m/%y %H:%M"),
+#         },
+#     }
+    
+
+
 # STOCK HERE END
 
 
@@ -542,7 +559,6 @@ class Receipt(BaseModel):
 class Operation:
 
     def __init__(self):
-        self.mongo_db = mongo_db
         self.clt_raw_ingredient = mongo_db.hayladb['raw_ingredient']
         self.clt_processed_ingredient = mongo_db.hayladb['processed_ingredient']
         self.clt_drink = mongo_db.hayladb['drink']
@@ -1206,7 +1222,11 @@ class Operation:
             
             item_data = await self.convert_stock(item)
             lst_stock_item.append(item_data)
-            
+        
+        
+        # # send mail
+        # await mailer.send_email()
+        
         
         return lst_stock_item
     
@@ -1243,17 +1263,31 @@ class Operation:
     
     async def summary_stock(self, obj_stock_summary_filter: SummaryStockFilter, current_user: UserPublic) -> dict:
         
-        lst_stock = await self.retrieve_stock_items(dict_filter_mongodb=obj_stock_summary_filter.model_dump(mode='json'), current_user=current_user)
+        # Here: need to check date between last and nearly latest check date
+        since = datetime.now() - timedelta(days=14)
+        dict_filter_mongodb = obj_stock_summary_filter.model_dump(mode='json') | {'DateTime': {'$gte': since}}
         
-        df_summary = pd.DataFrame([i.model_dump() for i in lst_stock])
-        df_summary['Qty_Total'] = df_summary[['Qty_Instock', 'Qty_Outstock']].sum(axis=1)
-        df_summary['_Date'] = pd.to_datetime(df_summary['DateTime'].dt.date)
+        lst_stock = await self.retrieve_stock_items(dict_filter_mongodb=dict_filter_mongodb, current_user=current_user)
         
+        df_data = pd.DataFrame([i.model_dump() for i in lst_stock])
+        df_data['DateTime'] = df_data['DateTime'].dt.normalize()
         
-        latest_check_date = df_summary.loc[df_summary.eval("Method == 'check'"), '_Date'].max()
-        df_summary = df_summary.query(f"(Method.isin(['add', 'get'])) | (Method == 'check' & _Date == @latest_check_date)")
+        lst_latest2_dates = (
+            pd.to_datetime(df_data.loc[df_data['Method'].str.lower().eq('check'), 'DateTime'])
+            .dropna()
+            .drop_duplicates()
+            .nlargest(2)
+            .sort_values(ascending=True)
+            .tolist()
+        )
         
-        df_pivot = df_summary.pivot_table(
+        df_data = df_data.query("DateTime.isin(@lst_latest2_dates)")
+        df_data['Qty_Total'] = df_data[['Qty_Instock', 'Qty_Outstock']].sum(axis=1)
+        
+        df_1st = df_data.query("DateTime < @lst_latest2_dates[-1]")        
+        df_2nd = df_data.query("DateTime == @lst_latest2_dates[-1] & Method == 'check'")        
+        
+        df_1st_pivot = df_1st.pivot_table(
             columns=['Method'],
             values=['Qty_Total'],
             aggfunc=['sum'],
@@ -1261,30 +1295,64 @@ class Operation:
             fill_value=0
         )
         
-        flat_index = df_pivot.columns.to_flat_index()
-        df_pivot.columns = flat_index.map(lambda t: t[-1])
-        df_pivot = df_pivot.reset_index(drop=False)
-        df_pivot['remain'] = df_pivot['add'] - df_pivot['get']
+        flat_index = df_1st_pivot.columns.to_flat_index()
+        df_1st_pivot.columns = flat_index.map(lambda t: t[-1])
+        df_1st_pivot = df_1st_pivot.rename(columns={'check': lst_latest2_dates[0].strftime("%d/%m/%y")})
         
         
-        df_pivot = df_pivot.sort_values(by=['remain'], ascending=[True])
+        if 'add' not in df_1st_pivot.columns:
+            df_1st_pivot['add'] = 0 
+        
+        elif 'get' not in df_1st_pivot.columns:
+            df_1st_pivot['get'] = 0
         
         
-        tbl_html = df_pivot.to_html(
-            table_id='dt-stock-summary', 
-            columns=df_pivot.columns.tolist(),
-            index=False, 
-            index_names=False, 
-            float_format="{:,.1f}".format,
-            justify='left',
-            classes='table table-hover table-bordered table-sm align-middle',  # mobile-cards
+        df_1st_pivot['get'] = df_1st_pivot['get'].apply(lambda x: x * -1)
+        
+        
+        df_2nd_pivot = df_2nd.pivot_table(
+            columns=['Method'],
+            values=['Qty_Total'],
+            aggfunc=['sum'],
+            index=['Raw_Ingredient_ID', 'Raw_Ingredient_Name', 'Location'],
+            fill_value=0
         )
         
+        flat_index = df_2nd_pivot.columns.to_flat_index()
+        df_2nd_pivot.columns = flat_index.map(lambda t: t[-1])
+        df_1st_pivot = df_1st_pivot.rename(columns={'check': lst_latest2_dates[-1]})
+        
+        a = 1
+        
+        
+        
+        
+        
+        
+        
+        # df_pivot = df_pivot.reset_index(drop=False)
+        # df_pivot['remain'] = df_pivot['add'] - df_pivot['get']
+        
+        
+        # df_pivot = df_pivot.sort_values(by=['remain'], ascending=[True])
+        
+        
+        # tbl_html = df_pivot.to_html(
+        #     table_id='dt-stock-summary', 
+        #     columns=df_pivot.columns.tolist(),
+        #     index=False, 
+        #     index_names=False, 
+        #     float_format="{:,.1f}".format,
+        #     justify='left',
+        #     classes='table table-hover table-bordered table-sm align-middle',  # mobile-cards
+        # )
+        
         return {
-            'dt_summary_stock': tbl_html
+            'lst_latest2_dates': lst_latest2_dates,
+            # 'dt_summary_stock': tbl_html
         }
-    
-    
+        
+
     
     # STOCK HERE END --------------------------------------------------------------------------------------------------------------------------------------------------------
     
