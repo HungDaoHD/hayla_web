@@ -1263,33 +1263,33 @@ class Operation:
     
     async def summary_stock(self, obj_stock_summary_filter: SummaryStockFilter, current_user: UserPublic) -> dict:
         
-        # Here: need to check date between last and nearly latest check date
         since = datetime.now() - timedelta(days=14)
         dict_filter_mongodb = obj_stock_summary_filter.model_dump(mode='json') | {'DateTime': {'$gte': since}}
         
         lst_stock = await self.retrieve_stock_items(dict_filter_mongodb=dict_filter_mongodb, current_user=current_user)
         
         df_data = pd.DataFrame([i.model_dump() for i in lst_stock])
-        df_data['DateTime'] = df_data['DateTime'].dt.normalize()
         
-        lst_latest2_dates = (
+        start_date, end_date = (
             pd.to_datetime(df_data.loc[df_data['Method'].str.lower().eq('check'), 'DateTime'])
             .dropna()
             .drop_duplicates()
             .nlargest(2)
             .sort_values(ascending=True)
+            .apply(lambda x: x.replace(second=0, microsecond=0))
             .tolist()
         )
         
-        lst_str_latest2_dates = [f'{'From' if i == 0 else 'To'} {d.strftime('%d/%m/%y')}' for i, d in enumerate(lst_latest2_dates)]
+        df_data = df_data.query("(Method == 'check' & DateTime.between(@start_date, @end_date.replace(hour=23, minute=59))) | (Method.isin(['get', 'add']) & DateTime.between(@start_date, @end_date))")
         
-        df_data = df_data.query("DateTime.isin(@lst_latest2_dates)")
+        df_data['DateTime'] = df_data['DateTime'].dt.normalize()
         df_data['Qty_Total'] = df_data[['Qty_Instock', 'Qty_Outstock']].sum(axis=1)
         
-        df_1st = df_data.query("DateTime < @lst_latest2_dates[-1]")        
-        df_2nd = df_data.query("DateTime == @lst_latest2_dates[-1] & Method == 'check'")        
+        df_data.loc[df_data.eval("Method == 'check' & DateTime == @start_date.replace(hour=0, minute=0, second=0, microsecond=0)"), 'Method'] = 'From'
+        df_data.loc[df_data.eval("Method == 'check' & DateTime == @end_date.replace(hour=0, minute=0, second=0, microsecond=0)"), 'Method'] = 'To'
+        df_data['Method'] = df_data['Method'].str.capitalize()
         
-        df_1st_pivot = df_1st.pivot_table(
+        df_pivot = df_data.pivot_table(
             columns=['Method'],
             values=['Qty_Total'],
             aggfunc=['sum'],
@@ -1297,48 +1297,42 @@ class Operation:
             fill_value=0
         )
         
-        flat_index = df_1st_pivot.columns.to_flat_index()
-        df_1st_pivot.columns = flat_index.map(lambda t: t[-1])
-        df_1st_pivot = df_1st_pivot.rename(columns={'check': lst_str_latest2_dates[0]})
+        flat_index = df_pivot.columns.to_flat_index()
+        df_pivot.columns = flat_index.map(lambda t: t[-1])
         
         
-        if 'add' not in df_1st_pivot.columns:
-            df_1st_pivot['add'] = 0 
+        for col in ['Add', 'Get']:
+            if col not in df_pivot.columns.to_list():
+                df_pivot[col] = 0
+            
         
-        elif 'get' not in df_1st_pivot.columns:
-            df_1st_pivot['get'] = 0
+        df_pivot['Remain'] = df_pivot['From'] + df_pivot['Add'] - df_pivot['Get'] 
+        df_pivot['Gap'] = df_pivot['To'] - df_pivot['Remain']
+        df_pivot['Status'] = df_pivot['Gap'].apply(lambda x: 'OK' if -1 <= x <= 1 else 'Error') 
         
-        
-        df_1st_pivot['get'] = df_1st_pivot['get'].apply(lambda x: x * -1)
-        df_1st_pivot['remain'] = df_1st_pivot.sum(axis=1, numeric_only=True)
-        
-        df_2nd_pivot = df_2nd.pivot_table(
-            columns=['Method'],
-            values=['Qty_Total'],
-            aggfunc=['sum'],
-            index=['Raw_Ingredient_ID', 'Raw_Ingredient_Name', 'Location'],
-            fill_value=0
-        )
-        
-        flat_index = df_2nd_pivot.columns.to_flat_index()
-        df_2nd_pivot.columns = flat_index.map(lambda t: t[-1])
-        df_2nd_pivot = df_2nd_pivot.rename(columns={'check': lst_str_latest2_dates[-1]})
-        
-        
-        df_pivot = pd.concat([df_1st_pivot, df_2nd_pivot], axis=1)
+        df_pivot = df_pivot.reindex(columns=['From', 'Add', 'Get', 'Remain', 'To', 'Gap', 'Status'])
         df_pivot = df_pivot.reset_index(drop=False)
-        df_pivot = df_pivot.sort_values(by=['remain'], ascending=[True])
-        df_pivot['gap'] = df_pivot['remain'] - df_pivot[lst_str_latest2_dates[-1]]
-        df_pivot['note'] = df_pivot['gap'].apply(lambda x: 'Ok' if -.5 <= x <= .5 else 'Error')
+        
+        df_pivot = df_pivot.rename(columns={
+            'From': f'From: {start_date.strftime("%d/%m/%y")}',
+            'To': f'To: {end_date.strftime("%d/%m/%y")}' 
+        })
+        
+        
+        here = 1
+        
+        
+        
+           
         
         tbl_html = df_pivot.to_html(
-            table_id='dt-stock-summary', 
+            table_id='dt-stock-summary',
             columns=df_pivot.columns.tolist(),
-            index=False, 
+            index=False,
             index_names=False, 
             float_format="{:,.1f}".format,
             justify='left',
-            classes='table table-hover table-bordered table-sm align-middle mobile-cards', 
+            classes='table table-hover table-bordered table-sm align-middle',  # mobile-cards 
         )
         
         return {
