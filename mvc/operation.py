@@ -1270,15 +1270,17 @@ class Operation:
         
         df_data = pd.DataFrame([i.model_dump() for i in lst_stock])
         
-        start_date, end_date = (
-            pd.to_datetime(df_data.loc[df_data['Method'].str.lower().eq('check'), 'DateTime'])
+        df_dates = (
+            pd.to_datetime(df_data.loc[df_data['Method'].str.lower().eq('check'), 'DateTime'].dt.date)
             .dropna()
             .drop_duplicates()
             .nlargest(2)
             .sort_values(ascending=True)
-            .apply(lambda x: x.replace(second=0, microsecond=0))
-            .tolist()
+            .reset_index(drop=True)
         )
+        
+        start_date = df_data.loc[df_data.eval(f"Method == 'check' & DateTime.dt.date == @df_dates.min().date()"), 'DateTime'].drop_duplicates().min()
+        end_date = df_data.loc[df_data.eval(f"Method == 'check' & DateTime.dt.date == @df_dates.max().date()"), 'DateTime'].drop_duplicates().max()
         
         df_data = df_data.query("(Method == 'check' & DateTime.between(@start_date, @end_date.replace(hour=23, minute=59))) | (Method.isin(['get', 'add']) & DateTime.between(@start_date, @end_date))")
         
@@ -1318,13 +1320,6 @@ class Operation:
             'To': f'To: {end_date.strftime("%d/%m/%y")}' 
         })
         
-        
-        here = 1
-        
-        
-        
-           
-        
         tbl_html = df_pivot.to_html(
             table_id='dt-stock-summary',
             columns=df_pivot.columns.tolist(),
@@ -1335,12 +1330,14 @@ class Operation:
             classes='table table-hover table-bordered table-sm align-middle',  # mobile-cards 
         )
         
+        # consider to convert df_pivot to model
+        
         return {
             # 'lst_latest2_dates': lst_latest2_dates,
             'dt_summary_stock': tbl_html
         }
         
-
+        
     
     # STOCK HERE END --------------------------------------------------------------------------------------------------------------------------------------------------------
     
