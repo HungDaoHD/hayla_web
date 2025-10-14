@@ -17,6 +17,11 @@ from mvc.users import UserPublic
 
 
 
+# CHƯA LÀM XONG
+
+
+
+
 
 class LocationFixedCost(BaseModel):
     SGN: Union[int, float] = Field(..., ge=10000)
@@ -256,7 +261,7 @@ class DrinkIngredientEntry(BaseModel):
 class DrinkRecipeSize(BaseModel):
     Ingredients: Dict[str, DrinkIngredientEntry]
     Price: Annotated[int, Field(ge=0)]
-
+    
     # Calculated fields
     Drink_Driect_Cost: Annotated[float, Field(ge=1, default=0)]
     Drink_Margin: Annotated[float, Field(ge=-1, default=0)]
@@ -511,7 +516,7 @@ class ReceiptUpload(BaseModel):
     Order_Day: str = Field(pattern=r"^(?:\d{4})-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])$")
     Order_Code: str = Field(pattern=r"^BH\d+$")
     Payment_Time: datetime
-    Payment_Method: Literal["Cash", "Tranfer", "Shopee"]
+    Payment_Method: Literal["Cash", "Tranfer", "Shopee", "Grab"]
     Amount: float = Field(ge=0)
     Items: List[ReceiptItemUpload] = Field(min_length=1)
 
@@ -541,7 +546,7 @@ class Receipt(BaseModel):
     Order_Day: str = Field(pattern=r"^(?:\d{4})-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])$")
     Order_Code: str = Field(pattern=r"^BH\d+$")
     Payment_Time: datetime
-    Payment_Method: Literal["Cash", "Tranfer", "Shopee"]
+    Payment_Method: Literal["Cash", "Tranfer", "Shopee", "Grab"]
     Amount: float = Field(ge=0)
     Items: List[ReceiptItem] = Field(min_length=1)
     
@@ -552,8 +557,8 @@ class Receipt(BaseModel):
         'json_encoders': {ObjectId: lambda oid: str(oid)},
     }
 
-
-
+    
+    
 
 
 class Operation:
@@ -576,7 +581,7 @@ class Operation:
 
         if current_user.role.upper() not in ['ADMIN']:
             rig_data.Cost_Per_Unit = 0
-
+        
         return rig_data
 
 
@@ -883,7 +888,7 @@ class Operation:
         return df_total_qty.to_dict(orient='records') if not is_export_df else df_total_qty
 
 
-
+    
     async def add_inventory_items(self, lst_inv_item: list[InventoryItemInsert], current_user: UserPublic) -> list[InventoryItem]:
         
         try:
@@ -1317,7 +1322,7 @@ class Operation:
         
         df_pivot = df_pivot.rename(columns={
             'From': f'From: {start_date.strftime("%d/%m/%y")}',
-            'To': f'To: {end_date.strftime("%d/%m/%y")}' 
+            'To': f'To: {end_date.strftime("%d/%m/%y")}'
         })
         
         tbl_html = df_pivot.to_html(

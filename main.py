@@ -11,6 +11,7 @@ from routers.auth.oauth2 import UserPublic, get_current_user_cookie, validate_cu
 from routers.administration import users
 from routers.operation import operation
 from routers.dashboard import dashboard
+from routers.calendar import reservation 
 
 
 
@@ -19,6 +20,7 @@ app.include_router(authentication.router)
 app.include_router(users.router)
 app.include_router(operation.router)
 app.include_router(dashboard.router)
+app.include_router(reservation.router)
 
 
 app.mount('/static', StaticFiles(directory='static'), name='static')
@@ -38,13 +40,6 @@ async def home(request: Request):
     })
 
 
-
-@app.get('/calendar', response_class=HTMLResponse)
-async def calendar(request: Request, current_user: UserPublic = Depends(get_current_user_cookie)):
-    return templates.TemplateResponse('application/calendar.html', {
-        'request': request,
-        'user': current_user.model_dump(),
-    })
 
 
 

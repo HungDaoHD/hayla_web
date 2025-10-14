@@ -20,7 +20,6 @@ class Database:
             self.hayladb = self.client['hayladb']
             self.clt_user = self.hayladb['user']
             
-            
             print('hayladb connected successfully!!!')
 
         except Exception as err:
