@@ -1,6 +1,6 @@
 (function () {
   const calendaroffcanvas = new bootstrap.Offcanvas('#calendar-add_edit_event');
-  const calendarmodal = new bootstrap.Modal('#calendar-modal');
+  const calendarmodal = new bootstrap.Modal('#calendar-reservation-modal');
   var calendevent = '';
 
   var date = new Date();
@@ -8,7 +8,7 @@
   var m = date.getMonth();
   var y = date.getFullYear();
 
-  function eventContentStartOnly(arg, opts = { hour12: false }) {
+  function eventContentStartOnly(arg, opts = {listView: false, hour12: false }) {
     // format only the START time
     const startOnly = FullCalendar.formatDate(arg.event.start, {
       hour: '2-digit',
@@ -16,24 +16,35 @@
       hour12: !!opts.hour12,   // false → 24h; true → 12h
     });
 
-    const p = arg.event.extendedProps || {};
+    const prop = arg.event.extendedProps || {};
 
-    return {
-      html: `
-        <div class="fc-evt">
-          <div class="fc-evt-title">${startOnly}</div>
-          <div class="fc-evt-row">${arg.event.title || ''}</div>
-          ${p.note ? `<div class="fc-evt-note">${p.note}</div>` : ''}
-        </div>`
-    };
+    if (opts.listView) {
+      return {
+        html: `
+          <div class="fc-evt">
+            <div class="fc-evt-title">${prop.name} | ${prop.people} ng</div>
+          </div>`
+      };
+    }
+    else {
+      return {
+        html: `
+          <div class="fc-evt">
+            <div class="fc-evt-title">${startOnly}</div>
+            <div class="fc-evt-row">${prop.name}</div>
+            <div class="fc-evt-row">${prop.people} ng</div>
+          </div>`
+      };
+    } 
+    
   }
-
+  
   window.calendar_reservation = new FullCalendar.Calendar(document.getElementById('calendar-reservation'), {
     
     headerToolbar: {
       left: 'prev,next today',
       center: 'title',
-      right: 'dayGridMonth,threeDay,timeGridDay,listMonth' // timeGridWeek
+      right: 'timeGridDay,dayGridMonth,listMonth' // timeGridWeek
     },
     
     themeSystem: 'bootstrap',
@@ -42,37 +53,34 @@
     // per-view title formats
     views: {
       dayGridMonth: { // Month view → "October 2025"
-        buttonText: '1m',
+        buttonText: 'Month',
         titleFormat: { month: 'short', year: 'numeric' },
       },
       // timeGridWeek: { // Week view → "Oct 13 – 19, 2025"
       //   titleFormat: { month: 'short', day: 'numeric', year: 'numeric' }
       // },
-      threeDay: { // Week view → "Oct 13 – 15, 2025"
-        type: 'timeGrid',               // base view
-        duration: { days: 3 },          // show 3 consecutive days
-        buttonText: '3d',           // header button label
-        titleFormat: { month: 'short', day: 'numeric', year: 'numeric' },
-        eventContent: (arg) => eventContentStartOnly(arg, { hour12: false }) // 24h
-      },
       timeGridDay: {  // Day view → "Tue, Oct 14, 2025"
-        buttonText: '1d',
+        buttonText: 'Day',
         titleFormat: { month: 'short', day: 'numeric', year: 'numeric' },
-        eventContent: (arg) => eventContentStartOnly(arg, { hour12: false }) // 24h
+        eventContent: (arg) => eventContentStartOnly(arg, { listView: false, hour12: false }) // 24h
       },
       listMonth: { // List (month) → "October 2025"
-        titleFormat: { month: 'short', year: 'numeric' }
+        buttonText: "List",
+        titleFormat: { month: 'short', year: 'numeric' },
+        eventContent: (arg) => eventContentStartOnly(arg, { listView: true, hour12: false }) // 24h
       }
     },
     
     initialView: 'timeGridDay',
+    slotLabelFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
+    eventTimeFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
     slotDuration: '00:30:00',
     slotMinTime: '08:00:00',
     slotMaxTime: '23:00:00',
     businessHours: { daysOfWeek: [0,1,2,3,4,5,6], startTime: '08:00', endTime: '22:00' },
     
-    slotEventOverlap: false,
-    eventOverlap: false,
+    // slotEventOverlap: false,
+    // eventOverlap: false,
 
     navLinks: true,
     height: 'auto',

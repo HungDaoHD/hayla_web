@@ -37,7 +37,7 @@
   </div>
 </div>
 
-<div class="modal fade" id="calendar-modal" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="calendar-reservation-modal" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
       <div class="modal-content">
         <div class="modal-header">
@@ -184,9 +184,17 @@
 
   <script>
 
-    const today = new Date();
-    const y = today.getFullYear();
-    const m = today.getMonth();
+    const lst_reservation = {{ lst_reservation | tojson }};
+    
+    calendar_reservation.addEventSource(lst_reservation);
+
+
+
+
+    
+    // const today = new Date();
+    // const y = today.getFullYear();
+    // const m = today.getMonth();
 
     // var events = [
     //   {
@@ -328,10 +336,7 @@
     //   }
     // ]
     
-    const json_data = {{ json_data | safe }};
-    const events = json_data.events;
-
-    calendar_reservation.addEventSource(events);
+    
     
     
     
