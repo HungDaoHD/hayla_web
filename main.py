@@ -63,7 +63,7 @@ async def custom_http_exception_handler(request: Request, exc: StarletteHTTPExce
     if exc.status_code == 500:
         return templates.TemplateResponse('pages/error-500.html', {'request': request}, status_code=500)
     
-
+    
     # Otherwise, fall back to FastAPI’s default HTTP‐exception handler
     return await fastapi_http_exception_handler(request, exc)
 

@@ -251,6 +251,7 @@
   // Tab INPUT -----------------------------------------------------------------------------------------------------------------------------------------------------
   $(function () {
 
+    
     // Define elements
     const $btn_stock_submit = $("#btn-stock-submit");
     const $stock_table_container = $('#stock-table-container');
@@ -426,6 +427,10 @@
     });
     
 
+    
+    
+
+
     // SUBMITING
     $btn_stock_submit.on('click', function () {
       
@@ -450,13 +455,7 @@
 
       }
 
-      
-
-
-
-
-
-      lst_mising = [];
+      var lst_mising = [];
 
       obj_items.lst_stock_items.forEach((item, idx) => {
         
@@ -472,12 +471,6 @@
         return;
       }
       
-
-      
-
-
-
-
 
       $btn_stock_submit.prop('disabled', true).find('.btn-text').text('Please wait…');
       $btn_stock_submit.find('.spinner-border').removeClass('d-none');
@@ -517,11 +510,52 @@
               
               $btn_stock_submit.prop('disabled', false).find('.btn-text').text('Submit');
               $btn_stock_submit.find('.spinner-border').addClass('d-none');
-
+              
               console.error(xhr);
               console.error(status);
               console.error(err);
-              Swal.fire('Phát sinh lỗi. Dữ liệu chưa được lưu.', xhr.responseJSON.detail[0].msg, 'error');
+              
+              
+              function getErrorMessagesFromXhr(xhr) {
+                // Prefer JSON if present
+                const rj = xhr.responseJSON;
+                if (rj && rj.detail !== undefined) {
+
+                  const d = rj.detail;
+                  
+                  if (Array.isArray(d)) {
+                    
+                    // FastAPI validation errors: [{loc: [...], msg: "...", type: "..."}]
+                    
+                    if ((d[0]?.msg === "Field required" || d[0]?.message === "Field required") && d[0].type === "missing" && (d[0].loc[1] === "email" || d[0].loc[1] === "password")) {
+                      return "Vui lòng đăng nhập!!!";
+                    }
+                    else {
+                      return d.map(item => item?.msg || item?.message || (typeof item === 'string' ? item : JSON.stringify(item))).join(', ');
+                    }
+                    
+
+                  } else {
+                    // Sometimes FastAPI sends {detail: "message"} or {detail: {...}}
+                    return [typeof d === 'string' ? d : (d.msg || d.message || JSON.stringify(d))].join(', ');
+                  }
+                  
+
+                }
+
+                // Fallbacks: try to parse text or show status text
+                try {
+                  const parsed = JSON.parse(xhr.responseText);
+                  if (parsed?.detail) return [parsed.detail].join(', ');
+                } catch (_) {}
+                
+                return [xhr.statusText || 'Unknown error'].join(', ');
+              }
+
+
+
+
+              Swal.fire('Phát sinh lỗi. Dữ liệu chưa được lưu.', getErrorMessagesFromXhr(xhr), 'error');
             }
           });
 
