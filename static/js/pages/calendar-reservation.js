@@ -1,5 +1,5 @@
 (function () {
-  const calendaroffcanvas = new bootstrap.Offcanvas('#calendar-add_edit_event');
+  const calendaroffcanvas = new bootstrap.Offcanvas('#calendar-reservation-add_edit_event');
   const calendarmodal = new bootstrap.Modal('#calendar-reservation-modal');
   var calendevent = '';
 
@@ -19,26 +19,26 @@
     const prop = arg.event.extendedProps || {};
 
     if (opts.listView) {
-      return {
-        html: `
-          <div class="fc-evt">
-            <div class="fc-evt-title">${prop.name} | ${prop.people} ng</div>
-          </div>`
-      };
+      var font_size = 'f-14';
     }
     else {
-      return {
-        html: `
-          <div class="fc-evt">
-            <div class="fc-evt-title">${startOnly}</div>
-            <div class="fc-evt-row">${prop.name}</div>
-            <div class="fc-evt-row">${prop.people} ng</div>
-          </div>`
-      };
+      var font_size = 'f-12';
     } 
+
+    // <div class="fc-evt-title">${startOnly}</div>
+    // <div class="fc-evt-row"></div>
+    
+    return {
+      html: `
+        <div class="fc-evt">
+          <div class="fc-evt-title">
+            <span>${prop.name}</span>
+            <span class="badge bg-light-warning ${font_size}"><i class="ti ti-users"></i>${prop.people}</span></div>
+        </div>`
+    };
     
   }
-  
+
   window.calendar_reservation = new FullCalendar.Calendar(document.getElementById('calendar-reservation'), {
     
     headerToolbar: {
@@ -52,17 +52,14 @@
 
     // per-view title formats
     views: {
-      dayGridMonth: { // Month view → "October 2025"
-        buttonText: 'Month',
-        titleFormat: { month: 'short', year: 'numeric' },
-      },
-      // timeGridWeek: { // Week view → "Oct 13 – 19, 2025"
-      //   titleFormat: { month: 'short', day: 'numeric', year: 'numeric' }
-      // },
       timeGridDay: {  // Day view → "Tue, Oct 14, 2025"
         buttonText: 'Day',
         titleFormat: { month: 'short', day: 'numeric', year: 'numeric' },
         eventContent: (arg) => eventContentStartOnly(arg, { listView: false, hour12: false }) // 24h
+      },
+      dayGridMonth: { // Month view → "October 2025"
+        buttonText: 'Month',
+        titleFormat: { month: 'short', year: 'numeric' },
       },
       listMonth: { // List (month) → "October 2025"
         buttonText: "List",
@@ -79,51 +76,63 @@
     slotMaxTime: '23:00:00',
     businessHours: { daysOfWeek: [0,1,2,3,4,5,6], startTime: '08:00', endTime: '22:00' },
     
-    // slotEventOverlap: false,
-    // eventOverlap: false,
+    slotEventOverlap: false,
+    eventOverlap: false,
 
     navLinks: true,
     height: 'auto',
-    droppable: true,
-    selectable: true,
-    selectMirror: true,
-    editable: true,
+    droppable: false,
+    selectable: false,
+    selectMirror: false,
+    editable: false,
     dayMaxEvents: true,
     handleWindowResize: true,
 
-    select: function (info) {
-      var sdt = new Date(info.start);
-      var edt = new Date(info.end);
-      document.getElementById('pc-e-sdate').value = sdt.getFullYear() + '-' + getRound(sdt.getMonth() + 1) + '-' + getRound(sdt.getDate());
-      document.getElementById('pc-e-edate').value = edt.getFullYear() + '-' + getRound(edt.getMonth() + 1) + '-' + getRound(edt.getDate());
+    // select: function (info) {
+    //   var sdt = new Date(info.start);
+    //   var edt = new Date(info.end);
+    //   document.getElementById('pc-e-sdate').value = sdt.getFullYear() + '-' + getRound(sdt.getMonth() + 1) + '-' + getRound(sdt.getDate());
+    //   document.getElementById('pc-e-edate').value = edt.getFullYear() + '-' + getRound(edt.getMonth() + 1) + '-' + getRound(edt.getDate());
 
-      document.getElementById('pc-e-title').value = "";
-      document.getElementById('pc-e-venue').value = "";
-      document.getElementById('pc-e-description').value = "";
-      document.getElementById('pc-e-type').value = "";
-      document.getElementById('pc-e-btn-text').innerHTML = '<i class="align-text-bottom me-1 ti ti-calendar-plus"></i> Add';
-      document.querySelector('#pc_event_add').setAttribute('data-pc-action', 'add');
+    //   document.getElementById('pc-e-title').value = "";
+    //   document.getElementById('pc-e-venue').value = "";
+    //   document.getElementById('pc-e-description').value = "";
+    //   document.getElementById('pc-e-type').value = "";
+    //   document.getElementById('pc-e-btn-text').innerHTML = '<i class="align-text-bottom me-1 ti ti-calendar-plus"></i> Add';
+    //   document.querySelector('#pc_event_add').setAttribute('data-pc-action', 'add');
 
-      calendaroffcanvas.show();
-      calendar_reservation.unselect();
-    },
+    //   calendaroffcanvas.show();
+    //   calendar_reservation.unselect();
+    // },
 
     eventClick: function (info) {
+
       calendevent = info.event;
+      
       var clickedevent = info.event;
-      var e_title = clickedevent.title === undefined ? '' : clickedevent.title;
-      var e_desc = clickedevent.extendedProps.description === undefined ? '' : clickedevent.extendedProps.description;
-      var e_date_start = clickedevent.start === null ? '' : dateformat(clickedevent.start);
-      var e_date_end = clickedevent.end === null ? '' : " <i class='text-sm'>to</i> " + dateformat(clickedevent.end);
-      e_date_end = clickedevent.end === null ? '' : e_date_end;
-      var e_venue = clickedevent.extendedProps.description === undefined ? '' : clickedevent.extendedProps.venue;
+      var prop = clickedevent.extendedProps;
 
-      document.querySelector('.calendar-modal-title').innerHTML = e_title;
-      document.querySelector('.pc-event-title').innerHTML = e_title;
-      document.querySelector('.pc-event-description').innerHTML = e_desc;
-      document.querySelector('.pc-event-date').innerHTML = e_date_start + e_date_end;
-      document.querySelector('.pc-event-venue').innerHTML = e_venue;
+      document.querySelector('.calendar-modal-title').innerHTML = prop.name;
+      document.querySelector('.pc-event-people').innerHTML = prop.people;
+      document.querySelector('.pc-event-venue').innerHTML = prop.venue;
+      document.querySelector('.pc-event-date').innerHTML = dateformat(clickedevent.start);
+      document.querySelector('.pc-event-time').innerHTML = [getTime(clickedevent.start), getTime(clickedevent.end)].join(' to ');
+      document.querySelector('.pc-event-description').innerHTML = prop.desc;
 
+      
+      // var e_title = clickedevent.title === undefined ? '' : clickedevent.title;
+      // var e_desc = clickedevent.extendedProps.description === undefined ? '' : clickedevent.extendedProps.description;
+      // var e_date_start = clickedevent.start === null ? '' : dateformat(clickedevent.start);
+      // var e_date_end = clickedevent.end === null ? '' : " <i class='text-sm'>to</i> " + dateformat(clickedevent.end);
+      // e_date_end = clickedevent.end === null ? '' : e_date_end;
+      // var e_venue = clickedevent.extendedProps.description === undefined ? '' : clickedevent.extendedProps.venue;
+      // document.querySelector('.calendar-modal-title').innerHTML = e_title;
+      // document.querySelector('.pc-event-name').innerHTML = e_title;
+      // document.querySelector('.pc-event-people').innerHTML = e_title;
+      // document.querySelector('.pc-event-venue').innerHTML = e_venue;
+      // document.querySelector('.pc-event-date').innerHTML = e_date_start + e_date_end;
+      // document.querySelector('.pc-event-description').innerHTML = e_desc;
+      
       calendarmodal.show();
     },
     
@@ -142,7 +151,11 @@
 
   var pc_event_remove = document.querySelector('#pc_event_remove');
   if (pc_event_remove) {
+
     pc_event_remove.addEventListener('click', function () {
+      
+      calendarmodal.hide();
+
       const swalWithBootstrapButtons = Swal.mixin({
         customClass: {
           confirmButton: 'btn btn-light-success',
@@ -150,6 +163,7 @@
         },
         buttonsStyling: false
       });
+
       swalWithBootstrapButtons
         .fire({
           title: 'Are you sure?',
@@ -163,7 +177,7 @@
         .then((result) => {
           if (result.isConfirmed) {
             calendevent.remove();
-            calendarmodal.hide();
+            // calendarmodal.hide();
             swalWithBootstrapButtons.fire('Deleted!', 'Your Event has been deleted.', 'success');
           } else if (result.dismiss === Swal.DismissReason.cancel) {
             swalWithBootstrapButtons.fire('Cancelled', 'Your Event data is safe.', 'error');
@@ -172,78 +186,80 @@
     });
   }
 
-  var pc_event_add = document.querySelector('#pc_event_add');
-  if (pc_event_add) {
-    pc_event_add.addEventListener('click', function () {
-      var day = true;
-      var end = null;
-      var e_date_start = document.getElementById('pc-e-sdate').value === null ? '' : document.getElementById('pc-e-sdate').value;
-      var e_date_end = document.getElementById('pc-e-edate').value === null ? '' : document.getElementById('pc-e-edate').value;
-      if (!e_date_end == '') {
-        end = new Date(e_date_end);
-      }
-      calendar_reservation.addEvent({
-        title: document.getElementById('pc-e-title').value,
-        start: new Date(e_date_start),
-        end: end,
-        allDay: day,
-        description: document.getElementById('pc-e-description').value,
-        venue: document.getElementById('pc-e-venue').value,
-        className: document.getElementById('pc-e-type').value
-      });
-      if (pc_event_add.getAttribute('data-pc-action') == 'add') {
-        Swal.fire({
-          customClass: {
-            confirmButton: 'btn btn-light-primary'
-          },
-          buttonsStyling: false,
-          icon: 'success',
-          title: 'Success',
-          text: 'Event added successfully'
-        });
-      } else {
-        calendevent.remove();
-        document.getElementById('pc-e-btn-text').innerHTML = '<i class="align-text-bottom me-1 ti ti-calendar-plus"></i> Add';
-        document.querySelector('#pc_event_add').setAttribute('data-pc-action', 'add');
-        Swal.fire({
-          customClass: {
-            confirmButton: 'btn btn-light-primary'
-          },
-          buttonsStyling: false,
-          icon: 'success',
-          title: 'Success',
-          text: 'Event Updated successfully'
-        });
-      }
-      calendaroffcanvas.hide();
-    });
-  }
+  // var pc_event_add = document.querySelector('#pc_event_add');
 
-  var pc_event_edit = document.querySelector('#pc_event_edit');
-  if (pc_event_edit) {
-    pc_event_edit.addEventListener('click', function () {
-      var e_title = calendevent.title === undefined ? '' : calendevent.title;
-      var e_desc = calendevent.extendedProps.description === undefined ? '' : calendevent.extendedProps.description;
-      var e_date_start = calendevent.start === null ? '' : dateformat(calendevent.start);
-      var e_date_end = calendevent.end === null ? '' : " <i class='text-sm'>to</i> " + dateformat(calendevent.end);
-      e_date_end = calendevent.end === null ? '' : e_date_end;
-      var e_venue = calendevent.extendedProps.description === undefined ? '' : calendevent.extendedProps.venue;
-      var e_type = calendevent.classNames[0] === undefined ? '' : calendevent.classNames[0];
+  // if (pc_event_add) {
+  //   pc_event_add.addEventListener('click', function () {
+  //     var day = true;
+  //     var end = null;
+  //     var e_date_start = document.getElementById('pc-e-sdate').value === null ? '' : document.getElementById('pc-e-sdate').value;
+  //     var e_date_end = document.getElementById('pc-e-edate').value === null ? '' : document.getElementById('pc-e-edate').value;
+  //     if (!e_date_end == '') {
+  //       end = new Date(e_date_end);
+  //     }
+  //     calendar_reservation.addEvent({
+  //       title: document.getElementById('pc-e-title').value,
+  //       start: new Date(e_date_start),
+  //       end: end,
+  //       allDay: day,
+  //       description: document.getElementById('pc-e-description').value,
+  //       venue: document.getElementById('pc-e-venue').value,
+  //       className: document.getElementById('pc-e-type').value
+  //     });
+  //     if (pc_event_add.getAttribute('data-pc-action') == 'add') {
+  //       Swal.fire({
+  //         customClass: {
+  //           confirmButton: 'btn btn-light-primary'
+  //         },
+  //         buttonsStyling: false,
+  //         icon: 'success',
+  //         title: 'Success',
+  //         text: 'Event added successfully'
+  //       });
+  //     } else {
+  //       calendevent.remove();
+  //       document.getElementById('pc-e-btn-text').innerHTML = '<i class="align-text-bottom me-1 ti ti-calendar-plus"></i> Add';
+  //       document.querySelector('#pc_event_add').setAttribute('data-pc-action', 'add');
+  //       Swal.fire({
+  //         customClass: {
+  //           confirmButton: 'btn btn-light-primary'
+  //         },
+  //         buttonsStyling: false,
+  //         icon: 'success',
+  //         title: 'Success',
+  //         text: 'Event Updated successfully'
+  //       });
+  //     }
+  //     calendaroffcanvas.hide();
+  //   });
+  // }
 
-      document.getElementById('pc-e-title').value = e_title;
-      document.getElementById('pc-e-venue').value = e_venue;
-      document.getElementById('pc-e-description').value = e_desc;
-      document.getElementById('pc-e-type').value = e_type;
-      var sdt = new Date(e_date_start);
-      var edt = new Date(e_date_end);
-      document.getElementById('pc-e-sdate').value = sdt.getFullYear() + '-' + getRound(sdt.getMonth() + 1) + '-' + getRound(sdt.getDate());
-      document.getElementById('pc-e-edate').value = edt.getFullYear() + '-' + getRound(edt.getMonth() + 1) + '-' + getRound(edt.getDate());
-      document.getElementById('pc-e-btn-text').innerHTML = '<i class="align-text-bottom me-1 ti ti-calendar-stats"></i> Update';
-      document.querySelector('#pc_event_add').setAttribute('data-pc-action', 'edit');
-      calendarmodal.hide();
-      calendaroffcanvas.show();
-    });
-  }
+  // var pc_event_edit = document.querySelector('#pc_event_edit');
+  // if (pc_event_edit) {
+  //   pc_event_edit.addEventListener('click', function () {
+  //     var e_title = calendevent.title === undefined ? '' : calendevent.title;
+  //     var e_desc = calendevent.extendedProps.description === undefined ? '' : calendevent.extendedProps.description;
+  //     var e_date_start = calendevent.start === null ? '' : dateformat(calendevent.start);
+  //     var e_date_end = calendevent.end === null ? '' : " <i class='text-sm'>to</i> " + dateformat(calendevent.end);
+  //     e_date_end = calendevent.end === null ? '' : e_date_end;
+  //     var e_venue = calendevent.extendedProps.description === undefined ? '' : calendevent.extendedProps.venue;
+  //     var e_type = calendevent.classNames[0] === undefined ? '' : calendevent.classNames[0];
+
+  //     document.getElementById('pc-e-title').value = e_title;
+  //     document.getElementById('pc-e-venue').value = e_venue;
+  //     document.getElementById('pc-e-description').value = e_desc;
+  //     document.getElementById('pc-e-type').value = e_type;
+  //     var sdt = new Date(e_date_start);
+  //     var edt = new Date(e_date_end);
+  //     document.getElementById('pc-e-sdate').value = sdt.getFullYear() + '-' + getRound(sdt.getMonth() + 1) + '-' + getRound(sdt.getDate());
+  //     document.getElementById('pc-e-edate').value = edt.getFullYear() + '-' + getRound(edt.getMonth() + 1) + '-' + getRound(edt.getDate());
+  //     document.getElementById('pc-e-btn-text').innerHTML = '<i class="align-text-bottom me-1 ti ti-calendar-stats"></i> Update';
+  //     document.querySelector('#pc_event_add').setAttribute('data-pc-action', 'edit');
+  //     calendarmodal.hide();
+  //     calendaroffcanvas.show();
+  //   });
+  // }
+
   //  get round value
   function getRound(vale) {
     var tmp = '';
@@ -260,7 +276,7 @@
     temp = new Date(temp);
     if (temp.getHours() != null) {
       var hour = temp.getHours();
-      var minute = temp.getMinutes() ? temp.getMinutes() : 0;
+      var minute = temp.getMinutes() ? temp.getMinutes() : '00';
       return hour + ':' + minute;
     }
   }

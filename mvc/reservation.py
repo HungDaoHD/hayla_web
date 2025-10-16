@@ -50,7 +50,7 @@ class _ReservationBase(BaseModel):
     name: Annotated[str, Field(min_length=2)]
     people: Annotated[int, Field(ge=1, le=30)]
     venue: Venue
-    isAllDay: Annotated[bool, Field(default=False)]
+    allDay: Annotated[bool, Field(default=False)]
     
     # allow None in typing to match db rule; we enforce logic in validator
     start: Optional[datetime] = None
@@ -63,10 +63,10 @@ class _ReservationBase(BaseModel):
     @model_validator(mode="after")
     def _check_all_day_and_times(self):
         """
-        - If isAllDay == True: start == None and end == None
-        - If isAllDay == False: start != None and end != None and start < end
+        - If allDay == True: start == None and end == None
+        - If allDay == False: start != None and end != None and start < end
         """
-        if self.isAllDay:
+        if self.allDay:
             if self.start is not None or self.end is not None:
                 raise ValueError("For all-day events, start and end must be null.")
        
@@ -122,7 +122,7 @@ class Reservation:
         month_start = today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         
         dict_db_filter = {
-            'isAllDay': False,
+            'allDay': False,
             'start': {"$gte": month_start}
         }
         
@@ -131,10 +131,6 @@ class Reservation:
         async for event in self.clt_reservation.find(dict_db_filter).sort({'start': 1}):
             
             event_data = ReservationDB(**(jsonable_encoder(event, custom_encoder={ObjectId: str})))
-            # event_data.start = event_data.start.isoformat()
-            # event_data.end = event_data.end.isoformat()
-            
-            
             obj_reservation.append(event_data.model_dump(mode='json') if json_dumps else event_data)
             
         
