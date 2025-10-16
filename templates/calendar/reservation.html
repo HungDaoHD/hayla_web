@@ -226,30 +226,53 @@
   
   <div class="offcanvas-body">
     
-    <form id="pc-form-event" validate>
+    <form id="pc-form-event" class="validate-me" data-validate>
 
       <div class="form-group">
-        <label class="form-label">Title</label>
-        <input type="email" class="form-control" id="pc-e-title" placeholder="Enter event title" autofocus>
+        <label class="form-label">Customer name</label>
+        <input type="text" class="form-control" id="pc-e-name" placeholder="Enter customer name" minlength="2" maxlength="30" required autofocus>
       </div>
 
       <div class="form-group">
+        <label class="form-label">Number of people</label>
+        <input type="number" class="form-control" id="pc-e-people" placeholder="Enter number of people" min="1", max="30" required>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Date</label>
+        <input type="date" class="form-control" name=" date" id="pc-e-date" required>
+      </div>
+
+      <!-- <div class="form-group row">
+        <div class="col-6">
+          <label class="form-label">Start Time</label>
+          <input type="time" class="form-control" name=" stime" id="pc-e-stime" required min="08:00" max="22:30" step="1800" 
+          pattern="^(?:[01]\d|2[0-3]):[0-5]\d$"
+          placeholder="HH:MM" lang="vi">
+        </div>
+        
+        <div class="col-6">
+          <label class="form-label">End Time</label>
+          <input type="time" class="form-control" name=" etime" id="pc-e-etime" required step="1800" lang="en-GB">
+        </div>
+        
+      </div> -->
+      
+
+      <!-- <div class="form-group">
         <label class="form-label">Venue</label>
         <input type="email" class="form-control" id="pc-e-venue" placeholder="Enter event venue">
-      </div>
+      </div> -->
 
-      <div class="form-group m-0">
-        <input type="datetime" class="form-control" id="pc-e-sdate">
-        <input type="datetime" class="form-control" id="pc-e-edate">
-      </div>
+      
 
-      <div class="form-group">
+      <!-- <div class="form-group">
         <label class="form-label">Description</label>
         <textarea class="form-control" placeholder="Enter event description" rows="3"
           id="pc-e-description"></textarea>
-      </div>
+      </div> -->
 
-      <div class="form-group">
+      <!-- <div class="form-group">
         <label class="form-label">Type</label>
         <select class="form-select" id="pc-e-type">
           <option value="empty" selected>Type</option>
@@ -260,7 +283,7 @@
           <option value="event-warning">Warning</option>
           <option value="event-info">Info</option>
         </select>
-      </div>
+      </div> -->
 
       <div class="row justify-content-between">
         
@@ -295,8 +318,46 @@
   <!-- Sweet Alert -->
   <script src="{{ request.url_for('static', path='js/plugins/sweetalert2.all.min.js') }}"></script>
   
+  <!-- Calendar -->
   <script src="{{ request.url_for('static', path='js/pages/calendar-reservation.js') }}"></script>
+
+  <!-- jquery-validation Js -->
+  <script src="{{ request.url_for('static', path='js/plugins/bouncer.min.js') }}"></script>
+  <script src="{{ request.url_for('static', path='js/pages/form-validation.js') }}"></script>
+
+
+  
   <!-- [Page Specific JS] end -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const input = document.getElementById('pc-e-date');
+      const today = new Date();
+      
+      // format as YYYY-MM-DD for <input type="date">
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      
+      const todayStr = `${yyyy}-${mm}-${dd}`;
+      input.min = todayStr;        // ⬅️ sets minimum to today
+      // input.value = todayStr;      // optional: prefill with today
+    });
+
+  </script>
+
+  <!-- <script>
+    // Prefill current time in 24h
+    document.addEventListener('DOMContentLoaded', () => {
+      const el = document.getElementById('pc-e-stime');
+
+      console.log(el);
+
+      const d = new Date();
+      const hh = String(d.getHours()).padStart(2,'0');
+      const mm = String(d.getMinutes()).padStart(2,'0');
+      el.value = `${hh}:${mm}`;        // always 24h format
+    });
+  </script> -->
 
   <script>
 
