@@ -28,9 +28,15 @@
 <!-- [ Main Content ] start -->
 {% block main_content %}
 <div class="text-end p-2 pb-2">
-  <a href="javascript:void(0)" class="btn btn-primary d-inline-flex align-item-center" data-bs-toggle="offcanvas" data-bs-target="#calendar-reservation-add_edit_event">
-    <i class="ti ti-plus f-18"></i>Add
-  </a>
+  <!-- <a href="javascript:void(0)" class="btn btn-primary d-inline-flex align-item-center">  -->
+    <!-- data-bs-toggle="offcanvas" data-bs-target="#calendar-reservation-add_edit_event" -->
+    <!-- <i class="ti ti-plus f-18"></i>Add -->
+  <!-- </a> -->
+
+  <button id="btn-add-reservation" type="button" class="btn btn-primary d-inline-flex align-item-center">
+    <span id="btn-add-reservation-text"><i class="align-text-bottom me-1 ti ti-plus"></i> Add</span>
+  </button>
+
 </div>
 
 <div class="row">
@@ -44,181 +50,129 @@
 </div>
 
 <div class="modal fade" id="calendar-reservation-modal" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-      <div class="modal-content">
-        
-        <div class="modal-header">
-          <h3 class="calendar-modal-title f-w-600 text-truncate">Title</h3>
-          <a href="#" class="avtar avtar-s btn-link-danger btn-pc-default" data-bs-dismiss="modal">
-            <i class="ti ti-x f-20 text-danger"></i>
-          </a>
-        </div>
-        
-        <div class="modal-body">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <h3 class="calendar-modal-title f-w-600 text-truncate">Title</h3>
+        <a href="#" class="avtar avtar-s btn-link-danger btn-pc-default" data-bs-dismiss="modal">
+          <i class="ti ti-x f-20 text-danger"></i>
+        </a>
+      </div>
+      
+      <div class="modal-body">
 
-          <div class="row g-3 align-items-start">
+        <div class="row g-3 align-items-start">
 
-            <!-- People -->
-            <div class="col-6">
-              <div class="d-flex align-items-start gap-2">
-                <div class="avtar avtar-xs bg-light-primary d-inline-flex justify-content-center align-items-center">
-                  <i class="ti ti-users f-20"></i>
-                </div>
-                <div>
-                  <p class="mb-1 text-muted fw-semibold">People</p>
-                  <h5 class="pc-event-people mb-0"></h5>
-                </div>
-              </div>
-            </div>
-
-            <!-- Venue -->
-            <div class="col-6">
-              <div class="d-flex align-items-start gap-2">
-                <div class="avtar avtar-xs bg-light-info d-inline-flex justify-content-center align-items-center">
-                  <i class="ti ti-map-pin f-20"></i>
-                </div>
-                <div>
-                  <p class="mb-1 text-muted fw-semibold">Venue</p>
-                  <h5 class="pc-event-venue mb-0"></h5>
-                </div>
-              </div>
-            </div>
-
-            <!-- Date -->
-            <div class="col-6">
-              <div class="d-flex align-items-start gap-2">
-                <div class="avtar avtar-xs bg-light-warning d-inline-flex justify-content-center align-items-center">
-                  <i class="ti ti-calendar-event f-20"></i>
-                </div>
-                <div>
-                  <p class="mb-1 text-muted fw-semibold">Date</p>
-                  <h5 class="pc-event-date mb-0"></h5>
-                </div>
-              </div>
-            </div>
-
-            <!-- Time -->
-            <div class="col-6">
-              <div class="d-flex align-items-start gap-2">
-                <div class="avtar avtar-xs bg-light-danger d-inline-flex justify-content-center align-items-center">
-                  <i class="ti ti-alarm f-20"></i>
-                </div>
-                <div>
-                  <p class="mb-1 text-muted fw-semibold">Time</p>
-                  <h5 class="pc-event-time mb-0"></h5>
-                </div>
-              </div>
-            </div>
-
-            <!-- Description (full width) -->
-            <div class="col-12">
-              <div class="d-flex align-items-start gap-2">
-                <div class="avtar avtar-xs bg-light-secondary d-inline-flex justify-content-center align-items-center">
-                  <i class="ti ti-file-text f-20"></i>
-                </div>
-                <div>
-                  <p class="mb-1 text-muted fw-semibold">Description</p>
-                  <h6 class="pc-event-description mb-0"></h6>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-
-        <!-- <div class="modal-body">
-          
-          <div class="d-flex">
-
-            <div class="flex-shrink-0">
-              <div class="avtar avtar-xs bg-light-primary">
+          <!-- People -->
+          <div class="col-6">
+            <div class="d-flex align-items-start gap-2">
+              <div class="avtar avtar-xs bg-light-primary d-inline-flex justify-content-center align-items-center">
                 <i class="ti ti-users f-20"></i>
               </div>
+              <div>
+                <p class="mb-1 text-muted fw-semibold">People</p>
+                <h5 class="pc-event-people mb-0"></h5>
+              </div>
             </div>
-            <div class="flex-grow-1 ms-3">
-              <p class="mb-1 text-muted"><b>People</b></p>
-              <h5 class="pc-event-people"></h5>
-            </div>
+          </div>
 
-            <div class="flex-shrink-0">
-              <div class="avtar avtar-xs bg-light-warning">
+          <!-- Venue -->
+          <div class="col-6">
+            <div class="d-flex align-items-start gap-2">
+              <div class="avtar avtar-xs bg-light-info d-inline-flex justify-content-center align-items-center">
                 <i class="ti ti-map-pin f-20"></i>
               </div>
+              <div>
+                <p class="mb-1 text-muted fw-semibold">Venue</p>
+                <h5 class="pc-event-venue mb-0"></h5>
+              </div>
             </div>
-            <div class="flex-grow-1 ms-3">
-              <p class="mb-1 text-muted"><b>Venue</b></p>
-              <h5 class="pc-event-venue"></h5>
-            </div>
-            
           </div>
 
-          <div class="d-flex">
-            
-            <div class="flex-shrink-0">
-              <div class="avtar avtar-xs bg-light-danger">
+          <!-- Date -->
+          <div class="col-6">
+            <div class="d-flex align-items-start gap-2">
+              <div class="avtar avtar-xs bg-light-warning d-inline-flex justify-content-center align-items-center">
                 <i class="ti ti-calendar-event f-20"></i>
               </div>
+              <div>
+                <p class="mb-1 text-muted fw-semibold">Date</p>
+                <h5 class="pc-event-date mb-0"></h5>
+              </div>
             </div>
-            <div class="flex-grow-1 ms-3">
-              <p class="mb-1 text-muted"><b>Date</b></p>
-              <h5 class="pc-event-date"></h5>
-            </div>
-            
-            <div class="flex-shrink-0">
-              <div class="avtar avtar-xs bg-light-danger">
+          </div>
+
+          <!-- Time -->
+          <div class="col-6">
+            <div class="d-flex align-items-start gap-2">
+              <div class="avtar avtar-xs bg-light-danger d-inline-flex justify-content-center align-items-center">
                 <i class="ti ti-alarm f-20"></i>
               </div>
-            </div>
-            <div class="flex-grow-1 ms-3">
-              <p class="mb-1 text-muted"><b>Time</b></p>
-              <h5 class="pc-event-time"></h5>
-            </div>
-
-          </div>
-          
-          <div class="d-flex">
-            <div class="flex-shrink-0">
-              <div class="avtar avtar-xs bg-light-secondary">
-                <i class="ti ti-file-text f-20"></i>
+              <div>
+                <p class="mb-1 text-muted fw-semibold">Time</p>
+                <h5 class="pc-event-time mb-0"></h5>
               </div>
             </div>
-            <div class="flex-grow-1 ms-3">
-              <h5 class="mb-1"><b>Description</b></h5>
-              <p class="pc-event-description text-muted"></p>
+          </div>
+          
+          <!-- Status -->
+          <div class="col-6">
+            <div class="d-flex align-items-start gap-2">
+              <div class="avtar avtar-xs bg-light-success d-inline-flex justify-content-center align-items-center">
+                <i class="ti ti-info-square f-20"></i>
+              </div>
+              <div>
+                <p class="mb-1 text-muted fw-semibold">Status</p>
+                <h5 class="pc-event-status mb-0"></h5>
+              </div>
             </div>
           </div>
 
-        </div> -->
-
-        <div class="modal-footer justify-content-between">
-          <ul class="list-inline me-auto mb-0">
-            <li class="list-inline-item align-bottom">
-              <a href="#" id="pc_event_remove" class="avtar avtar-s btn-link-danger btn-pc-default w-sm-auto" data-bs-toggle="tooltip" title="Delete">
-                <i class="ti ti-trash f-18 text-danger"></i>
-              </a>
-            </li>
-
-            <li class="list-inline-item align-bottom">
-              <a href="#" id="pc_event_edit" class="avtar avtar-s btn-link-success btn-pc-default" data-bs-toggle="tooltip" title="Edit">
-                <i class="ti ti-edit-circle f-18 text-success"></i>
-              </a>
-            </li>
-          </ul>
-          
-          <div class="flex-grow-1 text-end">
-            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+          <!-- Description (full width) -->
+          <div class="col-6">
+            <div class="d-flex align-items-start gap-2">
+              <div class="avtar avtar-xs bg-light-secondary d-inline-flex justify-content-center align-items-center">
+                <i class="ti ti-file-text f-20"></i>
+              </div>
+              <div>
+                <p class="mb-1 text-muted fw-semibold">Description</p>
+                <h6 class="pc-event-description mb-0"></h6>
+              </div>
+            </div>
           </div>
+
         </div>
-      
       </div>
+
+      <div class="modal-footer justify-content-between">
+        <ul class="list-inline me-auto mb-0">
+          <li class="list-inline-item align-bottom">
+            <a href="#" id="pc_event_remove" class="avtar avtar-s btn-link-danger btn-pc-default w-sm-auto" data-bs-toggle="tooltip" title="Delete">
+              <i class="ti ti-trash f-18 text-danger"></i>
+            </a>
+          </li>
+
+          <li class="list-inline-item align-bottom">
+            <a href="#" id="pc_event_edit" class="avtar avtar-s btn-link-success btn-pc-default" data-bs-toggle="tooltip" title="Edit">
+              <i class="ti ti-edit-circle f-18 text-success"></i>
+            </a>
+          </li>
+        </ul>
+        
+        <div class="flex-grow-1 text-end">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    
     </div>
   </div>
+</div>
 
 <div class="offcanvas offcanvas-end cal-event-offcanvas" tabindex="-1" id="calendar-reservation-add_edit_event">
     
   <div class="offcanvas-header">
-    <h3 class="f-w-600 text-truncate">Add Events</h3>
+    <h3 class="offcanvas_title f-w-600 text-truncate">Add Events</h3>
     <a href="#" class="avtar avtar-s btn-link-danger btn-pc-default" data-bs-dismiss="offcanvas">
       <i class="ti ti-x f-20"></i>
     </a>
@@ -226,7 +180,9 @@
   
   <div class="offcanvas-body">
     
-    <form id="pc-form-event" class="validate-me" data-validate>
+    <form id="form-reservation-add-edit" class="validate-me" data-validate>
+
+      <input type="hidden" id="pc-e-oid">
 
       <div class="form-group">
         <label class="form-label">Customer name</label>
@@ -240,66 +196,57 @@
       
       <div class="form-group">
         <label class="form-label">Date</label>
-        <input type="date" class="form-control" name=" date" id="pc-e-date" required>
+        <input type="date" class="form-control" name=" date" id="pc-e-date" placeholder="mm/dd/yyyy" required>
       </div>
 
       <div class="form-group row">
         <div class="col-6">
-          <label class="form-label">Start Time</label>
-          <input type="time" class="form-control" name=" stime" id="pc-e-stime" required min="08:00" max="22:30" step="1800" 
-          pattern="^(?:[01]\d|2[0-3]):[0-5]\d$"
-          placeholder="HH:MM" lang="vi">
+          <label class="col-form-label text-lg-end">Start time</label>
+          <select class="form-control" id="pc-e-stime" name=" stime" required></select>
         </div>
         
         <div class="col-6">
-          <label class="form-label">End Time</label>
-          <input type="time" class="form-control" name=" etime" id="pc-e-etime" required step="1800" lang="en-GB">
+          <label class="col-form-label text-lg-end">End time</label>
+          <select class="form-control" id="pc-e-etime" name=" etime" required></select>
+        </div>
+
+      </div>
+
+      <div class="form-group row">
+        <div class="col-6">
+          <label class="form-label">Venue</label>
+          <select class="form-control" id="pc-e-venue" name=" venue" required></select>
         </div>
         
+        <div class="col-6">
+          <label class="form-label">Status</label>
+          <select class="form-control" id="pc-e-status" name=" status" required></select>
+        </div>
+
       </div>
       
-
-      <!-- <div class="form-group">
-        <label class="form-label">Venue</label>
-        <input type="email" class="form-control" id="pc-e-venue" placeholder="Enter event venue">
-      </div> -->
-
-      
-
-      <!-- <div class="form-group">
+      <div class="form-group">
         <label class="form-label">Description</label>
-        <textarea class="form-control" placeholder="Enter event description" rows="3"
-          id="pc-e-description"></textarea>
-      </div> -->
+        <textarea class="form-control" placeholder="Enter description (if any)" rows="2" id="pc-e-desc" name=" desc"></textarea>
+      </div>
 
-      <!-- <div class="form-group">
-        <label class="form-label">Type</label>
-        <select class="form-select" id="pc-e-type">
-          <option value="empty" selected>Type</option>
-          <option value="event-primary">Primary</option>
-          <option value="event-secondary">Secondary</option>
-          <option value="event-success">Success</option>
-          <option value="event-danger">Danger</option>
-          <option value="event-warning">Warning</option>
-          <option value="event-info">Info</option>
-        </select>
-      </div> -->
+    </form>
 
-      <div class="row justify-content-between">
-        
-        <div class="col-auto">
-          <button type="button" class="btn btn-link-danger btn-pc-default text-danger" data-bs-dismiss="offcanvas">
-            <i class="align-text-bottom me-1 ti ti-circle-x"></i> Close</button>
-        </div>
-        
-        <div class="col-auto">
-          <button id="pc_event_add" type="button" class="btn btn-primary" data-pc-action="add">
-            <span id="pc-e-btn-text"><i class="align-text-bottom me-1 ti ti-calendar-plus"></i> Add</span>
-          </button>
-        </div>
+    <div class="offcanvas-footer row justify-content-between">
+      
+      <div class="col-auto">
+        <button type="button" class="btn btn-link-danger btn-pc-default text-danger" data-bs-dismiss="offcanvas">
+          <i class="align-text-bottom me-1 ti ti-circle-x"></i> Close</button>
       </div>
       
-    </form>
+      <div class="col-auto">
+        <button id="btn-reservation-submit" type="button" class="btn btn-primary" data-pc-action="add">
+          <span id="btn-reservation-submit-text"> Add</span>
+        </button>
+      </div>
+    </div>
+      
+    
 
   </div>
 
@@ -325,6 +272,8 @@
   <script src="{{ request.url_for('static', path='js/plugins/bouncer.min.js') }}"></script>
   <script src="{{ request.url_for('static', path='js/pages/form-validation.js') }}"></script>
 
+  <!-- tagify -->
+  <script src="{{ request.url_for('static', path='js/plugins/choices.min.js') }}"></script>
 
   
   <!-- [Page Specific JS] end -->
@@ -339,184 +288,125 @@
       const dd = String(today.getDate()).padStart(2, '0');
       
       const todayStr = `${yyyy}-${mm}-${dd}`;
-      input.min = todayStr;        // ⬅️ sets minimum to today
+      input.min = todayStr;        // sets minimum to today
       // input.value = todayStr;      // optional: prefill with today
     });
 
   </script>
+  
+  <script>
+    
+    const elm_stime = [{ value: '', label: 'Select time', disabled: true, selected: true, placeholder: true }];
+    const elm_etime = [{ value: '', label: 'Select time', disabled: true, selected: true, placeholder: true }];
 
-  <!-- <script>
-    // Prefill current time in 24h
-    document.addEventListener('DOMContentLoaded', () => {
-      const el = document.getElementById('pc-e-stime');
+    for (let h = 8; h <= 22; h++) {
+      for (let m = 0; m < 60; m += 30) {
+        const hh = String(h).padStart(2, '0');
+        const mm = String(m).padStart(2, '0');
 
-      console.log(el);
+        if (h == 22 && m == 30){
+          break;
+        }
 
-      const d = new Date();
-      const hh = String(d.getHours()).padStart(2,'0');
-      const mm = String(d.getMinutes()).padStart(2,'0');
-      el.value = `${hh}:${mm}`;        // always 24h format
+        elm_stime.push({ value: `${hh}:${mm}`, label: `${hh}:${mm}` });
+      }
+    }
+    
+    const choice_stime = new Choices('#pc-e-stime', {
+      allowHTML: false,
+      searchEnabled: true,
+      shouldSort: false,
+      placeholder: true,
+      placeholderValue: 'Select time',
+      itemSelectText: ''
+    }).setChoices(elm_stime, 'value', 'label', true);
+    
+    const choice_etime = new Choices('#pc-e-etime', {
+      allowHTML: false,
+      searchEnabled: true,
+      shouldSort: false,
+      placeholder: true,
+      placeholderValue: 'Select time',
+      itemSelectText: ''
+    }).setChoices(elm_etime, 'value', 'label', true);
+
+    document.getElementById("pc-e-stime").addEventListener("change", function () {
+      const startTime = this.value;
+      
+      if (!startTime) return; // nothing selected yet
+      
+      const startVal = parseInt(startTime.replace(":", ""), 10);
+      
+      const elm_etime = [{ value: '', label: 'Select time', disabled: true, selected: true, placeholder: true }];
+      
+      elm_stime.forEach((obj, i) => {
+        
+        if (obj.value) {
+          const endVal = parseInt(obj.value.replace(":", ""), 10);
+          
+          if (endVal > startVal) {
+            
+            const duration = endVal - startVal;
+            const hh = parseInt(duration / 100);
+            const mm = duration % 100 > 0 ? 0.5 : 0;
+            
+            elm_etime.push({
+              value: obj.value,
+              label: `${obj.label} (${hh + mm} hr)` 
+            });
+
+          }
+        };
+      });
+      
+      choice_etime.clearChoices().setChoices(elm_etime);
     });
-  </script> -->
+
+    
+    const choice_venue = new Choices('#pc-e-venue', {
+      allowHTML: false,
+      searchEnabled: false,
+      shouldSort: false,
+      placeholder: true,
+      placeholderValue: 'Select venue',
+      itemSelectText: ''
+    }).setChoices(
+      [
+        { value: '', label: 'Select venue', disabled: true, selected: true, placeholder: true },
+        { value: 'Anywhere', label: 'Anywhere' },
+        { value: 'Room 1', label: 'Room 1' },
+        { value: 'Room 2', label: 'Room 2' },
+        { value: 'Room 1 & 2', label: 'Room 1 & 2' },
+        { value: 'Backroom', label: 'Backroom' },
+        { value: 'Window table', label: 'Window table' },
+        { value: 'Sofa', label: 'Sofa' }
+      ]
+    );
+
+    const choice_status = new Choices('#pc-e-status', {
+      allowHTML: false,
+      searchEnabled: false,
+      shouldSort: false,
+      placeholder: true,
+      placeholderValue: 'Select status',
+      itemSelectText: ''
+    }).setChoices(
+      [
+        { value: '', label: 'Select status', disabled: true, selected: false, placeholder: true },
+        { value: 'Booking', label: 'Booking', disabled: false, selected: true},
+        { value: 'Arrived', label: 'Arrived', disabled: true, selected: false},
+        { value: 'Leaved', label: 'Leaved', disabled: true, selected: false},
+        { value: 'Cancel', label: 'Cancel', disabled: true, selected: false},
+      ]
+    );
+
+  </script>
 
   <script>
 
     const lst_reservation = {{ lst_reservation | tojson }};
-    
     calendar_reservation.addEventSource(lst_reservation);
 
-
-
-
-
-    // const today = new Date();
-    // const y = today.getFullYear();
-    // const m = today.getMonth();
-
-    // var events = [
-    //   {
-    //     title: 'Hung',
-    //     start: new Date(y, m, 14, 11, 30),
-    //     end: new Date(y, m, 14, 18, 30),
-
-    //     allDay: false,
-    //     description: 'aaaa bbb cccc',
-    //     venue: 'sgn',
-    //     className: 'event-warning'
-    //   },
-      
-    //   {
-    //     title: 'Hung 2',
-    //     start: new Date(y, m, 14, 11, 30),
-    //     end: new Date(y, m, 14, 18, 30),
-        
-    //     allDay: false,
-    //     description: 'aaaa bbb cccc',
-    //     venue: 'sgn',
-    //     className: 'event-warning'
-    //   },
-      
-
-      
-    //   {
-    //     title: 'All Day Event',
-    //     start: new Date(y, m, 1),
-    //     allDay: true,
-    //     description:
-    //       'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry standard dummy text ever since the 1500s.',
-    //     venue: 'City Town',
-    //     className: 'event-warning'
-    //   },
-    //   {
-    //     title: 'Long Event',
-    //     start: new Date(y, m, 7),
-    //     end: new Date(y, m, 10),
-    //     allDay: true,
-    //     description:
-    //       'It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.',
-    //     venue: 'City Town',
-    //     className: 'event-primary'
-    //   },
-    //   {
-    //     groupId: 999,
-    //     title: 'Repeating Event',
-    //     start: new Date(y, m, 9, 16, 0),
-    //     allDay: false,
-    //     description:
-    //       'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry standard dummy text ever since the 1500s.',
-    //     venue: 'City Town',
-    //     className: 'event-danger'
-    //   },
-    //   {
-    //     groupId: 999,
-    //     title: 'Repeating Event',
-    //     start: new Date(y, m, 16, 16, 0),
-    //     allDay: false,
-    //     description:
-    //       'It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.',
-    //     venue: 'City Town',
-    //     className: 'event-danger'
-    //   },
-    //   {
-    //     title: 'Conference',
-    //     start: new Date(y, m, 11),
-    //     end: new Date(y, m, 13),
-    //     allDay: true,
-    //     description:
-    //       'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry standard dummy text ever since the 1500s.',
-    //     venue: 'City Town',
-    //     className: 'event-info'
-    //   },
-    //   {
-    //     title: 'Meeting',
-    //     start: new Date(y, m, 12, 10, 30),
-    //     end: new Date(y, m, 12, 12, 30),
-    //     allDay: false,
-    //     description:
-    //       'It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.',
-    //     venue: 'City Town',
-    //     className: 'event-danger'
-    //   },
-    //   {
-    //     title: 'Lunch',
-    //     start: new Date(y, m, 12, 12, 30),
-    //     allDay: false,
-    //     description:
-    //       'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry standard dummy text ever since the 1500s.',
-    //     venue: 'City Town',
-    //     className: 'event-success'
-    //   },
-    //   {
-    //     title: 'Meeting',
-    //     start: new Date(y, m, 14, 14, 30),
-    //     allDay: false,
-    //     description:
-    //       'It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.',
-    //     venue: 'City Town',
-    //     className: 'event-warning'
-    //   },
-    //   {
-    //     title: 'Happy Hour',
-    //     start: new Date(y, m, 14, 17, 30),
-    //     allDay: false,
-    //     description:
-    //       'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry standard dummy text ever since the 1500s.',
-    //     venue: 'City Town',
-    //     className: 'event-info'
-    //   },
-    //   {
-    //     title: 'Dinner',
-    //     start: new Date(y, m, 15, 20, 0),
-    //     allDay: false,
-    //     description:
-    //       'It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.',
-    //     venue: 'City Town',
-    //     className: 'event-primary'
-    //   },
-    //   {
-    //     title: 'Birthday Party',
-    //     start: new Date(y, m, 13, 0, 0),
-    //     allDay: false,
-    //     description:
-    //       'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry standard dummy text ever since the 1500s.',
-    //     venue: 'City Town',
-    //     className: 'event-success'
-    //   },
-    //   {
-    //     title: 'Click for Google',
-    //     url: 'http://google.com/',
-    //     allDay: true,
-    //     description:
-    //       'It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.',
-    //     venue: 'City Town',
-    //     start: new Date(y, m, 28)
-    //   }
-    // ]
-    
-    
-    
-    
-    
   </script>
 
 

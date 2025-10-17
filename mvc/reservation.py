@@ -34,7 +34,7 @@ PyObjectId = Annotated[ObjectId, BeforeValidator(_validate_object_id)]
 
 
 # ---- Shared enum for venue ----
-Venue = Literal[
+VENUE = Literal[
     'Room 1',
     'Room 2',
     'Room 1 & 2',
@@ -44,17 +44,24 @@ Venue = Literal[
     'Anywhere'
 ]
 
-
+STATUS = Literal[
+    'Booking',
+    'Arrived',
+    'Leaved',
+    'Cancel'
+]
 
 class _ReservationBase(BaseModel):
     name: Annotated[str, Field(min_length=2)]
     people: Annotated[int, Field(ge=1, le=30)]
-    venue: Venue
+    venue: VENUE
     allDay: Annotated[bool, Field(default=False)]
     
     # allow None in typing to match db rule; we enforce logic in validator
     start: Optional[datetime] = None
     end: Optional[datetime] = None
+    
+    status: STATUS
     
     desc: Annotated[str, Field(min_length=0, default="")]
     inputer: Annotated[str, Field(min_length=2)]

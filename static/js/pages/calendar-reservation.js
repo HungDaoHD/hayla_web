@@ -3,6 +3,83 @@
   const calendarmodal = new bootstrap.Modal('#calendar-reservation-modal');
   var calendevent = '';
 
+
+  $("#btn-add-reservation").on('click', function() {
+    $calendaroffcanvas = $("#calendar-reservation-add_edit_event");
+    $calendaroffcanvas.find('.offcanvas_title').text('Add New');
+    $('#btn-reservation-submit-text').html('<i class="align-text-bottom me-1 ti ti-calendar-plus"></i> Add');
+    $("#pc-form-event").find("#pc-e-oid").val('');
+    calendaroffcanvas.show();
+  });
+
+  function toMongoDateFromMDY(dateStr, timeStr) {
+    const [yyyy, mm, dd] = dateStr.split('-').map(s => parseInt(s, 10));
+    const [HH, MM] = timeStr.split(':').map(s => parseInt(s, 10));
+
+    // Build a local Date (browser’s timezone), then to UTC ISO "Z"
+    const d = new Date(yyyy, mm - 1, dd, HH, MM, 0, 0);
+    
+    return { $date: d.toISOString() };
+  }
+
+  $("#btn-reservation-submit").on('click', function() {
+
+    var missing_count = 0;
+    
+    ["#pc-e-name", "#pc-e-people", "#pc-e-date", "#pc-e-stime", "#pc-e-etime", "#pc-e-venue", "#pc-e-status"].forEach((val, i) => {
+
+      if ($(val).val() === null || $(val).val().length === 0){
+        missing_count += 1;
+        $(val).addClass('border-danger');
+        $(val).parent().addClass('border-danger');
+      }
+      else {
+        $(val).removeClass('border-danger');
+        $(val).parent().removeClass('border-danger');
+      }
+
+    }); 
+
+    if (missing_count !== 0){
+      Swal.fire('Please input all information.', 'except description', 'error');
+      return;
+    }
+    
+
+
+    
+
+    obj_reservation = {
+        name: $("#pc-e-name").val(),
+        people: $("#pc-e-people").val(),
+        start: toMongoDateFromMDY($("#pc-e-date").val(), $("#pc-e-stime").val()),
+        end: toMongoDateFromMDY($("#pc-e-date").val(), $("#pc-e-etime").val()),
+        venue: $("#pc-e-venue").val(),
+        status: $("#pc-e-status").val(),
+        desc: $("#pc-e-desc").val(),
+        allDay: false,
+        // "inputer": "hungdao1991@live.com",
+        
+        
+    };
+    
+    console.log(obj_reservation);
+
+
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+
   var date = new Date();
   var d = date.getDate();
   var m = date.getMonth();
@@ -18,26 +95,40 @@
 
     const prop = arg.event.extendedProps || {};
 
-    if (opts.listView) {
-      var font_size = 'f-14';
-    }
-    else {
-      var font_size = 'f-12';
-    } 
+    // if (opts.listView) {
+    //   var font_size = 'f-14';
+    // }
+    // else {
+    //   var font_size = 'f-12';
+    // } 
 
-    // <div class="fc-evt-title">${startOnly}</div>
-    // <div class="fc-evt-row"></div>
-    
     return {
       html: `
         <div class="fc-evt">
           <div class="fc-evt-title">
-            <span>${prop.name}</span>
-            <span class="badge bg-light-warning ${font_size}"><i class="ti ti-users"></i>${prop.people}</span></div>
+            <span><i class="ti ti-a-b"></i>${prop.name}</span>
+          </div> 
+
+          <div class="fc-evt-row">
+            <span><i class="ti ti-users"></i>${prop.people}</span>
+          </div>
+
+          <div class="fc-evt-row">
+            <span><i class="ti ti-info-square"></i>${prop.status}</span>
+          </div>
+
         </div>`
     };
     
   }
+
+  const statusColors = {
+    Arrived:   { bg:'#3881efff', text:'#fff' },
+    Booking:   { bg:'#ffbf00ff', text:'#fff' },
+    Cancel: { bg:'#dc3545', text:'#fff' },
+    Leaved:   { bg:'#848484ff', text:'#fff' },
+    default: { bg:'#848484ff', text:'#fff' },
+  };
 
   window.calendar_reservation = new FullCalendar.Calendar(document.getElementById('calendar-reservation'), {
     
@@ -55,7 +146,15 @@
       timeGridDay: {  // Day view → "Tue, Oct 14, 2025"
         buttonText: 'Day',
         titleFormat: { month: 'short', day: 'numeric', year: 'numeric' },
-        eventContent: (arg) => eventContentStartOnly(arg, { listView: false, hour12: false }) // 24h
+        eventContent: (arg) => eventContentStartOnly(arg, { listView: false, hour12: false }), // 24h
+        eventDidMount(info) {
+          const s = info.event.extendedProps.status;
+          const { bg, text } = statusColors[s] || statusColors.default;
+          info.el.style.backgroundColor = bg;
+          info.el.style.borderColor = bg;
+          info.el.style.color = text;
+        }
+      
       },
       dayGridMonth: { // Month view → "October 2025"
         buttonText: 'Month',
@@ -117,22 +216,9 @@
       document.querySelector('.pc-event-venue').innerHTML = prop.venue;
       document.querySelector('.pc-event-date').innerHTML = dateformat(clickedevent.start);
       document.querySelector('.pc-event-time').innerHTML = [getTime(clickedevent.start), getTime(clickedevent.end)].join(' to ');
+      document.querySelector('.pc-event-status').innerHTML = prop.status;
       document.querySelector('.pc-event-description').innerHTML = prop.desc;
 
-      
-      // var e_title = clickedevent.title === undefined ? '' : clickedevent.title;
-      // var e_desc = clickedevent.extendedProps.description === undefined ? '' : clickedevent.extendedProps.description;
-      // var e_date_start = clickedevent.start === null ? '' : dateformat(clickedevent.start);
-      // var e_date_end = clickedevent.end === null ? '' : " <i class='text-sm'>to</i> " + dateformat(clickedevent.end);
-      // e_date_end = clickedevent.end === null ? '' : e_date_end;
-      // var e_venue = clickedevent.extendedProps.description === undefined ? '' : clickedevent.extendedProps.venue;
-      // document.querySelector('.calendar-modal-title').innerHTML = e_title;
-      // document.querySelector('.pc-event-name').innerHTML = e_title;
-      // document.querySelector('.pc-event-people').innerHTML = e_title;
-      // document.querySelector('.pc-event-venue').innerHTML = e_venue;
-      // document.querySelector('.pc-event-date').innerHTML = e_date_start + e_date_end;
-      // document.querySelector('.pc-event-description').innerHTML = e_desc;
-      
       calendarmodal.show();
     },
     
@@ -187,7 +273,6 @@
   }
 
   // var pc_event_add = document.querySelector('#pc_event_add');
-
   // if (pc_event_add) {
   //   pc_event_add.addEventListener('click', function () {
   //     var day = true;
@@ -234,31 +319,35 @@
   //   });
   // }
 
-  // var pc_event_edit = document.querySelector('#pc_event_edit');
-  // if (pc_event_edit) {
-  //   pc_event_edit.addEventListener('click', function () {
-  //     var e_title = calendevent.title === undefined ? '' : calendevent.title;
-  //     var e_desc = calendevent.extendedProps.description === undefined ? '' : calendevent.extendedProps.description;
-  //     var e_date_start = calendevent.start === null ? '' : dateformat(calendevent.start);
-  //     var e_date_end = calendevent.end === null ? '' : " <i class='text-sm'>to</i> " + dateformat(calendevent.end);
-  //     e_date_end = calendevent.end === null ? '' : e_date_end;
-  //     var e_venue = calendevent.extendedProps.description === undefined ? '' : calendevent.extendedProps.venue;
-  //     var e_type = calendevent.classNames[0] === undefined ? '' : calendevent.classNames[0];
+  var pc_event_edit = document.querySelector('#pc_event_edit');
+  if (pc_event_edit) {
+    pc_event_edit.addEventListener('click', function () {
 
-  //     document.getElementById('pc-e-title').value = e_title;
-  //     document.getElementById('pc-e-venue').value = e_venue;
-  //     document.getElementById('pc-e-description').value = e_desc;
-  //     document.getElementById('pc-e-type').value = e_type;
-  //     var sdt = new Date(e_date_start);
-  //     var edt = new Date(e_date_end);
-  //     document.getElementById('pc-e-sdate').value = sdt.getFullYear() + '-' + getRound(sdt.getMonth() + 1) + '-' + getRound(sdt.getDate());
-  //     document.getElementById('pc-e-edate').value = edt.getFullYear() + '-' + getRound(edt.getMonth() + 1) + '-' + getRound(edt.getDate());
-  //     document.getElementById('pc-e-btn-text').innerHTML = '<i class="align-text-bottom me-1 ti ti-calendar-stats"></i> Update';
-  //     document.querySelector('#pc_event_add').setAttribute('data-pc-action', 'edit');
-  //     calendarmodal.hide();
-  //     calendaroffcanvas.show();
-  //   });
-  // }
+      console.log(calendevent);
+
+      // var e_title = calendevent.title === undefined ? '' : calendevent.title;
+      // var e_desc = calendevent.extendedProps.description === undefined ? '' : calendevent.extendedProps.description;
+      // var e_date_start = calendevent.start === null ? '' : dateformat(calendevent.start);
+      // var e_date_end = calendevent.end === null ? '' : " <i class='text-sm'>to</i> " + dateformat(calendevent.end);
+      // e_date_end = calendevent.end === null ? '' : e_date_end;
+      // var e_venue = calendevent.extendedProps.description === undefined ? '' : calendevent.extendedProps.venue;
+      // var e_type = calendevent.classNames[0] === undefined ? '' : calendevent.classNames[0];
+
+      // document.getElementById('pc-e-title').value = e_title;
+      // document.getElementById('pc-e-venue').value = e_venue;
+      // document.getElementById('pc-e-description').value = e_desc;
+      // document.getElementById('pc-e-type').value = e_type;
+      // var sdt = new Date(e_date_start);
+      // var edt = new Date(e_date_end);
+      // document.getElementById('pc-e-sdate').value = sdt.getFullYear() + '-' + getRound(sdt.getMonth() + 1) + '-' + getRound(sdt.getDate());
+      // document.getElementById('pc-e-edate').value = edt.getFullYear() + '-' + getRound(edt.getMonth() + 1) + '-' + getRound(edt.getDate());
+      // document.getElementById('pc-e-btn-text').innerHTML = '<i class="align-text-bottom me-1 ti ti-calendar-stats"></i> Update';
+      // document.querySelector('#pc_event_add').setAttribute('data-pc-action', 'edit');
+      
+      calendarmodal.hide();
+      calendaroffcanvas.show();
+    });
+  }
 
   //  get round value
   function getRound(vale) {
