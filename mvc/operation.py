@@ -1351,7 +1351,7 @@ class Operation:
         }
         
         await mailer.send_email_sync(to_addr='hungdao1991@live.com', subject=f"Kiểm kho {' - '.join(dict_summary['lst_date'])}", html_body=dict_summary['dt_summary_stock'])
-            
+        
         
         return dict_summary
         
