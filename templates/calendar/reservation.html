@@ -49,7 +49,7 @@
   </div>
 </div>
 
-<div class="modal fade" id="calendar-reservation-modal" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="calendar-reservation-modal" data-bs-keyboard="false" tabindex="-1"> <!-- aria-hidden="true" -->
   <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content">
       
@@ -169,11 +169,11 @@
   </div>
 </div>
 
-<div class="offcanvas offcanvas-end cal-event-offcanvas" tabindex="-1" id="calendar-reservation-add_edit_event">
+<div class="offcanvas offcanvas-end cal-event-offcanvas" tabindex="-1" id="calendar-reservation-add_edit_event" data-bs-keyboard="false">
     
   <div class="offcanvas-header">
     <h3 class="offcanvas_title f-w-600 text-truncate">Add Events</h3>
-    <a href="#" class="avtar avtar-s btn-link-danger btn-pc-default" data-bs-dismiss="offcanvas">
+    <a href="#" class="avtar avtar-s btn-link-danger btn-pc-default text-danger" data-bs-dismiss="offcanvas">
       <i class="ti ti-x f-20"></i>
     </a>
   </div>
@@ -235,13 +235,19 @@
     <div class="offcanvas-footer row justify-content-between">
       
       <div class="col-auto">
-        <button type="button" class="btn btn-link-danger btn-pc-default text-danger" data-bs-dismiss="offcanvas">
-          <i class="align-text-bottom me-1 ti ti-circle-x"></i> Close</button>
+        <!-- <button id="btn-reservation-close" type="button" class="btn btn-link-danger btn-pc-default text-danger" data-bs-dismiss="offcanvas">
+          <i class="align-text-bottom me-1 ti ti-circle-x"></i> Close
+        </button> -->
       </div>
       
       <div class="col-auto">
         <button id="btn-reservation-submit" type="button" class="btn btn-primary" data-pc-action="add">
-          <span id="btn-reservation-submit-text"> Add</span>
+          
+          <i class="spinner-border spinner-border-sm d-none" role="status"></i>
+          <i class="align-text-bottom me-1 ti ti-calendar-plus"></i>
+          
+          <span id="btn-reservation-submit-text">Add</span>
+          
         </button>
       </div>
     </div>
@@ -277,6 +283,8 @@
 
   
   <!-- [Page Specific JS] end -->
+  
+  <!-- Avoid select previous date -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const input = document.getElementById('pc-e-date');
@@ -294,6 +302,7 @@
 
   </script>
   
+  <!-- Init choice elements -->
   <script>
     
     const elm_stime = [{ value: '', label: 'Select time', disabled: true, selected: true, placeholder: true }];
@@ -383,6 +392,7 @@
       ]
     );
 
+
     const choice_status = new Choices('#pc-e-status', {
       allowHTML: false,
       searchEnabled: false,
@@ -402,14 +412,267 @@
 
   </script>
 
+  <!-- Init calendar with reservation form DB -->
   <script>
-
     const lst_reservation = {{ lst_reservation | tojson }};
     calendar_reservation.addEventSource(lst_reservation);
+  </script>
+  
+  <!-- Add reservtion -->
+  <script>
+
+    $("#btn-add-reservation").on('click', function() {
+      $calendaroffcanvas = $("#calendar-reservation-add_edit_event");
+      $calendaroffcanvas.find('.offcanvas_title').text('Add New');
+      $("#pc-form-event").find("#pc-e-oid").val('');
+      $('#btn-reservation-submit-text').html('Add');
+      calendaroffcanvas.show();
+    });
+
+    function toMongoDateFromMDY(dateStr, timeStr) {
+      const [yyyy, mm, dd] = dateStr.split('-').map(s => parseInt(s, 10));
+      const [HH, MM] = timeStr.split(':').map(s => parseInt(s, 10));
+
+      // Build a local Date (browser’s timezone), then to UTC ISO "Z"
+      const d = new Date(yyyy, mm - 1, dd, HH, MM, 0, 0);
+      
+      // return { $date: d.toISOString() };
+      return d.toISOString();
+    }
+
+
+    const elm_reservation_id = {
+      basic: {
+        name: "#pc-e-name",
+        people: "#pc-e-people",
+        date: "#pc-e-date",
+        desc: "#pc-e-desc",
+      },
+      choices: {
+        start: "#pc-e-stime",
+        end: "#pc-e-etime",
+        venue: "#pc-e-venue",
+        status: "#pc-e-status",
+      }
+    };
+
+    function validate_reservation_input () {
+
+      const isEmptyVal = (v) => v == null || (Array.isArray(v) ? v.length === 0 : String(v).trim() === "");
+      var missing_count = 0;
+      
+      // BASIC (inputs, textareas, etc.)
+      Object.values(elm_reservation_id.basic).forEach((sel) => {
+        
+        if(sel === '#pc-e-desc'){
+          return;
+        }
+        
+        const $el = $(sel);
+        if (!$el.length) return;
+
+        const v = $el.val();
+        if (isEmptyVal(v)) {
+          missing_count++;
+          $el.addClass('border-danger');
+        } else {
+          $el.removeClass('border-danger');
+        }
+      });
+
+      // CHOICES (selects enhanced by Choices.js)
+      Object.values(elm_reservation_id.choices).forEach((sel) => {
+        const $select = $(sel);
+        if (!$select.length) return;
+
+        if (isEmptyVal($select.val())) {
+          
+          missing_count++;
+          $select.parent().addClass('border-danger');
+          
+        } else {
+
+          $select.parent().removeClass('border-danger');
+        
+        }
+      });
+
+      return missing_count;
+    }
+
+
+    function disable_input_elements($btnSubmit, isDisable) {
+
+      if(isDisable){
+        $('#calendar-reservation-add_edit_event [data-bs-dismiss="offcanvas"]').prop('disabled', isDisable);
+
+        $btnSubmit.prop('disabled', isDisable);
+        $btnSubmit.find(".spinner-border").removeClass('d-none');
+        $btnSubmit.find(".ti-calendar-plus").addClass('d-none');
+
+        document.querySelectorAll(Object.values(elm_reservation_id.basic).join(', ')).forEach(el => el.disabled = true);
+        choice_stime.disable();
+        choice_etime.disable();
+        choice_venue.disable();
+        choice_status.disable();
+      }
+      else {
+        $('#calendar-reservation-add_edit_event [data-bs-dismiss="offcanvas"]').prop('disabled', isDisable);
+        
+        $btnSubmit.prop('disabled', isDisable);
+        $btnSubmit.find(".spinner-border").addClass('d-none');
+        $btnSubmit.find(".ti-calendar-plus").removeClass('d-none');
+        
+        document.querySelectorAll(Object.values(elm_reservation_id.basic).join(', ')).forEach(el => el.disabled = isDisable);
+        choice_stime.enable();
+        choice_etime.enable();
+        choice_venue.enable();
+        choice_status.enable();
+      }
+
+    }
+
+
+
+    $("#btn-reservation-submit").on('click', function() {
+
+      var missing_count = validate_reservation_input();
+      
+      if (missing_count !== 0){
+        Swal.fire('Please input all information.', 'except description', 'error');
+        return;
+      }
+      
+      disable_input_elements($(this), true);
+
+      Swal.fire({
+          title: 'Do you want do add this reservation?',
+          showDenyButton: true,
+          showCancelButton: false,
+          confirmButtonText: 'Yes',
+          denyButtonText: 'No',
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          allowEnterKey: false,
+        }).then((result) => {
+          
+          if (result.isDenied) 
+          {
+            
+            disable_input_elements($(this), false);
+            return;
+          }
+          else if (result.isConfirmed) {
+            
+            obj_reservation = {
+              name: $("#pc-e-name").val(),
+              people: $("#pc-e-people").val(),
+              start: toMongoDateFromMDY($("#pc-e-date").val(), $("#pc-e-stime").val()),
+              end: toMongoDateFromMDY($("#pc-e-date").val(), $("#pc-e-etime").val()),
+              venue: $("#pc-e-venue").val(),
+              status: $("#pc-e-status").val(),
+              desc: $("#pc-e-desc").val(),
+              allDay: false,
+              inputer: "hungdao1991@live.com",
+            };
+            
+            console.log(obj_reservation);
+            
+
+            $.ajax({
+              url: '/calendar/reservation/add',
+              method: 'POST',
+              contentType: 'application/json',
+              data: JSON.stringify(obj_reservation),
+
+              success: function(obj_added) {
+
+                Swal.fire('Add reservation successfully!', Object.values(obj_added).join(', '), 'success').then(() => {
+                  disable_input_elements($(this), false);
+                }).then((result) => {
+                  window.location.reload();
+                });
+                
+              },
+
+              error: function(xhr, status, err) {
+                
+                console.error(xhr);
+                console.error(status);
+                console.error(err);
+                
+                function getErrorMessagesFromXhr(xhr) {
+                  // Prefer JSON if present
+                  const rj = xhr.responseJSON;
+                  if (rj && rj.detail !== undefined) {
+
+                    const d = rj.detail;
+                    
+                    if (Array.isArray(d)) {
+                      
+                      // FastAPI validation errors: [{loc: [...], msg: "...", type: "..."}]
+                      
+                      if ((d[0]?.msg === "Field required" || d[0]?.message === "Field required") && d[0].type === "missing" && (d[0].loc[1] === "email" || d[0].loc[1] === "password")) {
+                        return "Vui lòng đăng nhập!!!";
+                      }
+                      else {
+                        return d.map(item => item?.msg || item?.message || (typeof item === 'string' ? item : JSON.stringify(item))).join(', ');
+                      }
+                      
+
+                    } else {
+                      // Sometimes FastAPI sends {detail: "message"} or {detail: {...}}
+                      return [typeof d === 'string' ? d : (d.msg || d.message || JSON.stringify(d))].join(', ');
+                    }
+                    
+                    
+                  }
+
+                  // Fallbacks: try to parse text or show status text
+                  try {
+                    const parsed = JSON.parse(xhr.responseText);
+                    if (parsed?.detail) return [parsed.detail].join(', ');
+                  } catch (_) {}
+                  
+                  return [xhr.statusText || 'Unknown error'].join(', ');
+                }
+              
+                Swal.fire('Phát sinh lỗi. Dữ liệu chưa được lưu.', getErrorMessagesFromXhr(xhr), 'error');
+              }
+              // complete: function refresh() {
+              //   window.location.reload();
+              // }
+            });
+
+          }
+
+        });
+
+
+      
+
+      
+
+
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   </script>
 
-
+  
 {% endblock %}
 
 

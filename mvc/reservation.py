@@ -67,6 +67,17 @@ class _ReservationBase(BaseModel):
     inputer: Annotated[str, Field(min_length=2)]
 
     
+    # # Make sure "Z" (UTC) is parsed even in strict environments
+    # @field_validator("start", "end", mode="before")
+    # @classmethod
+    # def _parse_z_datetime(cls, v):
+    #     if isinstance(v, str) and v.endswith("Z"):
+    #         # fromisoformat doesn't like 'Z' => replace with '+00:00'
+    #         return datetime.fromisoformat(v.replace("Z", "+00:00"))
+    #     return v
+    
+    
+    
     @model_validator(mode="after")
     def _check_all_day_and_times(self):
         """
@@ -99,7 +110,7 @@ class _ReservationBase(BaseModel):
     )
 
 
-class ReservationIn(_ReservationBase):
+class ReservationAdd(_ReservationBase):
     """
     Use for inserts when MongoDB will assign _id (or you set it client-side).
     """
@@ -119,8 +130,13 @@ class ReservationDB(_ReservationBase):
 class Reservation:
 
     def __init__(self):
+        self.is_local = mongo_db.is_local
+        
         self.clt_reservation = mongo_db.hayladb['reservation']
 
+
+    
+    
     
     
     async def retrieve_reservation(self, current_user: UserPublic, json_dumps: bool) -> list[ReservationDB]:
@@ -133,17 +149,40 @@ class Reservation:
             'start': {"$gte": month_start}
         }
         
+        HCM = ZoneInfo("Asia/Ho_Chi_Minh")
+        
         obj_reservation = list()
         
         async for event in self.clt_reservation.find(dict_db_filter).sort({'start': 1}):
             
             event_data = ReservationDB(**(jsonable_encoder(event, custom_encoder={ObjectId: str})))
+            event_data.start = event_data.start.replace(tzinfo=timezone.utc).astimezone(HCM)
+            event_data.end = event_data.end.replace(tzinfo=timezone.utc).astimezone(HCM)
+            
             obj_reservation.append(event_data.model_dump(mode='json') if json_dumps else event_data)
             
         
         return obj_reservation
     
     
+    
+    
+    async def add_reservation(self, obj_reservation: ReservationAdd, current_user: UserPublic) -> ReservationAdd:
+        
+        try:
+            obj_reservation.inputer = current_user.email
+            obj_reservation_dump = obj_reservation.model_dump(by_alias=True, exclude_none=True)
+            
+            result = await self.clt_reservation.insert_one(obj_reservation_dump)
+            
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Could not insert stock item(s): {e}")
+
+
+        
+        
+        return obj_reservation
+
     
     
     

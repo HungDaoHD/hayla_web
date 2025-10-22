@@ -5,7 +5,7 @@ from fastapi.templating import Jinja2Templates
 
 from routers.auth.oauth2 import require_role
 from mvc.users import UserPublic
-from mvc.reservation import Reservation
+from mvc.reservation import Reservation, ReservationAdd
 
 from datetime import datetime
 import json
@@ -32,3 +32,11 @@ async def retrieve_reservation(request: Request, current_user: UserPublic = Depe
     })
     
 
+
+@router.post('/reservation/add', response_class=JSONResponse)
+async def add_reservation(obj_reservation: ReservationAdd, current_user: UserPublic = Depends(require_role(role=lst_role))):
+    
+    res = Reservation()
+    obj_added = await res.add_reservation(obj_reservation, current_user)
+    
+    return JSONResponse(content=[obj_added.model_dump(mode='json')])

@@ -1179,13 +1179,16 @@ class Operation:
         dict_filter.update({'Raw_Ingredient_ID': {'$exists': True, '$ne': None}})
         
         if current_user.role.lower() not in ['admin']:
-            
             since = datetime.now() - timedelta(days=7)
             dict_filter.update({
                 'DateTime': {'$gte': since},
                 'email': current_user.email
             })
+        else:
+            since = datetime.now() - timedelta(days=14)
+            dict_filter.update({'DateTime': {'$gte': since}})
             
+        
         async for item in self.clt_stock.find(dict_filter).sort({'DateTime': -1}):
             
             item_data = await self.convert_stock(item)

@@ -20,6 +20,8 @@ class Database:
             self.hayladb = self.client['hayladb']
             self.clt_user = self.hayladb['user']
             
+            self.is_local = True if MONGO_URI == "mongodb://localhost:27017" else False
+            
             print('hayladb connected successfully!!!')
 
         except Exception as err:

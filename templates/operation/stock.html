@@ -474,7 +474,7 @@
 
       $btn_stock_submit.prop('disabled', true).find('.btn-text').text('Please wait…');
       $btn_stock_submit.find('.spinner-border').removeClass('d-none');
-
+      
       Swal.fire({
         title: `Bạn có muốn lưu (${obj_items.lst_stock_items.length}) dữ liệu đã nhập?`,
         showDenyButton: true,
@@ -555,7 +555,7 @@
 
 
 
-              Swal.fire('Phát sinh lỗi. Dữ liệu chưa được lưu.', getErrorMessagesFromXhr(xhr), 'error');
+              Swal.fire(getErrorMessagesFromXhr(xhr), 'Phát sinh lỗi. Dữ liệu chưa được lưu.', 'error');
             }
           });
 

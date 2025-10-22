@@ -1,85 +1,8 @@
 (function () {
-  const calendaroffcanvas = new bootstrap.Offcanvas('#calendar-reservation-add_edit_event');
+  window.calendaroffcanvas = new bootstrap.Offcanvas('#calendar-reservation-add_edit_event');
   const calendarmodal = new bootstrap.Modal('#calendar-reservation-modal');
   var calendevent = '';
-
-
-  $("#btn-add-reservation").on('click', function() {
-    $calendaroffcanvas = $("#calendar-reservation-add_edit_event");
-    $calendaroffcanvas.find('.offcanvas_title').text('Add New');
-    $('#btn-reservation-submit-text').html('<i class="align-text-bottom me-1 ti ti-calendar-plus"></i> Add');
-    $("#pc-form-event").find("#pc-e-oid").val('');
-    calendaroffcanvas.show();
-  });
-
-  function toMongoDateFromMDY(dateStr, timeStr) {
-    const [yyyy, mm, dd] = dateStr.split('-').map(s => parseInt(s, 10));
-    const [HH, MM] = timeStr.split(':').map(s => parseInt(s, 10));
-
-    // Build a local Date (browser’s timezone), then to UTC ISO "Z"
-    const d = new Date(yyyy, mm - 1, dd, HH, MM, 0, 0);
-    
-    return { $date: d.toISOString() };
-  }
-
-  $("#btn-reservation-submit").on('click', function() {
-
-    var missing_count = 0;
-    
-    ["#pc-e-name", "#pc-e-people", "#pc-e-date", "#pc-e-stime", "#pc-e-etime", "#pc-e-venue", "#pc-e-status"].forEach((val, i) => {
-
-      if ($(val).val() === null || $(val).val().length === 0){
-        missing_count += 1;
-        $(val).addClass('border-danger');
-        $(val).parent().addClass('border-danger');
-      }
-      else {
-        $(val).removeClass('border-danger');
-        $(val).parent().removeClass('border-danger');
-      }
-
-    }); 
-
-    if (missing_count !== 0){
-      Swal.fire('Please input all information.', 'except description', 'error');
-      return;
-    }
-    
-
-
-    
-
-    obj_reservation = {
-        name: $("#pc-e-name").val(),
-        people: $("#pc-e-people").val(),
-        start: toMongoDateFromMDY($("#pc-e-date").val(), $("#pc-e-stime").val()),
-        end: toMongoDateFromMDY($("#pc-e-date").val(), $("#pc-e-etime").val()),
-        venue: $("#pc-e-venue").val(),
-        status: $("#pc-e-status").val(),
-        desc: $("#pc-e-desc").val(),
-        allDay: false,
-        // "inputer": "hungdao1991@live.com",
-        
-        
-    };
-    
-    console.log(obj_reservation);
-
-
-  });
-
-
-
-
-
-
-
-
-
-
-
-
-
+  
   var date = new Date();
   var d = date.getDate();
   var m = date.getMonth();
