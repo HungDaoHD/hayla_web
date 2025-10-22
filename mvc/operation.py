@@ -1221,11 +1221,11 @@ class Operation:
         lst_stock_item = list()
         
         async for item in self.clt_stock.find(
-                {
-                    "_id": {"$in": result.inserted_ids},
-                    "email": current_user.email
-                }, 
-            ).sort({'DateTime': -1}):
+            {
+                "_id": {"$in": result.inserted_ids},
+                "email": current_user.email
+            }, 
+        ).sort({'DateTime': -1}):
             
             item_data = await self.convert_stock(item)
             lst_stock_item.append(item_data)
