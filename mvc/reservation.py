@@ -176,11 +176,9 @@ class Reservation:
             result = await self.clt_reservation.insert_one(obj_reservation_dump)
             
         except Exception as e:
-            raise HTTPException(status_code=400, detail=f"Could not insert stock item(s): {e}")
+            raise HTTPException(status_code=400, detail=f"Could not insert reservation(s): {e}")
 
 
-        
-        
         return obj_reservation
 
     

@@ -60,17 +60,17 @@ class Mailer:
     
     
     
-    async def send_email(self):
+    # async def send_email(self):
+    
+    #     msg = EmailMessage()
+    #     msg["From"] = self.MAIL_FROM
+    #     msg["To"] = self.MAIL_TO
+    #     msg["Subject"] = "Test via gmail SMTP"
+    #     msg.set_content("Hello from gmail SMTP!")
         
-        msg = EmailMessage()
-        msg["From"] = self.MAIL_FROM
-        msg["To"] = self.MAIL_TO
-        msg["Subject"] = "Test via gmail SMTP"
-        msg.set_content("Hello from gmail SMTP!")
-        
-        async with SMTP(hostname=self.SMTP_HOST, port=self.SMTP_PORT, start_tls=True, timeout=30) as smtp:
-            await smtp.login(self.SMTP_USERNAME, self.SMTP_PASSWORD)
-            await smtp.send_message(msg)
+    #     async with SMTP(hostname=self.SMTP_HOST, port=self.SMTP_PORT, start_tls=True, timeout=30) as smtp:
+    #         await smtp.login(self.SMTP_USERNAME, self.SMTP_PASSWORD)
+    #         await smtp.send_message(msg)
 
 
 

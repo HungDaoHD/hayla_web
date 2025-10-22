@@ -1345,10 +1345,15 @@ class Operation:
         
         # consider to convert df_pivot to model
         
-        return {
+        dict_summary = {
             'lst_date': [start_date.strftime("%d/%m/%y"), end_date.strftime("%d/%m/%y")],
             'dt_summary_stock': tbl_html
         }
+        
+        await mailer.send_email_sync(to_addr='hungdao1991@live.com', subject=f"Kiểm kho {' - '.join(dict_summary['lst_date'])}", html_body=dict_summary['dt_summary_stock'])
+            
+        
+        return dict_summary
         
         
     
