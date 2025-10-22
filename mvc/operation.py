@@ -11,7 +11,7 @@ from fastapi.encoders import jsonable_encoder
 
 from mvc.database import mongo_db
 from mvc.users import UserPublic
-# from mvc.mailer import mailer
+from mvc.mailer import mailer
 
 
 
@@ -1158,7 +1158,7 @@ class Operation:
 
 
 
-    async def retrieve_stock_items(self, dict_filter_mongodb: dict, current_user: UserPublic) -> list[StockItem]:
+    async def retrieve_stock_items(self, dict_filter_mongodb: dict, current_user: UserPublic, send_mail: bool = False) -> list[StockItem]:
         
         LOCAL_TZ = ZoneInfo("Asia/Ho_Chi_Minh")
         
@@ -1179,16 +1179,17 @@ class Operation:
         dict_filter.update({'Raw_Ingredient_ID': {'$exists': True, '$ne': None}})
         
         if current_user.role.lower() not in ['admin']:
-            since = datetime.now() - timedelta(days=7)
-            dict_filter.update({
-                'DateTime': {'$gte': since},
-                'email': current_user.email
-            })
+            since = datetime.now() - timedelta(days=14)
+            dict_filter.update({'DateTime': {'$gte': since}})
+            
+            if not send_mail:
+                dict_filter.update({'email': current_user.email})
+
         else:
             since = datetime.now() - timedelta(days=14)
             dict_filter.update({'DateTime': {'$gte': since}})
             
-        
+
         async for item in self.clt_stock.find(dict_filter).sort({'DateTime': -1}):
             
             item_data = await self.convert_stock(item)
@@ -1213,8 +1214,6 @@ class Operation:
             result = await self.clt_stock.insert_many(lst_stock_item_dump)
 
             
-            
-        
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"Could not insert stock item(s): {e}")
 
@@ -1232,9 +1231,15 @@ class Operation:
             lst_stock_item.append(item_data)
         
         
-        # # send mail
-        # await mailer.send_email()
-        
+        if lst_item[0].Method == 'check':
+            
+            dict_summary = await self.summary_stock(obj_stock_summary_filter=SummaryStockFilter(Location=lst_item[0].Location), current_user=current_user, send_mail=True)
+            
+            await mailer.send_email_sync(to_addr='hungdao1991@live.com, hayla.cafe2003@gmail.com', subject=f"Kiểm kho {' - '.join(dict_summary['lst_date'])}", html_body=dict_summary['dt_summary_stock'])
+            
+            # # send mail
+            # await mailer.send_email()
+
         
         return lst_stock_item
     
@@ -1261,20 +1266,18 @@ class Operation:
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"Could not delete stock item(s): {e}")
 
-
-        
         lst_stock_item = await self.retrieve_stock_items(dict_filter_mongodb={}, current_user=current_user)
         
         return lst_stock_item
     
     
     
-    async def summary_stock(self, obj_stock_summary_filter: SummaryStockFilter, current_user: UserPublic) -> dict:
+    async def summary_stock(self, obj_stock_summary_filter: SummaryStockFilter, current_user: UserPublic, send_mail: bool = False) -> dict:
         
         since = datetime.now() - timedelta(days=14)
         dict_filter_mongodb = obj_stock_summary_filter.model_dump(mode='json') | {'DateTime': {'$gte': since}}
         
-        lst_stock = await self.retrieve_stock_items(dict_filter_mongodb=dict_filter_mongodb, current_user=current_user)
+        lst_stock = await self.retrieve_stock_items(dict_filter_mongodb=dict_filter_mongodb, current_user=current_user, send_mail=send_mail)
         
         df_data = pd.DataFrame([i.model_dump() for i in lst_stock])
         
@@ -1322,6 +1325,8 @@ class Operation:
         
         df_pivot = df_pivot.reindex(columns=['From', 'Add', 'Get', 'Remain', 'To', 'Gap', 'Status'])
         df_pivot = df_pivot.reset_index(drop=False)
+        df_pivot = df_pivot.sort_values(by='To', ascending=True)
+        
         
         df_pivot = df_pivot.rename(columns={
             'From': f'From: {start_date.strftime("%d/%m/%y")}',
@@ -1341,7 +1346,7 @@ class Operation:
         # consider to convert df_pivot to model
         
         return {
-            # 'lst_latest2_dates': lst_latest2_dates,
+            'lst_date': [start_date.strftime("%d/%m/%y"), end_date.strftime("%d/%m/%y")],
             'dt_summary_stock': tbl_html
         }
         
