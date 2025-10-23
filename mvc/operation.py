@@ -1231,15 +1231,14 @@ class Operation:
             lst_stock_item.append(item_data)
         
         
-        # if lst_item[0].Method == 'check':
+        if lst_item[0].Method in ['check', 'add']:
             
-        #     dict_summary = await self.summary_stock(obj_stock_summary_filter=SummaryStockFilter(Location=lst_item[0].Location), current_user=current_user, send_mail=True)
+            dict_summary = await self.summary_stock(obj_stock_summary_filter=SummaryStockFilter(Location=lst_item[0].Location), current_user=current_user, send_mail=True)
             
-        #     await mailer.send_email_sync(to_addr='hungdao1991@live.com, hayla.cafe2003@gmail.com', subject=f"Kiểm kho {' - '.join(dict_summary['lst_date'])}", html_body=dict_summary['dt_summary_stock'])
+            # await mailer.send_email_sync(to_addr='hungdao1991@live.com, hayla.cafe2003@gmail.com', subject=f"Kiểm kho {' - '.join(dict_summary['lst_date'])}", html_body=dict_summary['dt_summary_stock'])
             
-        #     # # send mail
-        #     # await mailer.send_email()
-
+            await mailer.send_email_resend(to_addr='hung.daotuan.1991@gmail.com', subject=f"Kiểm kho {' - '.join(dict_summary['lst_date'])}", html_body=dict_summary['dt_summary_stock'])
+            
         
         return lst_stock_item
     
