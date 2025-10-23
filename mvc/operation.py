@@ -1231,7 +1231,7 @@ class Operation:
             lst_stock_item.append(item_data)
         
         
-        if lst_item[0].Method in ['check', 'add']:
+        if lst_item[0].Method in ['check']:
             
             dict_summary = await self.summary_stock(obj_stock_summary_filter=SummaryStockFilter(Location=lst_item[0].Location), current_user=current_user, send_mail=True)
             
