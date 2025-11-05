@@ -784,7 +784,7 @@
 						Swal.fire('Đã xóa!', '', 'success');
 					
 					},
-
+          
 					error: function (xhr) {
 						const msg = xhr.responseJSON?.detail || xhr.statusText || 'Error';
 						Swal.fire('Xóa thất bại', msg, 'error');
@@ -793,20 +793,20 @@
 					complete: function () {
 						$btn.prop('disabled', true).addClass('disabled').find('.count-items').text('');
 					}
+
 				});
 			
 			});
+
 		});
-
     
-
   });
 
 
   // Tab SUMMARY -----------------------------------------------------------------------------------------------------------------------------------------------------
   $(function () {
     
-    const $sel_summary_location = $('#stock-summary-select'); 
+    const $sel_summary_location = $('#stock-summary-select');
     const $btn_summary_submit = $('#btn-summary-submit');
     const $stock_summary_container = $('#stock-summary-table-container');
     const $dt_stock_summary = $('#dt-stock-summary');

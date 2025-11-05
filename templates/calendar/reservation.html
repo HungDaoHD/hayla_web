@@ -558,7 +558,6 @@
           
           if (result.isDenied) 
           {
-            
             disable_input_elements($(this), false);
             return;
           }
@@ -637,11 +636,11 @@
                   return [xhr.statusText || 'Unknown error'].join(', ');
                 }
               
-                Swal.fire('Phát sinh lỗi. Dữ liệu chưa được lưu.', getErrorMessagesFromXhr(xhr), 'error');
+                Swal.fire(getErrorMessagesFromXhr(xhr), 'Phát sinh lỗi. Dữ liệu chưa được lưu.', 'error').then((result) => {
+                  window.location.reload();
+                });
+                
               }
-              // complete: function refresh() {
-              //   window.location.reload();
-              // }
             });
 
           }

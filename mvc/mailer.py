@@ -115,9 +115,9 @@ class Mailer:
                 }
             )
             
-            print("[RESEND ERROR]", r.status_code, r.text)
+            print("[RESEND STT]", r.status_code, r.text)
             r.raise_for_status()
-
+            
 
 
 
