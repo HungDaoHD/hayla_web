@@ -15,7 +15,7 @@ class Database:
             
             if not MONGO_URI:
                 raise RuntimeError('MONGO_URI must be set')
-
+            
             self.client = AsyncIOMotorClient(MONGO_URI)
             self.hayladb = self.client['hayladb']
             self.clt_user = self.hayladb['user']
@@ -25,6 +25,8 @@ class Database:
             print('hayladb connected successfully!!!')
 
         except Exception as err:
+            
+            
             raise err
 
 

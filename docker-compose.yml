@@ -1,0 +1,8 @@
+services:
+  api:
+    build: .
+    container_name: hayla-web
+    ports: ["8080:8080"]
+    env_file: .env         # loads envs into the container
+    # environment:          # optional per-var overrides
+    #   DEBUG: "false"
