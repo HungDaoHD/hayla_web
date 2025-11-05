@@ -1,6 +1,6 @@
 FROM python:3.11-slim
 WORKDIR /
-ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PORT=8080
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PORT=8080 MONGO_URI=mongodb://localhost:27017
 RUN pip install --no-cache-dir --upgrade pip
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
