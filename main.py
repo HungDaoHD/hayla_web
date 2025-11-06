@@ -5,6 +5,8 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.exception_handlers import http_exception_handler as fastapi_http_exception_handler
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from urllib.parse import quote
+from starlette.middleware import ProxyHeadersMiddleware
+
 
 from routers.auth import authentication
 from routers.auth.oauth2 import UserPublic, get_current_user_cookie, validate_current_user_cookie, require_role
@@ -16,6 +18,9 @@ from routers.calendar import reservation
 
 
 app = FastAPI()
+app.add_middleware(ProxyHeadersMiddleware, trusted_hosts="*")
+
+
 app.include_router(authentication.router)
 app.include_router(users.router)
 app.include_router(operation.router)
