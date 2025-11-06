@@ -6,4 +6,4 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt gunicorn
 COPY . .
 EXPOSE 8080
-CMD exec gunicorn main:app -k uvicorn.workers.UvicornWorker -w 2 -b 0.0.0.0:${PORT} --timeout 0
+CMD exec gunicorn main:app -k uvicorn.workers.UvicornWorker -w 2 -b 0.0.0.0:${PORT} --timeout 0 --proxy-headers --forwarded-allow-ips="*"
