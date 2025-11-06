@@ -45,7 +45,7 @@ class Mailer:
 
     
     
-    async def send_email_sync(self, subject: str, html_body: str, to_addr: str):
+    async def send_email_smtp(self, subject: str, html_body: str, to_addr: str):
         msg = EmailMessage()
         msg["Subject"] = subject
         msg["From"] = self.MAIL_FROM
@@ -65,38 +65,38 @@ class Mailer:
     
     
     
-    @staticmethod
-    def normalize_recipients(to_field) -> list[str]:
-        """
-        Accepts a single string, a comma/semicolon separated string, or a list of strings.
-        Returns a clean list of valid addresses or raises ValueError.
-        """
-        if not to_field:
-            raise ValueError("Missing recipient(s)")
-        # Turn into a list first
-        if isinstance(to_field, str):
-            # Allow commas or semicolons
-            parts = [p.strip() for p in to_field.replace(";", ",").split(",")]
-        elif isinstance(to_field, (list, tuple, set)):
-            parts = [str(p).strip() for p in to_field]
-        else:
-            raise ValueError("Unsupported recipient type")
+    # @staticmethod
+    # def normalize_recipients(to_field) -> list[str]:
+    #     """
+    #     Accepts a single string, a comma/semicolon separated string, or a list of strings.
+    #     Returns a clean list of valid addresses or raises ValueError.
+    #     """
+    #     if not to_field:
+    #         raise ValueError("Missing recipient(s)")
+    #     # Turn into a list first
+    #     if isinstance(to_field, str):
+    #         # Allow commas or semicolons
+    #         parts = [p.strip() for p in to_field.replace(";", ",").split(",")]
+    #     elif isinstance(to_field, (list, tuple, set)):
+    #         parts = [str(p).strip() for p in to_field]
+    #     else:
+    #         raise ValueError("Unsupported recipient type")
 
-        # Remove empties and dedupe
-        parts = list({p for p in parts if p})
+    #     # Remove empties and dedupe
+    #     parts = list({p for p in parts if p})
 
-        # Validate with parseaddr (simple, robust)
-        cleaned = []
-        for p in parts:
-            name, addr = parseaddr(p)  # supports "Name <email@x.com>" or "email@x.com"
-            if not addr or "@" not in addr or addr.startswith(".") or addr.endswith("."):
-                raise ValueError(f"Invalid email address: {p}")
-            # basic extra guard for consecutive dots or dot right before @
-            local, _, domain = addr.partition("@")
-            if not local or not domain or ".." in addr or local.endswith("."):
-                raise ValueError(f"Invalid email address: {p}")
-            cleaned.append(p)  # keep original "Name <...>" if provided
-        return cleaned
+    #     # Validate with parseaddr (simple, robust)
+    #     cleaned = []
+    #     for p in parts:
+    #         name, addr = parseaddr(p)  # supports "Name <email@x.com>" or "email@x.com"
+    #         if not addr or "@" not in addr or addr.startswith(".") or addr.endswith("."):
+    #             raise ValueError(f"Invalid email address: {p}")
+    #         # basic extra guard for consecutive dots or dot right before @
+    #         local, _, domain = addr.partition("@")
+    #         if not local or not domain or ".." in addr or local.endswith("."):
+    #             raise ValueError(f"Invalid email address: {p}")
+    #         cleaned.append(p)  # keep original "Name <...>" if provided
+    #     return cleaned
 
     
     

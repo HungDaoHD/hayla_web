@@ -18,11 +18,6 @@ from routers.calendar import reservation
 
 
 
-
-
-
-
-
 app = FastAPI()
 app.add_middleware(ProxyHeadersMiddleware, trusted_hosts="*")
 

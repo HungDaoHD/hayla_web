@@ -1235,7 +1235,7 @@ class Operation:
             
             dict_summary = await self.summary_stock(obj_stock_summary_filter=SummaryStockFilter(Location=lst_item[0].Location), current_user=current_user, send_mail=True)
             
-            # await mailer.send_email_sync(to_addr='hungdao1991@live.com, hayla.cafe2003@gmail.com', subject=f"Kiểm kho {' - '.join(dict_summary['lst_date'])}", html_body=dict_summary['dt_summary_stock'])
+            # await mailer.send_email_smtp(to_addr='hungdao1991@live.com', subject=f"Kiểm kho {' - '.join(dict_summary['lst_date'])}", html_body=dict_summary['dt_summary_stock'])
             
             await mailer.send_email_resend(to_addr='hung.daotuan.1991@gmail.com', subject=f"Kiểm kho {' - '.join(dict_summary['lst_date'])}", html_body=dict_summary['dt_summary_stock'])
             
@@ -1349,7 +1349,8 @@ class Operation:
             'dt_summary_stock': tbl_html
         }
         
-        # await mailer.send_email_sync(to_addr='hungdao1991@live.com', subject=f"Kiểm kho {' - '.join(dict_summary['lst_date'])}", html_body=dict_summary['dt_summary_stock'])
+        
+        await mailer.send_email_smtp(to_addr='hungdao1991@live.com', subject=f"Kiểm kho {' - '.join(dict_summary['lst_date'])}", html_body=dict_summary['dt_summary_stock'])
         
         
         return dict_summary
