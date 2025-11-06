@@ -15,35 +15,35 @@
 
     <!-- [Favicon] icon -->
     <!-- <link rel="icon" href="{{ request.url_for('static', path='images/favicon.svg') }}" type="image/x-icon">  -->
-    <link rel="icon" href="static/images/hayla_favicon.png" type="image/x-icon">
+    <link rel="icon" href="{{ request.url_for('static', path='images/hayla_favicon.png') }}" type="image/x-icon">
 
     <!-- [Google Font] Family -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" id="main-font-link">
     
     <!-- [Tabler Icons] https://tablericons.com -->
-    <link rel="stylesheet" href="static/fonts/tabler-icons.min.css" >
+    <link rel="stylesheet" href="{{ request.url_for('static', path='fonts/tabler-icons.min.css') }}" >
     
     <!-- [Feather Icons] https://feathericons.com -->
-    <link rel="stylesheet" href="static/fonts/feather.css" >
+    <link rel="stylesheet" href="{{ request.url_for('static', path='/fonts/feather.css') }}" >
     
     <!-- [Font Awesome Icons] https://fontawesome.com/icons -->
-    <link rel="stylesheet" href="static/fonts/fontawesome.css" >
+    <link rel="stylesheet" href="{{ request.url_for('static', path='/fonts/fontawesome.css') }}" >
     
     <!-- [Material Icons] https://fonts.google.com/icons -->
-    <link rel="stylesheet" href="static/fonts/material.css" >
+    <link rel="stylesheet" href="{{ request.url_for('static', path='/fonts/material.css') }}" >
     
     <!-- [Template CSS Files] -->
-    <link rel="stylesheet" href="static/css/style.css" id="main-style-link" >
-    <link rel="stylesheet" href="static/css/style-preset.css" >
+    <link rel="stylesheet" href="{{ request.url_for('static', path='/css/style.css') }}" id="main-style-link" >
+    <link rel="stylesheet" href="{{ request.url_for('static', path='/css/style-preset.css') }}" >
     
     <!-- [Page specific CSS] start -->
-    <link rel="stylesheet" href="static/css/plugins/uppy.min.css">
+    <link rel="stylesheet" href="{{ request.url_for('static', path='/css/plugins/uppy.min.css') }}">
     
     <!-- [Page specific CSS] start -->
-    <link rel="stylesheet" href="static/css/plugins/flatpickr.min.css">
+    <link rel="stylesheet" href="{{ request.url_for('static', path='/css/plugins/flatpickr.min.css') }}">
     
     <!-- my css-->
-    <link rel="stylesheet" href="static/css/custom_style.css" >
+    <link rel="stylesheet" href="{{ request.url_for('static', path='/css/custom_style.css') }}" >
 
   </head>
   <!-- [Head] end -->
@@ -69,7 +69,7 @@
           <a href="/" class="b-brand text-primary">
             <!-- ========   Change your logo from here   ============ -->
             <!-- <img src="{{ request.url_for('static', path='images/logo-dark.svg') }}" class="img-fluid logo" alt="logo"> -->
-            <img src="static/images/hayla_icon.png" class="img-fluid logo" alt="logo">
+            <img src="{{ request.url_for('static', path='images/hayla_icon.png') }}" class="img-fluid logo" alt="logo">
           </a>
         </div>
 
@@ -483,7 +483,7 @@
                   <div class="dropdown-header">
                     <div class="d-flex mb-1">
                       <div class="flex-shrink-0">
-                        <img src="static/images/user/avatar-0.jpg" alt="user-image" class="user-avtar wid-35">
+                        <img src="{{ request.url_for('static', path='images/user/avatar-0.jpg') }}" alt="user-image" class="user-avtar wid-35">
                       </div>
                       <div class="flex-grow-1 ms-3">
                         <h6 class="mb-1">{{ user.firstname + ' ' + user.lastname  if user else 'Guest' }}</h6>
@@ -662,12 +662,12 @@
 
 
     <!-- Required Js -->
-    <script src="static/js/plugins/popper.min.js"></script>
-    <script src="static/js/plugins/simplebar.min.js"></script>
-    <script src="static/js/plugins/bootstrap.min.js"></script>
-    <script src="static/js/fonts/custom-font.js"></script>
-    <script src="static/js/pcoded.js"></script>
-    <script src="static/js/plugins/feather.min.js"></script>
+    <script src="{{ request.url_for('static', path='js/plugins/popper.min.js') }}"></script>
+    <script src="{{ request.url_for('static', path='js/plugins/simplebar.min.js') }}"></script>
+    <script src="{{ request.url_for('static', path='js/plugins/bootstrap.min.js') }}"></script>
+    <script src="{{ request.url_for('static', path='js/fonts/custom-font.js') }}"></script>
+    <script src="{{ request.url_for('static', path='js/pcoded.js') }}"></script>
+    <script src="{{ request.url_for('static', path='js/plugins/feather.min.js') }}"></script>
 
 
     <script>layout_change('light');</script>
