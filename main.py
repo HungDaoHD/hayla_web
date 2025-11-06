@@ -7,6 +7,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from urllib.parse import quote
 
 
+
 from routers.auth import authentication
 from routers.auth.oauth2 import UserPublic, get_current_user_cookie, validate_current_user_cookie, require_role
 from routers.administration import users
@@ -16,7 +17,14 @@ from routers.calendar import reservation
 
 
 
+
+
+
+
+
+
 app = FastAPI()
+
 app.include_router(authentication.router)
 app.include_router(users.router)
 app.include_router(operation.router)
