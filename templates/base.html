@@ -77,14 +77,14 @@
 
           <ul class="pc-navbar">
 
-              {% if user.role in ['Admin', 'Staff'] %}
-                <li class="pc-item">
-                  <a href="/operation/stock" class="pc-link">
-                    <span class="pc-micon"><i class="ti ti-building-warehouse"></i></span>
-                    <span class="pc-mtext">Stock</span>
-                  </a>
-                </li>
-              {% endif %}
+            {% if user.role in ['Admin', 'Staff'] %}
+              <li class="pc-item">
+                <a href="/operation/stock" class="pc-link">
+                  <span class="pc-micon"><i class="ti ti-building-warehouse"></i></span>
+                  <span class="pc-mtext">Stock</span>
+                </a>
+              </li>
+            {% endif %}
 
             {% if user.role in ['Admin'] %}
               <!-- [ Sidebar Menu - Dashboard ] start -->
