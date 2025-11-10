@@ -18,18 +18,7 @@ class PasswordHashing:
 
 
 
-# lst_pass = [
-#     'tiger.eagle.dolphin2025',
-#     'panda.wolf.koala2025',
-#     'lion.horse.penguin2025',
-#     'fox.rabbit.shark2025',
-#     'cat.bear.turtle2025',
-#     'falcon.leopard.seal2025',
-#     'monkey.whale.deer2025',
-#     'Giraffe.Wolf.Dolphin2025',
-
-# ]
-
+# lst_pass = []
 
 # for p in lst_pass:
 #     print(p, PasswordHashing().get_password_hash(p))
