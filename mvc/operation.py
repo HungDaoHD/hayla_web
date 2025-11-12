@@ -1240,7 +1240,35 @@ class Operation:
             # await mailer.send_email_resend(to_addr='hung.daotuan.1991@gmail.com', subject=f"Kiểm kho {' - '.join(dict_summary['lst_date'])}", html_body=dict_summary['dt_summary_stock'])
             
         
+        else:
+            
+            df_data = pd.DataFrame([i.model_dump() for i in lst_stock_item])
+            
+            str_subject = f"{'Nhập hàng' if lst_item[0].Method == 'add' else 'Lấy hàng'} - {current_user.email} - {datetime.now().strftime("%d/%m/%y")}"
+            
+            
+            df_data = df_data.drop(columns=['id', 'email', 'Qty_Outstock'])
+            
+            tbl_html = df_data.to_html(
+                table_id='dt-stock-summary',
+                columns=df_data.columns.tolist(),
+                index=False,
+                index_names=False, 
+                float_format="{:,.1f}".format,
+                justify='left',
+                classes='table table-hover table-bordered table-sm align-middle',  # mobile-cards 
+            )
+            
+            await mailer.send_email_smtp(to_addr='hungdao1991@live.com', subject=str_subject, html_body=tbl_html)
+            
+            
+        
+        
         return lst_stock_item
+    
+    
+    
+    
     
     
     
